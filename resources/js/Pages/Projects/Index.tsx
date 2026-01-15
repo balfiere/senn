@@ -34,6 +34,7 @@ import {
 } from '@/Components/ui/dropdown-menu';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
+import { ResponsiveToaster } from '@/Components/ResponsiveToaster';
 
 interface Project {
   id: string;
@@ -256,6 +257,7 @@ export default function Index({ projects }: Props) {
           <ProjectsList projects={projects} />
         </main>
       </div>
+      <ResponsiveToaster />
     </>
   );
 }

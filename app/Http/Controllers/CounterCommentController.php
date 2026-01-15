@@ -20,7 +20,7 @@ class CounterCommentController extends Controller
 
         $counter->comments()->create($validated);
 
-        return back();
+        return back()->with('success', 'Note added successfully');
     }
 
     public function destroy(CounterComment $comment)
@@ -29,6 +29,6 @@ class CounterCommentController extends Controller
 
         $comment->delete();
 
-        return back();
+        return back()->with('success', 'Note deleted successfully');
     }
 }

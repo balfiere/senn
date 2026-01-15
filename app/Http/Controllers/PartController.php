@@ -20,9 +20,9 @@ class PartController extends Controller
             'name' => ['required', 'string', 'max:255'],
         ]);
 
-        $createPartAction->execute($project, $validated['name']);
+        $part = $createPartAction->execute($project, $validated['name']);
 
-        return back();
+        return back()->with('success', "Part \"{$part->name}\" created successfully");
     }
 
     public function update(Request $request, Part $part, UpdatePartAction $updatePartAction)
@@ -36,7 +36,7 @@ class PartController extends Controller
 
         $updatePartAction->execute($part, $validated);
 
-        return back();
+        return back()->with('success', "Part \"{$part->name}\" updated successfully");
     }
 
     public function destroy(Part $part, DeletePartAction $deletePartAction)
@@ -47,8 +47,9 @@ class PartController extends Controller
             return back()->with('error', 'Each project must have at least one part.');
         }
 
+        $name = $part->name;
         $deletePartAction->execute($part);
 
-        return back();
+        return back()->with('success', "Part \"{$name}\" deleted successfully");
     }
 }

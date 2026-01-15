@@ -5,6 +5,7 @@ import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { PageProps } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useState } from 'react';
+import { ResponsiveToaster } from '@/Components/ResponsiveToaster';
 
 export default function Authenticated({
     header,
@@ -175,6 +176,7 @@ export default function Authenticated({
             )}
 
             <main>{children}</main>
+            <ResponsiveToaster />
         </div>
     );
 }

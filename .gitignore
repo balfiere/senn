@@ -14,6 +14,7 @@
 .env.backup
 .env.production
 .env.local
+.env.sqlite
 .env.cloud
 .phpactor.json
 .phpunit.result.cache

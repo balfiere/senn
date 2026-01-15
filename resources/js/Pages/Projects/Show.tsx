@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Project, Part } from '@/types';
 import { ProjectSidebar } from '@/Components/ProjectSidebar';
 import { CounterCard } from '@/Components/CounterCard';
+import { ResponsiveToaster } from '@/Components/ResponsiveToaster';
 
 interface Props {
   project: Project;
@@ -140,7 +141,7 @@ export default function Show({ project, parts = [] }: Props) {
         >
           {/* Main scrollable content */}
           <div className="absolute inset-0 overflow-y-auto p-4 md:p-8">
-            <div className="max-w-4xl mx-auto space-y-8">
+            <div className="max-w-screen-2xl mx-auto space-y-8">
               {currentPart ? (
                 <>
                   <div className="flex items-center justify-between">
@@ -149,7 +150,7 @@ export default function Show({ project, parts = [] }: Props) {
                   </div>
 
                   {currentPart.counters && currentPart.counters.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                       {currentPart.counters.map(counter => (
                         <CounterCard key={counter.id} counter={counter} />
                       ))}
@@ -171,6 +172,7 @@ export default function Show({ project, parts = [] }: Props) {
           </div>
         </main>
       </div>
+      <ResponsiveToaster />
     </>
   );
 }
