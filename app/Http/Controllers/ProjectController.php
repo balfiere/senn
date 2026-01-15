@@ -50,10 +50,15 @@ class ProjectController extends Controller
     {
         Gate::authorize('view', $project);
 
-        $project->load(['parts.counters.comments']);
+        $project->load([
+            'parts' => fn($query) => $query->orderBy('position'),
+            'parts.counters' => fn($query) => $query->orderBy('position'),
+            'parts.counters.comments',
+        ]);
 
         return Inertia::render('Projects/Show', [
             'project' => $project,
+            'parts' => $project->parts,
         ]);
     }
 
