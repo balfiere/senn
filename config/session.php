@@ -118,6 +118,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Session Connection Options
+    |--------------------------------------------------------------------------
+    |
+    | These options will be passed to the database connection when using
+    | the database session driver. Useful for handling connection pooling
+    | issues with services like Supabase.
+    |
+    */
+
+    'connection_options' => [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_EMULATE_PREPARES => false,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Session Cookie Name
     |--------------------------------------------------------------------------
     |
