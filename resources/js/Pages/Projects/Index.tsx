@@ -7,9 +7,10 @@ import {
   Plus,
   Trash2,
 } from 'lucide-react';
-import { FormEventHandler, useState } from 'react';
+import { FormEventHandler, useState, useEffect } from 'react';
 
 import { Button } from '@/Components/ui/button';
+import { cn } from '@/lib/utils';
 import {
   Card,
   CardContent,
@@ -141,6 +142,97 @@ function LogoutButton() {
   );
 }
 
+function ProjectCard({ project, handleDelete, deletingId }: { project: Project, handleDelete: (id: string) => void, deletingId: string | null }) {
+  const [displaySeconds, setDisplaySeconds] = useState(project.stopwatch_seconds);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+
+    const updateDisplay = () => {
+      if (project.stopwatch_running && project.stopwatch_started_at) {
+        const start = new Date(project.stopwatch_started_at).getTime();
+        const now = Date.now();
+        const elapsed = Math.max(0, Math.floor((now - start) / 1000));
+        setDisplaySeconds(project.stopwatch_seconds + elapsed);
+      } else {
+        setDisplaySeconds(project.stopwatch_seconds);
+      }
+    };
+
+    updateDisplay();
+
+    if (project.stopwatch_running) {
+      interval = setInterval(updateDisplay, 1000);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [project.stopwatch_running, project.stopwatch_seconds, project.stopwatch_started_at]);
+
+  return (
+    <Card
+      className="border-border hover:border-primary/50 group relative flex flex-col overflow-hidden transition-colors"
+    >
+      <Link
+        href={route('projects.show', project.id)}
+        className="absolute inset-0 z-10"
+      >
+        <span className="sr-only">Open {project.name}</span>
+      </Link>
+      <CardHeader className="pb-2">
+        <div className="flex items-start justify-between">
+          <CardTitle className="text-foreground line-clamp-1 text-base font-medium">
+            {project.name}
+          </CardTitle>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative z-20 h-8 w-8 opacity-0 group-hover:opacity-100"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleDelete(project.id);
+                }}
+                disabled={deletingId === project.id}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                {deletingId === project.id ? 'Deleting...' : 'Delete'}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        <CardDescription className="text-muted-foreground text-xs">
+          Updated {new Date(project.updated_at).toLocaleDateString()}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="text-muted-foreground flex items-center gap-4 text-sm">
+          <div className={cn("flex items-center gap-1", project.stopwatch_running && "text-primary animate-pulse")}>
+            <Clock className="h-3.5 w-3.5" />
+            <span>{formatTime(displaySeconds)}</span>
+          </div>
+          {project.pdf_url && (
+            <div className="flex items-center gap-1">
+              <FileText className="h-3.5 w-3.5" />
+              <span>PDF</span>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function ProjectsList({ projects }: { projects: Project[] }) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -172,66 +264,12 @@ function ProjectsList({ projects }: { projects: Project[] }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {projects.map((project) => (
-        <Card
+        <ProjectCard
           key={project.id}
-          className="border-border hover:border-primary/50 group relative flex flex-col overflow-hidden transition-colors"
-        >
-          <Link
-            href={route('projects.show', project.id)}
-            className="absolute inset-0 z-10"
-          >
-            <span className="sr-only">Open {project.name}</span>
-          </Link>
-          <CardHeader className="pb-2">
-            <div className="flex items-start justify-between">
-              <CardTitle className="text-foreground line-clamp-1 text-base font-medium">
-                {project.name}
-              </CardTitle>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="relative z-20 h-8 w-8 opacity-0 group-hover:opacity-100"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    variant="destructive"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleDelete(project.id);
-                    }}
-                    disabled={deletingId === project.id}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    {deletingId === project.id ? 'Deleting...' : 'Delete'}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-            <CardDescription className="text-muted-foreground text-xs">
-              Updated {new Date(project.updated_at).toLocaleDateString()}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-muted-foreground flex items-center gap-4 text-sm">
-              <div className="flex items-center gap-1">
-                <Clock className="h-3.5 w-3.5" />
-                <span>{formatTime(project.stopwatch_seconds)}</span>
-              </div>
-              {project.pdf_url && (
-                <div className="flex items-center gap-1">
-                  <FileText className="h-3.5 w-3.5" />
-                  <span>PDF</span>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+          project={project}
+          handleDelete={handleDelete}
+          deletingId={deletingId}
+        />
       ))}
     </div>
   );

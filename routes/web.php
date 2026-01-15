@@ -44,6 +44,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Counter Comments
     Route::post('/counters/{counter}/comments', [CounterCommentController::class, 'store'])->name('counter_comments.store');
     Route::delete('/comments/{comment}', [CounterCommentController::class, 'destroy'])->name('counter_comments.destroy');
+
+    // Stopwatch
+    Route::patch('/projects/{project}/stopwatch/start', [\App\Http\Controllers\ProjectStopwatchController::class, 'start'])->name('projects.stopwatch.start');
+    Route::patch('/projects/{project}/stopwatch/stop', [\App\Http\Controllers\ProjectStopwatchController::class, 'stop'])->name('projects.stopwatch.stop');
+    Route::patch('/projects/{project}/stopwatch/reset', [\App\Http\Controllers\ProjectStopwatchController::class, 'reset'])->name('projects.stopwatch.reset');
 });
 
 Route::middleware('auth')->group(function () {

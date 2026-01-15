@@ -13,8 +13,7 @@ interface Props {
 export default function Show({ project, parts = [] }: Props) {
   const [currentPartId, setCurrentPartId] = useState<string>(parts[0]?.id || "");
   const [view, setView] = useState<"counters" | "pdf" | "split">("counters");
-  const [stopwatchSeconds, setStopwatchSeconds] = useState(project.stopwatch_seconds);
-  const [isRunning, setIsRunning] = useState(project.stopwatch_running);
+  const [displaySeconds, setDisplaySeconds] = useState(project.stopwatch_seconds);
   const [isMobile, setIsMobile] = useState(false);
 
   const prevPartsLength = useRef(parts.length);
@@ -34,15 +33,28 @@ export default function Show({ project, parts = [] }: Props) {
   // Stopwatch effect
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
-    if (isRunning) {
-      interval = setInterval(() => {
-        setStopwatchSeconds((prev) => prev + 1);
-      }, 1000);
+
+    const updateDisplay = () => {
+      if (project.stopwatch_running && project.stopwatch_started_at) {
+        const start = new Date(project.stopwatch_started_at).getTime();
+        const now = Date.now();
+        const elapsed = Math.max(0, Math.floor((now - start) / 1000));
+        setDisplaySeconds(project.stopwatch_seconds + elapsed);
+      } else {
+        setDisplaySeconds(project.stopwatch_seconds);
+      }
+    };
+
+    updateDisplay(); // initial
+
+    if (project.stopwatch_running) {
+      interval = setInterval(updateDisplay, 1000);
     }
+
     return () => {
       if (interval) clearInterval(interval);
     }
-  }, [isRunning]);
+  }, [project.stopwatch_running, project.stopwatch_seconds, project.stopwatch_started_at]);
   // Auto-select logic
   useEffect(() => {
     // If no part is selected but we have parts, select the first one
@@ -99,12 +111,21 @@ export default function Show({ project, parts = [] }: Props) {
   };
 
   const handleToggleStopwatch = () => {
-    setIsRunning(!isRunning);
+    if (project.stopwatch_running) {
+      router.patch(route('projects.stopwatch.stop', project.id), {}, {
+        preserveScroll: true,
+      });
+    } else {
+      router.patch(route('projects.stopwatch.start', project.id), {}, {
+        preserveScroll: true,
+      });
+    }
   };
 
   const handleResetStopwatch = () => {
-    setStopwatchSeconds(0);
-    setIsRunning(false);
+    router.patch(route('projects.stopwatch.reset', project.id), {}, {
+      preserveScroll: true,
+    });
   };
 
   const handlePdfUpload = (url: string | null) => {
@@ -129,8 +150,8 @@ export default function Show({ project, parts = [] }: Props) {
           onCreateCounter={handleCreateCounter}
           view={effectiveView}
           onViewChange={setView}
-          stopwatchSeconds={stopwatchSeconds}
-          isStopwatchRunning={isRunning}
+          stopwatchSeconds={displaySeconds}
+          isStopwatchRunning={project.stopwatch_running}
           onToggleStopwatch={handleToggleStopwatch}
           onResetStopwatch={handleResetStopwatch}
           onPdfUpload={handlePdfUpload}
