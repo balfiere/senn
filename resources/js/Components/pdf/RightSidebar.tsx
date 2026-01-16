@@ -253,10 +253,7 @@ export function RightSidebar({
                                   [
                                     'line',
                                     'lineArrow',
-                                    'polyline',
-                                    'polygon',
                                     'square',
-                                    'circle',
                                   ].includes(root.annotation_type)
                                     ? root.stroke_color || root.color
                                     : root.color

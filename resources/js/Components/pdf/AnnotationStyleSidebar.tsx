@@ -100,7 +100,8 @@ function TextMarkupPanel({
   if (!annotationApi) return null;
 
   const annotation = selectedAnnotation?.object;
-  const defaults = activeTool?.defaults;
+  const toolType = typeof activeTool === 'string' ? activeTool : activeTool?.id;
+  const defaults = typeof activeTool === 'string' ? null : activeTool?.defaults;
   const editing = !!annotation;
 
   const baseColor = editing ? annotation.object.color : (defaults?.color ?? ANNOTATION_COLORS.find((color) => color.name === 'Yellow')?.value ?? '#000000');
@@ -134,8 +135,8 @@ function TextMarkupPanel({
     if (!annotationApi) return;
     if (editing) {
       annotationApi.updateAnnotation(annotation.object.pageIndex, annotation.object.id, patch);
-    } else if (activeTool) {
-      annotationApi.setToolDefaults(activeTool.id, patch);
+    } else if (toolType) {
+      annotationApi.setToolDefaults(toolType, patch);
     }
   }
 
@@ -195,10 +196,11 @@ function ShapePanel({
   if (!annotationApi) return null;
 
   const annotation = selectedAnnotation?.object;
-  const defaults = activeTool?.defaults;
+  const toolType = typeof activeTool === 'string' ? activeTool : activeTool?.id;
+  const defaults = typeof activeTool === 'string' ? null : activeTool?.defaults;
   const editing = !!annotation;
 
-  const baseFill = editing ? annotation.object.color : (defaults?.color ?? '#000000');
+  const baseFill = editing ? annotation.object.color : (defaults?.color ?? '#0000');
   const baseStroke = editing ? annotation.object.strokeColor : (defaults?.strokeColor ?? '#000000');
   const baseOpacity = editing ? annotation.object.opacity : (defaults?.opacity ?? 1);
   const baseStrokeWidth = editing ? annotation.object.strokeWidth : (defaults?.strokeWidth ?? 2);
@@ -237,8 +239,8 @@ function ShapePanel({
     if (!annotationApi) return;
     if (editing) {
       annotationApi.updateAnnotation(annotation.object.pageIndex, annotation.object.id, patch);
-    } else if (activeTool) {
-      annotationApi.setToolDefaults(activeTool.id, patch);
+    } else if (toolType) {
+      annotationApi.setToolDefaults(toolType, patch);
     }
   }
 
@@ -312,7 +314,8 @@ function FreeTextPanel({
   if (!annotationApi) return null;
 
   const annotation = selectedAnnotation?.object;
-  const defaults = activeTool?.defaults;
+  const toolType = typeof activeTool === 'string' ? activeTool : activeTool?.id;
+  const defaults = typeof activeTool === 'string' ? null : activeTool?.defaults;
   const editing = !!annotation;
 
   const baseFontColor = editing ? String(annotation.object.fontColor || '#00000') : String(defaults?.fontColor || '#000000');
@@ -354,8 +357,8 @@ function FreeTextPanel({
     if (!annotationApi) return;
     if (editing) {
       annotationApi.updateAnnotation(annotation.object.pageIndex, annotation.object.id, patch);
-    } else if (activeTool) {
-      annotationApi.setToolDefaults(activeTool.id, patch);
+    } else if (toolType) {
+      annotationApi.setToolDefaults(toolType, patch);
     }
   }
 
@@ -425,7 +428,8 @@ function LinePanel({
   if (!annotationApi) return null;
 
   const annotation = selectedAnnotation?.object;
-  const defaults = activeTool?.defaults;
+  const toolType = typeof activeTool === 'string' ? activeTool : activeTool?.id;
+  const defaults = typeof activeTool === 'string' ? null : activeTool?.defaults;
   const editing = !!annotation;
 
   const baseColor = editing ? annotation.object.strokeColor : (defaults?.strokeColor ?? '#000000');
@@ -459,8 +463,8 @@ function LinePanel({
     if (!annotationApi) return;
     if (editing) {
       annotationApi.updateAnnotation(annotation.object.pageIndex, annotation.object.id, patch);
-    } else if (activeTool) {
-      annotationApi.setToolDefaults(activeTool.id, patch);
+    } else if (toolType) {
+      annotationApi.setToolDefaults(toolType, patch);
     }
   }
 
@@ -506,98 +510,94 @@ function LinePanel({
 // Main annotation style sidebar component
 interface AnnotationStyleSidebarProps {
   documentId: string;
+  activeTool?: AnnotationToolType;
 }
 
-export function AnnotationStyleSidebar({ documentId }: AnnotationStyleSidebarProps) {
+export function AnnotationStyleSidebar({ documentId, activeTool }: AnnotationStyleSidebarProps) {
   const { provides: annotationApi } = useAnnotationCapability();
   const { state: annotationState } = useAnnotation(documentId);
-  if (!annotationApi || !annotationState) return null;
+  if (!annotationApi || !annotationState) return null
 
-  // Get the selected annotation and active tool from the embedpdf state
+  // Get the selected annotation from the embedpdf state
   const selectedAnnotation = annotationState.selectedUid
     ? { object: getAnnotationByUid(annotationState, annotationState.selectedUid) }
-    : null;
+    : null
 
-  const activeTool = annotationApi.getActiveTool ? annotationApi.getActiveTool() : null;
+  // Use the passed activeTool prop for conditional logic, but still get the full tool object for functionality
+  const currentActiveTool = activeTool ? annotationApi.getActiveTool?.() : null;
 
   // Determine which panel to show based on annotation type or active tool
-  let panelType: string;
-  let title: string;
+  let panelType: string
+  let title: string
 
   if (selectedAnnotation && selectedAnnotation.object) {
     // If annotation is selected, use its type
     // TrackedAnnotation has: { commitState, object: { type, ... } }
-    const annotationType = (selectedAnnotation.object as any).object?.type;
+    const annotationType = (selectedAnnotation.object as any).object?.type
 
     switch (annotationType) {
       case PdfAnnotationSubtype.HIGHLIGHT:
       case PdfAnnotationSubtype.UNDERLINE:
       case PdfAnnotationSubtype.STRIKEOUT:
       case PdfAnnotationSubtype.SQUIGGLY:
-        panelType = 'textMarkup';
-        title = 'Styles';
-        break;
+        panelType = 'textMarkup'
+        title = 'Styles'
+        break
       case PdfAnnotationSubtype.SQUARE:
-      case PdfAnnotationSubtype.CIRCLE:
-        panelType = 'shape';
-        title = 'Styles';
-        break;
+        panelType = 'shape'
+        title = 'Styles'
+        break
       case PdfAnnotationSubtype.LINE:
-      case PdfAnnotationSubtype.POLYLINE:
-      case PdfAnnotationSubtype.POLYGON:
-        panelType = 'line';
-        title = 'Styles';
-        break;
+        panelType = 'line'
+        title = 'Styles'
+        break
       case PdfAnnotationSubtype.FREETEXT:
-        panelType = 'freeText';
-        title = 'Styles';
-        break;
+        panelType = 'freeText'
+        title = 'Styles'
+        break
       default:
         return (
           <div className="text-muted-foreground p-4 text-center text-sm">
             No styling options available for this annotation type.
           </div>
-        );
+        )
     }
-  } else if (activeTool) {
+  } else if (activeTool && currentActiveTool) {
     // If no annotation selected, use active tool type
-    switch (activeTool.id) {
+    switch (activeTool) {
       case 'highlight':
       case 'underline':
       case 'strikeout':
       case 'squiggly':
-        panelType = 'textMarkup';
-        title = 'Defaults';
-        break;
+        panelType = 'textMarkup'
+        title = 'Defaults'
+        break
       case 'square':
-      case 'circle':
-        panelType = 'shape';
-        title = 'Defaults';
-        break;
+        panelType = 'shape'
+        title = 'Defaults'
+        break
       case 'line':
       case 'lineArrow':
-      case 'polyline':
-      case 'polygon':
-        panelType = 'line';
-        title = 'Defaults';
-        break;
+        panelType = 'line'
+        title = 'Defaults'
+        break
       case 'freeText':
-        panelType = 'freeText';
-        title = 'Defaults';
-        break;
+        panelType = 'freeText'
+        title = 'Defaults'
+        break
       default:
         return (
           <div className="text-muted-foreground p-4 text-center text-sm">
             Select an annotation tool to configure defaults.
           </div>
-        );
+        )
     }
   } else {
     return (
       <div className="text-muted-foreground p-4 text-center text-sm">
         Select an annotation tool or annotation to configure styling.
       </div>
-    );
+    )
   }
 
   return (
