@@ -154,6 +154,7 @@ function PdfViewerContent({
                   documentId={docId}
                   activeTab={leftSidebarTab}
                   setActiveTab={setLeftSidebarTab}
+                  activeTool={activeTool}
                 />
               )}
 
@@ -196,7 +197,7 @@ function PdfViewerContent({
                                     if (storedAnn) {
                                       setSelectedAnnotation(storedAnn)
                                       if (annotationApi) {
-                                        annotationApi.selectAnnotation(storedAnn.page_number - 1, storedAnn.embedpdf_annotation_id)
+                                        (annotationApi as any).selectAnnotation(storedAnn.page_number - 1, storedAnn.embedpdf_annotation_id)
                                       }
                                     }
                                   }
@@ -450,27 +451,18 @@ export function PdfViewer({
             break;
 
           case 'delete':
-            // Use fetch for delete operations to avoid Inertia state issues
-            const response = await fetch(route('annotations.destroy', annotationId), {
-              method: 'DELETE',
-              headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json',
-              },
-              credentials: 'same-origin',
-            });
-
-            if (response.ok) {
+            // Use Axios for delete operations to ensure CSRF token is included
+            try {
+              await window.axios.delete(route('annotations.destroy', annotationId));
+              
               // Update local state on success
               setAnnotations((prev) =>
                 prev.filter(
                   (ann) => ann.embedpdf_annotation_id !== annotationId,
                 ),
               );
-            } else {
-              const errorData = await response.json();
-              console.error('Failed to delete annotation:', errorData);
+            } catch (error) {
+              console.error('Failed to delete annotation:', error);
             }
             break;
         }

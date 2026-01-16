@@ -69,7 +69,7 @@ export function LeftSidebar({ documentId, activeTab, setActiveTab, activeTool }:
           </ScrollArea>
         </TabsContent>
         <TabsContent value="styles" className="m-0 flex-1">
-          <AnnotationStyleSidebar documentId={documentId} activeTool={activeTool} />
+          <AnnotationStyleSidebar documentId={documentId} />
         </TabsContent>
       </Tabs>
     </div>
