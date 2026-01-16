@@ -95,30 +95,19 @@ function TextMarkupPanel({
   activeTool,
 }: {
   documentId: string;
-  selectedAnnotation: { object: unknown } | null;
-  activeTool: AnnotationToolType;
+  selectedAnnotation: any;
+  activeTool: any;
 }) {
   const { provides: annotationApi } = useAnnotationCapability();
   if (!annotationApi) return null;
 
-  const annotation = selectedAnnotation?.object as
-    | Record<string, unknown>
-    | undefined;
-  const annotationObject = annotation?.object as
-    | Record<string, unknown>
-    | undefined;
+  const annotation = selectedAnnotation?.object;
+  const defaults = activeTool?.defaults;
   const editing = !!annotation;
 
-  const baseColor = editing
-    ? (annotationObject?.color as string)
-    : ANNOTATION_COLORS.find((color) => color.name === 'Yellow')?.value ??
-      '#000000';
-  const baseOpacity = editing
-    ? ((annotationObject?.opacity as number) ?? 0.5)
-    : 0.5;
-  const baseBlendMode = editing
-    ? ((annotationObject?.blendMode as number) ?? PdfBlendMode.Normal)
-    : PdfBlendMode.Normal;
+  const baseColor = editing ? annotation.object.color : (defaults?.color ?? ANNOTATION_COLORS.find((color) => color.name === 'Yellow')?.value ?? '#000000');
+  const baseOpacity = editing ? (annotation.object.opacity ?? 0.5) : (defaults?.opacity ?? 0.5);
+  const baseBlendMode = editing ? (annotation.object.blendMode ?? PdfBlendMode.Normal) : (defaults?.blendMode ?? PdfBlendMode.Normal);
 
   const [color, setColor] = useState(baseColor);
   const [opacity, setOpacity] = useState(baseOpacity);
@@ -127,19 +116,6 @@ function TextMarkupPanel({
   useEffect(() => setColor(baseColor), [baseColor]);
   useEffect(() => setOpacity(baseOpacity), [baseOpacity]);
   useEffect(() => setBlendMode(baseBlendMode), [baseBlendMode]);
-
-  const applyPatch = (patch: Partial<Record<string, unknown>>) => {
-    if (!annotationApi) return;
-    if (editing && annotationObject) {
-      annotationApi.updateAnnotation(
-        annotationObject.pageIndex as number,
-        annotationObject.id as string,
-        patch,
-      );
-    } else {
-      annotationApi.setToolDefaults(activeTool, patch);
-    }
-  };
 
   const changeColor = (c: string) => {
     setColor(c);
@@ -155,6 +131,15 @@ function TextMarkupPanel({
     setBlendMode(bm);
     applyPatch({ blendMode: bm });
   };
+
+  function applyPatch(patch: Partial<any>) {
+    if (!annotationApi) return;
+    if (editing) {
+      annotationApi.updateAnnotation(annotation.object.pageIndex, annotation.object.id, patch);
+    } else if (activeTool) {
+      annotationApi.setToolDefaults(activeTool.id, patch);
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -207,32 +192,20 @@ function ShapePanel({
   activeTool,
 }: {
   documentId: string;
-  selectedAnnotation: { object: unknown } | null;
-  activeTool: AnnotationToolType;
+  selectedAnnotation: any;
+  activeTool: any;
 }) {
   const { provides: annotationApi } = useAnnotationCapability();
   if (!annotationApi) return null;
 
-  const annotation = selectedAnnotation?.object as
-    | Record<string, unknown>
-    | undefined;
-  const annotationObject = annotation?.object as
-    | Record<string, unknown>
-    | undefined;
+  const annotation = selectedAnnotation?.object;
+  const defaults = activeTool?.defaults;
   const editing = !!annotation;
 
-  const baseFill = editing
-    ? (annotationObject?.color as string)
-    : '#000000';
-  const baseStroke = editing
-    ? (annotationObject?.strokeColor as string)
-    : '#000000';
-  const baseOpacity = editing
-    ? (annotationObject?.opacity as number)
-    : 1;
-  const baseStrokeWidth = editing
-    ? (annotationObject?.strokeWidth as number)
-    : 2;
+  const baseFill = editing ? annotation.object.color : (defaults?.color ?? '#000000');
+  const baseStroke = editing ? annotation.object.strokeColor : (defaults?.strokeColor ?? '#000000');
+  const baseOpacity = editing ? annotation.object.opacity : (defaults?.opacity ?? 1);
+  const baseStrokeWidth = editing ? annotation.object.strokeWidth : (defaults?.strokeWidth ?? 2);
 
   const [fill, setFill] = useState(baseFill);
   const [stroke, setStroke] = useState(baseStroke);
@@ -243,19 +216,6 @@ function ShapePanel({
   useEffect(() => setStroke(baseStroke), [baseStroke]);
   useEffect(() => setOpacity(baseOpacity), [baseOpacity]);
   useEffect(() => setStrokeWidth(baseStrokeWidth), [baseStrokeWidth]);
-
-  const applyPatch = (patch: Partial<Record<string, unknown>>) => {
-    if (!annotationApi) return;
-    if (editing && annotationObject) {
-      annotationApi.updateAnnotation(
-        annotationObject.pageIndex as number,
-        annotationObject.id as string,
-        patch,
-      );
-    } else {
-      annotationApi.setToolDefaults(activeTool, patch);
-    }
-  };
 
   const changeFill = (c: string) => {
     setFill(c);
@@ -276,6 +236,15 @@ function ShapePanel({
     setStrokeWidth(w);
     applyPatch({ strokeWidth: w });
   };
+
+  function applyPatch(patch: Partial<any>) {
+    if (!annotationApi) return;
+    if (editing) {
+      annotationApi.updateAnnotation(annotation.object.pageIndex, annotation.object.id, patch);
+    } else if (activeTool) {
+      annotationApi.setToolDefaults(activeTool.id, patch);
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -342,29 +311,19 @@ function FreeTextPanel({
   activeTool,
 }: {
   documentId: string;
-  selectedAnnotation: { object: unknown } | null;
-  activeTool: AnnotationToolType;
+  selectedAnnotation: any;
+  activeTool: any;
 }) {
   const { provides: annotationApi } = useAnnotationCapability();
   if (!annotationApi) return null;
 
-  const annotation = selectedAnnotation?.object as
-    | Record<string, unknown>
-    | undefined;
-  const annotationObject = annotation?.object as
-    | Record<string, unknown>
-    | undefined;
+  const annotation = selectedAnnotation?.object;
+  const defaults = activeTool?.defaults;
   const editing = !!annotation;
 
-  const baseFontColor = editing
-    ? (annotationObject?.fontColor as string)
-    : '#000000';
-  const baseOpacity = editing
-    ? (annotationObject?.opacity as number)
-    : 1;
-  const baseFontSize = editing
-    ? (annotationObject?.fontSize as number)
-    : 14;
+  const baseFontColor = editing ? annotation.object.fontColor : (defaults?.fontColor ?? '#000000');
+  const baseOpacity = editing ? annotation.object.opacity : (defaults?.opacity ?? 1);
+  const baseFontSize = editing ? annotation.object.fontSize : (defaults?.fontSize ?? 14);
 
   const [fontColor, setFontColor] = useState(baseFontColor);
   const [opacity, setOpacity] = useState(baseOpacity);
@@ -373,19 +332,6 @@ function FreeTextPanel({
   useEffect(() => setFontColor(baseFontColor), [baseFontColor]);
   useEffect(() => setOpacity(baseOpacity), [baseOpacity]);
   useEffect(() => setFontSize(baseFontSize), [baseFontSize]);
-
-  const applyPatch = (patch: Partial<Record<string, unknown>>) => {
-    if (!annotationApi) return;
-    if (editing && annotationObject) {
-      annotationApi.updateAnnotation(
-        annotationObject.pageIndex as number,
-        annotationObject.id as string,
-        patch,
-      );
-    } else {
-      annotationApi.setToolDefaults(activeTool, patch);
-    }
-  };
 
   const changeFontColor = (c: string) => {
     setFontColor(c);
@@ -401,6 +347,15 @@ function FreeTextPanel({
     setFontSize(s);
     applyPatch({ fontSize: s });
   };
+
+  function applyPatch(patch: Partial<any>) {
+    if (!annotationApi) return;
+    if (editing) {
+      annotationApi.updateAnnotation(annotation.object.pageIndex, annotation.object.id, patch);
+    } else if (activeTool) {
+      annotationApi.setToolDefaults(activeTool.id, patch);
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -448,29 +403,19 @@ function LinePanel({
   activeTool,
 }: {
   documentId: string;
-  selectedAnnotation: { object: unknown } | null;
-  activeTool: AnnotationToolType;
+  selectedAnnotation: any;
+  activeTool: any;
 }) {
   const { provides: annotationApi } = useAnnotationCapability();
   if (!annotationApi) return null;
 
-  const annotation = selectedAnnotation?.object as
-    | Record<string, unknown>
-    | undefined;
-  const annotationObject = annotation?.object as
-    | Record<string, unknown>
-    | undefined;
+  const annotation = selectedAnnotation?.object;
+  const defaults = activeTool?.defaults;
   const editing = !!annotation;
 
-  const baseColor = editing
-    ? (annotationObject?.strokeColor as string)
-    : '#000000';
-  const baseOpacity = editing
-    ? (annotationObject?.opacity as number)
-    : 1;
-  const baseStrokeWidth = editing
-    ? (annotationObject?.strokeWidth as number)
-    : 2;
+  const baseColor = editing ? annotation.object.strokeColor : (defaults?.strokeColor ?? '#000000');
+  const baseOpacity = editing ? annotation.object.opacity : (defaults?.opacity ?? 1);
+  const baseStrokeWidth = editing ? annotation.object.strokeWidth : (defaults?.strokeWidth ?? 2);
 
   const [color, setColor] = useState(baseColor);
   const [opacity, setOpacity] = useState(baseOpacity);
@@ -480,20 +425,7 @@ function LinePanel({
   useEffect(() => setOpacity(baseOpacity), [baseOpacity]);
   useEffect(() => setStrokeWidth(baseStrokeWidth), [baseStrokeWidth]);
 
-  const applyPatch = (patch: Partial<Record<string, unknown>>) => {
-    if (!annotationApi) return;
-    if (editing && annotationObject) {
-      annotationApi.updateAnnotation(
-        annotationObject.pageIndex as number,
-        annotationObject.id as string,
-        patch,
-      );
-    } else {
-      annotationApi.setToolDefaults(activeTool, patch);
-    }
-  };
-
-  const changeColor = (c: string) => {
+ const changeColor = (c: string) => {
     setColor(c);
     applyPatch({ strokeColor: c });
   };
@@ -507,6 +439,15 @@ function LinePanel({
     setStrokeWidth(w);
     applyPatch({ strokeWidth: w });
   };
+
+  function applyPatch(patch: Partial<any>) {
+    if (!annotationApi) return;
+    if (editing) {
+      annotationApi.updateAnnotation(annotation.object.pageIndex, annotation.object.id, patch);
+    } else if (activeTool) {
+      annotationApi.setToolDefaults(activeTool.id, patch);
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -550,26 +491,19 @@ function LinePanel({
 // Main annotation style sidebar component
 interface AnnotationStyleSidebarProps {
   documentId: string;
-  activeTool: AnnotationToolType;
 }
 
-export function AnnotationStyleSidebar({
-  documentId,
-  activeTool,
-}: AnnotationStyleSidebarProps) {
+export function AnnotationStyleSidebar({ documentId }: AnnotationStyleSidebarProps) {
   const { provides: annotationApi } = useAnnotationCapability();
   const { state: annotationState } = useAnnotation(documentId);
   if (!annotationApi || !annotationState) return null;
 
-  // Get the selected annotation from the embedpdf state
+  // Get the selected annotation and active tool from the embedpdf state
   const selectedAnnotation = annotationState.selectedUid
-    ? {
-        object: getAnnotationByUid(
-          annotationState,
-          annotationState.selectedUid,
-        ) as unknown,
-      }
+    ? { object: getAnnotationByUid(annotationState, annotationState.selectedUid) }
     : null;
+
+  const activeTool = annotationApi.getActiveTool ? annotationApi.getActiveTool() : null;
 
   // Determine which panel to show based on annotation type or active tool
   let panelType: string;
@@ -577,12 +511,10 @@ export function AnnotationStyleSidebar({
 
   if (selectedAnnotation && selectedAnnotation.object) {
     // If annotation is selected, use its type
-    const annotationType = (
-      selectedAnnotation.object as Record<string, unknown>
-    )?.object as Record<string, unknown> | undefined;
-    const type = annotationType?.type as number | undefined;
+    // TrackedAnnotation has: { commitState, object: { type, ... } }
+    const annotationType = (selectedAnnotation.object as any).object?.type;
 
-    switch (type) {
+    switch (annotationType) {
       case PdfAnnotationSubtype.HIGHLIGHT:
       case PdfAnnotationSubtype.UNDERLINE:
       case PdfAnnotationSubtype.STRIKEOUT:
@@ -612,9 +544,9 @@ export function AnnotationStyleSidebar({
           </div>
         );
     }
-  } else if (activeTool && activeTool !== 'select') {
+  } else if (activeTool) {
     // If no annotation selected, use active tool type
-    switch (activeTool) {
+    switch (activeTool.id) {
       case 'highlight':
       case 'underline':
       case 'strikeout':
@@ -653,23 +585,16 @@ export function AnnotationStyleSidebar({
     );
   }
 
-  const annotationObj = selectedAnnotation?.object as Record<
-    string,
-    unknown
-  > | null;
-  const innerObj = annotationObj?.object as Record<string, unknown> | undefined;
-  const key = (innerObj?.id as string) || 'default';
-
   return (
-    <div className="flex h-full flex-col">
-      <div className="border-border border-b p-3">
-        <h3 className="text-sm font-medium">{title}</h3>
+    <div className="h-full flex flex-col">
+      <div className="p-3 border-b border-border">
+        <h3 className="font-medium text-sm">{title}</h3>
       </div>
       <ScrollArea className="flex-1">
         <div className="p-4">
           {panelType === 'textMarkup' && (
             <TextMarkupPanel
-              key={key}
+              key={selectedAnnotation?.object?.object?.id || 'default'}
               documentId={documentId}
               selectedAnnotation={selectedAnnotation}
               activeTool={activeTool}
@@ -677,7 +602,7 @@ export function AnnotationStyleSidebar({
           )}
           {panelType === 'shape' && (
             <ShapePanel
-              key={key}
+              key={selectedAnnotation?.object?.object?.id || 'default'}
               documentId={documentId}
               selectedAnnotation={selectedAnnotation}
               activeTool={activeTool}
@@ -685,7 +610,7 @@ export function AnnotationStyleSidebar({
           )}
           {panelType === 'line' && (
             <LinePanel
-              key={key}
+              key={selectedAnnotation?.object?.object?.id || 'default'}
               documentId={documentId}
               selectedAnnotation={selectedAnnotation}
               activeTool={activeTool}
@@ -693,7 +618,7 @@ export function AnnotationStyleSidebar({
           )}
           {panelType === 'freeText' && (
             <FreeTextPanel
-              key={key}
+              key={selectedAnnotation?.object?.object?.id || 'default'}
               documentId={documentId}
               selectedAnnotation={selectedAnnotation}
               activeTool={activeTool}

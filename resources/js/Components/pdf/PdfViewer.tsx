@@ -54,7 +54,6 @@ import {
   ANNOTATION_COLORS,
   annotationToDbFormat,
   dbAnnotationToEmbedpdf,
-  DEFAULT_ANNOTATION_SETTINGS,
   type AnnotationSettings,
   type AnnotationToolType,
   type DbAnnotation,
@@ -102,31 +101,30 @@ function PdfViewerContent({
   setRightSidebarTab,
 }: PdfViewerContentProps) {
   useEffect(() => {
-    onDocumentIdChange(docId);
-  }, [docId, onDocumentIdChange]);
+    onDocumentIdChange(docId)
+  }, [docId, onDocumentIdChange])
 
-  const [activeTool, setActiveTool] = useState<AnnotationToolType>('select');
-  const [settings, setSettings] = useState<AnnotationSettings>(
-    DEFAULT_ANNOTATION_SETTINGS,
-  );
-  const [searchQuery, setSearchQuery] = useState('');
-  const [zoom, setZoom] = useState(100);
-  const [darkMode, setDarkMode] = useState(false);
-  const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
-  const [leftSidebarTab, setLeftSidebarTab] = useState<
-    'thumbnails' | 'bookmarks' | 'styles'
-  >('thumbnails');
+  const [activeTool, setActiveTool] = useState<AnnotationToolType>("select")
+  const [settings, setSettings] = useState<AnnotationSettings>({
+    color: ANNOTATION_COLORS[3].value, // Mauve
+    opacity: 0.5,
+    blendMode: PdfBlendMode.Multiply,
+    fontSize: 14,
+    strokeWidth: 2,
+  })
+  const [searchQuery, setSearchQuery] = useState("")
+  const [zoom, setZoom] = useState(100)
+  const [darkMode, setDarkMode] = useState(false)
+  const [leftSidebarOpen, setLeftSidebarOpen] = useState(false)
+  const [leftSidebarTab, setLeftSidebarTab] = useState<"thumbnails" | "bookmarks" | "styles">("thumbnails")
 
-  const { provides: searchApi } = useSearch(docId);
+  const { provides: searchApi } = useSearch(docId)
 
   return (
     <DocumentContent documentId={docId}>
       {({ isLoaded }) =>
         isLoaded && (
-          <div
-            className="bg-muted/30 flex h-full w-full flex-col"
-            style={{ userSelect: 'none' }}
-          >
+          <div className="flex flex-col h-full w-full bg-muted/30" style={{ userSelect: "none" }}>
             <AnnotationToolbar
               documentId={docId}
               activeTool={activeTool}
@@ -156,35 +154,25 @@ function PdfViewerContent({
                   documentId={docId}
                   activeTab={leftSidebarTab}
                   setActiveTab={setLeftSidebarTab}
-                  activeTool={activeTool}
                 />
               )}
 
-              <div className="relative flex-1 overflow-hidden">
+              <div className="flex-1 relative overflow-hidden">
                 <GlobalPointerProvider documentId={docId}>
                   <Viewport
                     documentId={docId}
-                    className={cn(
-                      'bg-muted absolute inset-0',
-                      darkMode && 'hue-rotate-180 invert',
-                    )}
+                    className={cn("absolute inset-0 bg-muted", darkMode && "invert hue-rotate-180")}
                   >
                     <Scroller
                       documentId={docId}
                       renderPage={({ pageIndex }) => (
-                        <PagePointerProvider
-                          documentId={docId}
-                          pageIndex={pageIndex}
-                        >
+                        <PagePointerProvider documentId={docId} pageIndex={pageIndex}>
                           <RenderLayer
                             documentId={docId}
                             pageIndex={pageIndex}
-                            style={{ pointerEvents: 'none' }}
+                            style={{ pointerEvents: "none" }}
                           />
-                          <SearchLayer
-                            documentId={docId}
-                            pageIndex={pageIndex}
-                          />
+                          <SearchLayer documentId={docId} pageIndex={pageIndex} />
                           <SelectionLayer
                             documentId={docId}
                             pageIndex={pageIndex}
@@ -204,31 +192,17 @@ function PdfViewerContent({
                                 documentId={docId}
                                 onOpenComment={(annotation) => {
                                   if (annotation) {
-                                    const storedAnn = annotations.find(
-                                      (a) =>
-                                        a.embedpdf_annotation_id ===
-                                        (annotation as Record<string, unknown>)
-                                          .id,
-                                    );
+                                    const storedAnn = annotations.find(a => a.embedpdf_annotation_id === annotation.id)
                                     if (storedAnn) {
-                                      setSelectedAnnotation(storedAnn);
+                                      setSelectedAnnotation(storedAnn)
                                       if (annotationApi) {
-                                        const api = annotationApi as {
-                                          selectAnnotation: (
-                                            pageIndex: number,
-                                            id: string,
-                                          ) => void;
-                                        };
-                                        api.selectAnnotation(
-                                          storedAnn.page_number - 1,
-                                          storedAnn.embedpdf_annotation_id,
-                                        );
+                                        annotationApi.selectAnnotation(storedAnn.page_number - 1, storedAnn.embedpdf_annotation_id)
                                       }
                                     }
                                   }
-                                  setRightSidebarOpen(true);
-                                  setRightSidebarTab('comments');
-                                  setCommentTrigger((prev) => prev + 1);
+                                  setRightSidebarOpen(true)
+                                  setRightSidebarTab("comments")
+                                  setCommentTrigger(prev => prev + 1)
                                 }}
                               />
                             )}
@@ -241,28 +215,19 @@ function PdfViewerContent({
               </div>
 
               {rightSidebarOpen && !isMobile && (
-                <div className="border-border bg-card flex h-full w-64 flex-col border-l">
-                  <Tabs
-                    value={rightSidebarTab}
-                    onValueChange={(v) =>
-                      setRightSidebarTab(v as 'comments' | 'search')
-                    }
-                    className="flex h-full flex-col"
-                  >
-                    <TabsList className="w-full shrink-0 rounded-none border-b">
+                <div className="w-64 border-l border-border bg-card flex flex-col h-full">
+                  <Tabs value={rightSidebarTab} onValueChange={(v) => setRightSidebarTab(v as "comments" | "search")} className="flex flex-col h-full">
+                    <TabsList className="w-full rounded-none border-b shrink-0">
                       <TabsTrigger value="comments" className="flex-1 text-xs">
-                        <MessageSquare className="mr-1 h-3 w-3" />
+                        <MessageSquare className="h-3 w-3 mr-1" />
                         Comments
                       </TabsTrigger>
                       <TabsTrigger value="search" className="flex-1 text-xs">
-                        <Search className="mr-1 h-3 w-3" />
+                        <Search className="h-3 w-3 mr-1" />
                         Search
                       </TabsTrigger>
                     </TabsList>
-                    <TabsContent
-                      value="comments"
-                      className="m-0 flex-1 overflow-hidden"
-                    >
+                    <TabsContent value="comments" className="flex-1 m-0 overflow-hidden">
                       <RightSidebar
                         annotations={annotations}
                         selectedAnnotation={selectedAnnotation}
@@ -272,20 +237,14 @@ function PdfViewerContent({
                         documentId={docId}
                       />
                     </TabsContent>
-                    <TabsContent
-                      value="search"
-                      className="m-0 flex-1 overflow-hidden"
-                    >
+                    <TabsContent value="search" className="flex-1 m-0 overflow-hidden">
                       <SearchResultsSidebar
                         documentId={docId}
                         searchQuery={searchQuery}
                         onClose={() => {
-                          setRightSidebarOpen(false);
-                          setSearchQuery('');
-                          if (searchApi) {
-                            const api = searchApi as { stopSearch: () => void };
-                            api.stopSearch();
-                          }
+                          setRightSidebarOpen(false)
+                          setSearchQuery("")
+                          searchApi?.stopSearch()
                         }}
                       />
                     </TabsContent>
@@ -297,7 +256,7 @@ function PdfViewerContent({
         )
       }
     </DocumentContent>
-  );
+  )
 }
 
 export function PdfViewer({
@@ -324,18 +283,15 @@ export function PdfViewer({
   );
   const [isMobile, setIsMobile] = useState(false);
 
-  // Ref to store annotationApi for use after document loads
+  // Refs to store API and state for use in event handlers
   const annotationApiRef = useRef<Record<string, unknown> | null>(null);
-  // Refs to avoid stale closures in event handlers
   const rightSidebarOpenRef = useRef(rightSidebarOpen);
   const rightSidebarTabRef = useRef(rightSidebarTab);
   const annotationsRef = useRef(annotations);
-  // Ref to track if annotations have been loaded
   const annotationsLoadedRef = useRef(false);
-  // Ref to track annotation IDs that were loaded from database to avoid duplicate saves
   const loadedAnnotationIdsRef = useRef<Set<string>>(new Set());
 
-  // Keep refs in sync with state (to avoid stale closures in event handlers)
+  // Keep refs in sync with state
   useEffect(() => {
     rightSidebarOpenRef.current = rightSidebarOpen;
   }, [rightSidebarOpen]);
@@ -494,21 +450,28 @@ export function PdfViewer({
             break;
 
           case 'delete':
-            router.post(route('annotations.destroy', annotationId), {
-              preserveScroll: true,
-              preserveState: true,
-              onSuccess: () => {
-                // Update local state
-                setAnnotations((prev) =>
-                  prev.filter(
-                    (ann) => ann.embedpdf_annotation_id !== annotationId,
-                  ),
-                );
+            // Use fetch for delete operations to avoid Inertia state issues
+            const response = await fetch(route('annotations.destroy', annotationId), {
+              method: 'DELETE',
+              headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
               },
-              onError: (errors) => {
-                console.error('Failed to delete annotation:', errors);
-              },
+              credentials: 'same-origin',
             });
+
+            if (response.ok) {
+              // Update local state on success
+              setAnnotations((prev) =>
+                prev.filter(
+                  (ann) => ann.embedpdf_annotation_id !== annotationId,
+                ),
+              );
+            } else {
+              const errorData = await response.json();
+              console.error('Failed to delete annotation:', errorData);
+            }
             break;
         }
       } catch (error) {
@@ -717,7 +680,18 @@ export function PdfViewer({
               break;
 
             case 'delete':
-              saveAnnotation('delete', {}, annotationId);
+              // For delete events, use the annotation ID from the event
+              const deleteAnnotationId = annotation.id || annotation.object?.id;
+              if (deleteAnnotationId) {
+                saveAnnotation('delete', {}, deleteAnnotationId);
+                
+                // Remove from local state immediately
+                setAnnotations((prev) =>
+                  prev.filter(
+                    (ann) => ann.embedpdf_annotation_id !== deleteAnnotationId,
+                  ),
+                );
+              }
               break;
           }
         });

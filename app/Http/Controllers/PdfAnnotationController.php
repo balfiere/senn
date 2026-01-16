@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\PdfAnnotation;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -29,7 +28,7 @@ class PdfAnnotationController extends Controller
     /**
      * Store a new annotation.
      */
-    public function store(Request $request, Project $project): RedirectResponse
+    public function store(Request $request, Project $project): JsonResponse
     {
         Gate::authorize('update', $project);
 
@@ -67,15 +66,15 @@ class PdfAnnotationController extends Controller
             $validated['segment_rects'] = json_decode($validated['segment_rects'], true);
         }
 
-        $project->pdfAnnotations()->create($validated);
+        $annotation = $project->pdfAnnotations()->create($validated);
 
-        return redirect()->back()->with('success', 'Annotation created.');
+        return response()->json($annotation);
     }
 
     /**
      * Update an annotation.
      */
-    public function update(Request $request, string $annotationId): RedirectResponse
+    public function update(Request $request, string $annotationId): JsonResponse
     {
         $annotation = PdfAnnotation::where('embedpdf_annotation_id', $annotationId)->firstOrFail();
 
@@ -116,7 +115,7 @@ class PdfAnnotationController extends Controller
 
         $annotation->update($validated);
 
-        return redirect()->back()->with('success', 'Annotation updated.');
+        return response()->json($annotation);
     }
 
     /**

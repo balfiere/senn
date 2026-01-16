@@ -55,7 +55,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/projects/{project}/annotations', [PdfAnnotationController::class, 'index'])->name('annotations.index');
     Route::post('/projects/{project}/annotations', [PdfAnnotationController::class, 'store'])->name('annotations.store');
     Route::patch('/annotations/{annotationId}', [PdfAnnotationController::class, 'update'])->name('annotations.update');
-    Route::post('/annotations/{annotationId}/delete', [PdfAnnotationController::class, 'destroy'])->name('annotations.destroy');
+    Route::delete('/annotations/{annotationId}', [PdfAnnotationController::class, 'destroy'])->name('annotations.destroy');
 
     // Stopwatch
     Route::patch('/projects/{project}/stopwatch/start', [\App\Http\Controllers\ProjectStopwatchController::class, 'start'])->name('projects.stopwatch.start');
