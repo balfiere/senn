@@ -4,6 +4,7 @@ use App\Http\Controllers\CounterCommentController;
 use App\Http\Controllers\CounterController;
 use App\Http\Controllers\PartController;
 use App\Http\Controllers\PatternController;
+use App\Http\Controllers\PdfAnnotationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use Illuminate\Support\Facades\Route;
@@ -50,6 +51,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/counters/{counter}/comments', [CounterCommentController::class, 'store'])->name('counter_comments.store');
     Route::delete('/comments/{comment}', [CounterCommentController::class, 'destroy'])->name('counter_comments.destroy');
 
+    // PDF Annotations
+    Route::get('/projects/{project}/annotations', [PdfAnnotationController::class, 'index'])->name('annotations.index');
+    Route::post('/projects/{project}/annotations', [PdfAnnotationController::class, 'store'])->name('annotations.store');
+    Route::patch('/annotations/{annotationId}', [PdfAnnotationController::class, 'update'])->name('annotations.update');
+    Route::post('/annotations/{annotationId}/delete', [PdfAnnotationController::class, 'destroy'])->name('annotations.destroy');
+
     // Stopwatch
     Route::patch('/projects/{project}/stopwatch/start', [\App\Http\Controllers\ProjectStopwatchController::class, 'start'])->name('projects.stopwatch.start');
     Route::patch('/projects/{project}/stopwatch/stop', [\App\Http\Controllers\ProjectStopwatchController::class, 'stop'])->name('projects.stopwatch.stop');
@@ -62,4 +69,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
