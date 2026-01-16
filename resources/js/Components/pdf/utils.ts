@@ -72,6 +72,28 @@ export function lineEndingToNumber(value: string | null | undefined): number {
   return STRING_TO_LINE_ENDING[value] ?? 0;
 }
 
+// Helper function to convert font family value to string
+// EmbedPDF sometimes returns numeric font family codes instead of strings
+export function getFontFamilyString(fontFamily: unknown): string {
+  if (typeof fontFamily === 'string') {
+    return fontFamily;
+  }
+  if (typeof fontFamily === 'number') {
+    // Map common font family numbers to their string equivalents
+    // Based on PDF font families: 0=Helvetica, 1=Times-Roman, 2=Courier, etc.
+    const fontMap: Record<number, string> = {
+      0: 'Helvetica',
+      1: 'Times-Roman',
+      2: 'Courier',
+      3: 'Symbol',
+      4: 'Helvetica', // Default to Helvetica for freeText
+      5: 'ZapfDingbats',
+    };
+    return fontMap[fontFamily] || 'Helvetica';
+  }
+  return 'Helvetica';
+}
+
 // Catppuccin Mocha palette - harmonious with pastel lavender
 export const ANNOTATION_COLORS = [
   { name: 'Rosewater', value: '#f5e0dc' },
@@ -223,35 +245,34 @@ export function annotationToDbFormat(
 
   const baseData: Partial<DbAnnotation> = {
     project_id: projectId,
-    embedpdf_annotation_id: obj.id as string,
+    embedpdf_annotation_id: String(obj.id || ''),
     page_number: pageIndex + 1, // Convert to 1-based
-    annotation_type: annotationTypeStr,
-    position_x: rect?.origin?.x || position?.x || 0,
-    position_y: rect?.origin?.y || position?.y || 0,
-    width: rect?.size?.width || dimensions?.width || 0,
-    height: rect?.size?.height || dimensions?.height || 0,
-    opacity: (obj.opacity as number) ?? 1.0,
-    blend_mode: (obj.blendMode as number) ?? 0,
-    stroke_width:
-      (obj.borderWidth as number) || (obj.strokeWidth as number) || 1,
-    font_size: (obj.fontSize as number) || 14,
-    font_family: (obj.fontFamily as string) || 'Helvetica',
-    line_start_x: linePoints?.start?.x ?? null,
-    line_start_y: linePoints?.start?.y ?? null,
-    line_end_x: linePoints?.end?.x ?? null,
-    line_end_y: linePoints?.end?.y ?? null,
-    line_ending: (obj.lineEnding as string) || null,
-    line_start_ending: lineEndingToString(
+    annotation_type: String(annotationTypeStr),
+    position_x: Number(rect?.origin?.x || position?.x || 0),
+    position_y: Number(rect?.origin?.y || position?.y || 0),
+    width: Number(rect?.size?.width || dimensions?.width || 0),
+    height: Number(rect?.size?.height || dimensions?.height || 0),
+    opacity: Number(obj.opacity ?? 1.0),
+    blend_mode: Number(obj.blendMode ?? 0),
+    stroke_width: Number((obj.borderWidth as number) || (obj.strokeWidth as number) || 1),
+    font_size: Number(obj.fontSize || 14),
+    font_family: getFontFamilyString(obj.fontFamily),
+    line_start_x: linePoints?.start?.x != null ? Number(linePoints.start.x) : null,
+    line_start_y: linePoints?.start?.y != null ? Number(linePoints.start.y) : null,
+    line_end_x: linePoints?.end?.x != null ? Number(linePoints.end.x) : null,
+    line_end_y: linePoints?.end?.y != null ? Number(linePoints.end.y) : null,
+    line_ending: obj.lineEnding != null ? String(obj.lineEnding) : null,
+    line_start_ending: String(lineEndingToString(
       lineEndings?.start ?? obj.lineStartEnding ?? obj.lineEndStarting,
-    ),
-    line_end_ending: lineEndingToString(lineEndings?.end ?? obj.lineEndEnding),
-    contents: (obj.contents as string) || null,
-    comment: (obj.comment as string) || null,
-    in_reply_to_id: (obj.inReplyToId as string) || null,
+    )),
+    line_end_ending: String(lineEndingToString(lineEndings?.end ?? obj.lineEndEnding)),
+    contents: obj.contents != null ? String(obj.contents) : null,
+    comment: obj.comment != null ? String(obj.comment) : null,
+    in_reply_to_id: obj.inReplyToId != null ? String(obj.inReplyToId) : null,
     segment_rects: (obj.segmentRects as unknown[]) || null,
   };
 
-  // Set colors based on annotation type
+ // Set colors based on annotation type
   if (
     ['highlight', 'underline', 'strikeout', 'squiggly'].includes(
       annotationTypeStr,
@@ -260,15 +281,16 @@ export function annotationToDbFormat(
     // Text markup annotations: use color for markup color
     return {
       ...baseData,
-      color: (obj.color as string) || '#cba6f7',
+      color: String(obj.color || '#cba6f7'),
     };
   } else if (['square', 'circle'].includes(annotationTypeStr)) {
     // Shape annotations: separate fill and stroke colors
     return {
       ...baseData,
-      fill_color: (obj.color as string) || 'transparent',
-      stroke_color:
-        (obj.strokeColor as string) || (obj.color as string) || '#000000',
+      fill_color: String(obj.color || 'transparent'),
+      stroke_color: String(
+        (obj.strokeColor as string) || (obj.color as string) || '#000000'
+      ),
     };
   } else if (
     ['line', 'lineArrow', 'polyline', 'polygon'].includes(annotationTypeStr)
@@ -276,19 +298,20 @@ export function annotationToDbFormat(
     // Line annotations: use stroke color
     return {
       ...baseData,
-      stroke_color:
-        (obj.strokeColor as string) || (obj.color as string) || '#000000',
+      stroke_color: String(
+        (obj.strokeColor as string) || (obj.color as string) || '#000000'
+      ),
     };
   } else if (annotationTypeStr === 'freeText') {
     // FreeText annotations: use color for text color
     return {
       ...baseData,
-      color: (obj.fontColor as string) || '#000000',
+      color: String(obj.fontColor || '#00000'),
     };
   }
 
   // Fallback for unknown types
-  return { ...baseData, color: (obj.color as string) || '#cba6f7' };
+  return { ...baseData, color: String(obj.color || '#cba6f7') };
 }
 
 // Convert DB annotation to embedpdf format for import
@@ -367,7 +390,7 @@ export function dbAnnotationToEmbedpdf(
       dbAnnotation.font_size !== null
     ) {
       annotationObj.fontSize = dbAnnotation.font_size;
-      annotationObj.fontFamily = dbAnnotation.font_family || 'Helvetica';
+      annotationObj.fontFamily = String(dbAnnotation.font_family || 'Helvetica');
       if (dbAnnotation.contents !== null) {
         annotationObj.contents = dbAnnotation.contents;
       }

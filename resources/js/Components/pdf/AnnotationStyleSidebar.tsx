@@ -315,31 +315,39 @@ function FreeTextPanel({
   const defaults = activeTool?.defaults;
   const editing = !!annotation;
 
-  const baseFontColor = editing ? annotation.object.fontColor : (defaults?.fontColor ?? '#000000');
-  const baseOpacity = editing ? annotation.object.opacity : (defaults?.opacity ?? 1);
-  const baseFontSize = editing ? annotation.object.fontSize : (defaults?.fontSize ?? 14);
+  const baseFontColor = editing ? String(annotation.object.fontColor || '#00000') : String(defaults?.fontColor || '#000000');
+  const baseOpacity = editing ? Number(annotation.object.opacity || 1) : Number(defaults?.opacity || 1);
+  const baseFontSize = editing ? Number(annotation.object.fontSize || 14) : Number(defaults?.fontSize || 14);
+  const baseFontFamily = editing ? String(annotation.object.fontFamily || 'Helvetica') : String(defaults?.fontFamily || 'Helvetica');
 
   const [fontColor, setFontColor] = useState(baseFontColor);
   const [opacity, setOpacity] = useState(baseOpacity);
   const [fontSize, setFontSize] = useState(baseFontSize);
+  const [fontFamily, setFontFamily] = useState(baseFontFamily);
 
   useEffect(() => setFontColor(baseFontColor), [baseFontColor]);
   useEffect(() => setOpacity(baseOpacity), [baseOpacity]);
   useEffect(() => setFontSize(baseFontSize), [baseFontSize]);
+  useEffect(() => setFontFamily(baseFontFamily), [baseFontFamily]);
 
-  const changeFontColor = (c: string) => {
+ const changeFontColor = (c: string) => {
     setFontColor(c);
-    applyPatch({ fontColor: c });
+    applyPatch({ fontColor: String(c) });
   };
 
   const changeOpacity = (o: number) => {
     setOpacity(o);
-    applyPatch({ opacity: o });
+    applyPatch({ opacity: Number(o) });
   };
 
   const changeFontSize = (s: number) => {
     setFontSize(s);
-    applyPatch({ fontSize: s });
+    applyPatch({ fontSize: Number(s) });
+  };
+
+  const changeFontFamily = (family: string) => {
+    setFontFamily(family);
+    applyPatch({ fontFamily: String(family) });
   };
 
   function applyPatch(patch: Partial<any>) {
@@ -386,6 +394,21 @@ function FreeTextPanel({
         step={1}
         suffix="px"
       />
+
+      <div className="space-y-2">
+        <Label className="text-xs">Font Family</Label>
+        <select
+          className="w-full bg-background border border-input h-8 rounded-md px-2 text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          value={fontFamily}
+          onChange={(e) => changeFontFamily(e.target.value)}
+        >
+          <option value="Helvetica">Helvetica</option>
+          <option value="Times-Roman">Times-Roman</option>
+          <option value="Courier">Courier</option>
+          <option value="Symbol">Symbol</option>
+          <option value="ZapfDingbats">ZapfDingbats</option>
+        </select>
+      </div>
     </div>
   );
 }

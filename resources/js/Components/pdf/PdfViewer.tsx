@@ -397,12 +397,15 @@ export function PdfViewer({
     [pdfUrl],
   );
 
-  // Helper to prepare annotation data for Inertia (serialize segment_rects)
+  // Helper to prepare annotation data for Inertia (serialize segment_rects and ensure type safety)
   const prepareAnnotationPayload = (data: Partial<DbAnnotation>) => {
     const payload: Record<string, string | number | null | undefined> = {};
     for (const [key, value] of Object.entries(data)) {
       if (key === 'segment_rects' && value != null) {
         payload[key] = JSON.stringify(value);
+      } else if (key === 'font_family' && value != null) {
+        // Ensure font_family is always a string
+        payload[key] = String(value);
       } else {
         payload[key] = value as string | number | null | undefined;
       }
@@ -422,32 +425,30 @@ export function PdfViewer({
 
         switch (eventType) {
           case 'create':
-            // Annotation is already added optimistically to local state
-            // Just persist to server
-            router.post(route('annotations.store', projectId), payload, {
-              preserveScroll: true,
-              preserveState: true,
-              onError: (errors) => {
-                console.error('Failed to save annotation:', errors);
-              },
-            });
+            // Use axios for API calls to avoid Inertia response conflicts
+            try {
+              await window.axios.post(route('annotations.store', projectId), payload);
+              // Success - the optimistic update already handled the UI
+            } catch (error) {
+              console.error('Failed to save annotation:', error);
+              // Optionally revert the optimistic update
+            }
             break;
 
           case 'update':
-            router.patch(route('annotations.update', annotationId), payload, {
-              preserveScroll: true,
-              preserveState: true,
-              onSuccess: () => {
-                // Update local state
-                setAnnotations((prev) =>
-                  prev.map((ann) =>
-                    ann.embedpdf_annotation_id === annotationId
-                      ? ({ ...ann, ...annotationData } as StoredAnnotation)
-                      : ann,
-                  ),
-                );
-              },
-            });
+            try {
+              const response = await window.axios.patch(route('annotations.update', annotationId), payload);
+              // Update local state on success
+              setAnnotations((prev) =>
+                prev.map((ann) =>
+                  ann.embedpdf_annotation_id === annotationId
+                    ? ({ ...ann, ...response.data } as StoredAnnotation)
+                    : ann,
+                ),
+              );
+            } catch (error) {
+              console.error('Failed to update annotation:', error);
+            }
             break;
 
           case 'delete':
