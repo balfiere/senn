@@ -90,11 +90,9 @@ function SliderControl({
 
 // Text markup styling panel (highlight, underline, strikeout, squiggly)
 function TextMarkupPanel({
-  documentId,
   selectedAnnotation,
   activeTool,
 }: {
-  documentId: string;
   selectedAnnotation: any;
   activeTool: any;
 }) {
@@ -187,11 +185,9 @@ function TextMarkupPanel({
 
 // Shape styling panel (square, circle)
 function ShapePanel({
-  documentId,
   selectedAnnotation,
   activeTool,
 }: {
-  documentId: string;
   selectedAnnotation: any;
   activeTool: any;
 }) {
@@ -306,11 +302,9 @@ function ShapePanel({
 
 // Free text styling panel
 function FreeTextPanel({
-  documentId,
   selectedAnnotation,
   activeTool,
 }: {
-  documentId: string;
   selectedAnnotation: any;
   activeTool: any;
 }) {
@@ -398,11 +392,9 @@ function FreeTextPanel({
 
 // Line/arrow styling panel
 function LinePanel({
-  documentId,
   selectedAnnotation,
   activeTool,
 }: {
-  documentId: string;
   selectedAnnotation: any;
   activeTool: any;
 }) {
@@ -595,7 +587,6 @@ export function AnnotationStyleSidebar({ documentId }: AnnotationStyleSidebarPro
           {panelType === 'textMarkup' && (
             <TextMarkupPanel
               key={selectedAnnotation?.object?.object?.id || 'default'}
-              documentId={documentId}
               selectedAnnotation={selectedAnnotation}
               activeTool={activeTool}
             />
@@ -603,7 +594,6 @@ export function AnnotationStyleSidebar({ documentId }: AnnotationStyleSidebarPro
           {panelType === 'shape' && (
             <ShapePanel
               key={selectedAnnotation?.object?.object?.id || 'default'}
-              documentId={documentId}
               selectedAnnotation={selectedAnnotation}
               activeTool={activeTool}
             />
@@ -611,7 +601,6 @@ export function AnnotationStyleSidebar({ documentId }: AnnotationStyleSidebarPro
           {panelType === 'line' && (
             <LinePanel
               key={selectedAnnotation?.object?.object?.id || 'default'}
-              documentId={documentId}
               selectedAnnotation={selectedAnnotation}
               activeTool={activeTool}
             />
@@ -619,7 +608,6 @@ export function AnnotationStyleSidebar({ documentId }: AnnotationStyleSidebarPro
           {panelType === 'freeText' && (
             <FreeTextPanel
               key={selectedAnnotation?.object?.object?.id || 'default'}
-              documentId={documentId}
               selectedAnnotation={selectedAnnotation}
               activeTool={activeTool}
             />
