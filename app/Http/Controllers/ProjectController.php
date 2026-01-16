@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Actions\CreateProjectAction;
 use App\Actions\DeleteProjectAction;
 use App\Http\Requests\StoreProjectRequest;
+use App\Http\Requests\UpdateProjectRequest;
 use App\Models\Project;
+use App\Services\Pdf\PdfThumbnailGenerator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -13,6 +15,11 @@ use Inertia\Response;
 
 class ProjectController extends Controller
 {
+    public function __construct(
+        private PdfThumbnailGenerator $thumbnailGenerator
+    ) {
+    }
+
     /**
      * Display a listing of the user's projects.
      */
@@ -36,7 +43,7 @@ class ProjectController extends Controller
         $project = $action->execute(
             user: $request->user(),
             name: $request->validated('name'),
-            pdfUrl: $request->validated('pdf_url'),
+            pdfFile: $request->file('pdf_file'),
         );
 
         return redirect()->route('projects.show', $project)
@@ -60,6 +67,48 @@ class ProjectController extends Controller
             'project' => $project,
             'parts' => $project->parts,
         ]);
+    }
+
+    /**
+     * Update the specified project.
+     */
+    public function update(UpdateProjectRequest $request, Project $project): RedirectResponse
+    {
+        Gate::authorize('update', $project);
+
+        \Illuminate\Support\Facades\Log::info('Project update started', ['project_id' => $project->id, 'has_file' => $request->hasFile('pdf_file')]);
+
+        $data = $request->validated();
+
+        if ($request->hasFile('pdf_file')) {
+            $disk = \Illuminate\Support\Facades\Storage::disk('patterns');
+            \Illuminate\Support\Facades\Log::info('File detected', ['original_name' => $request->file('pdf_file')->getClientOriginalName()]);
+
+            // Delete old PDF
+            if ($project->pdf_path && $disk->exists($project->pdf_path)) {
+                $disk->delete($project->pdf_path);
+            }
+
+            // Delete old Thumbnail
+            if ($project->thumbnail_path && $disk->exists($project->thumbnail_path)) {
+                $disk->delete($project->thumbnail_path);
+            }
+
+            $path = $request->file('pdf_file')->store('projects/' . $request->user()->id, 'patterns');
+            $data['pdf_path'] = $path;
+
+            // Generate thumbnail
+            $project->pdf_path = $path; // Temporarily set path for generator
+            $thumbnailPath = $this->thumbnailGenerator->generate($project);
+            if ($thumbnailPath) {
+                $data['thumbnail_path'] = $thumbnailPath;
+            }
+        }
+
+        $project->update($data);
+
+        return redirect()->back()
+            ->with('success', 'Project updated successfully.');
     }
 
     /**

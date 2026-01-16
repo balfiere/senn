@@ -20,7 +20,8 @@ class Project extends Model
     protected $fillable = [
         'user_id',
         'name',
-        'pdf_url',
+        'pdf_path',
+        'thumbnail_path',
         'stopwatch_seconds',
         'stopwatch_running',
         'stopwatch_started_at',

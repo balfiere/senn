@@ -133,7 +133,7 @@ export default function Show({ project, parts = [] }: Props) {
   };
 
   // Determine view based on PDF availability and viewport
-  const effectiveView = !project.pdf_url ? "counters" : view;
+  const effectiveView = !project.pdf_path ? "counters" : view;
 
   return (
     <>

@@ -9,7 +9,8 @@ export interface Project {
   id: string;
   user_id: number;
   name: string;
-  pdf_url: string | null;
+  pdf_path: string | null;
+  thumbnail_path: string | null;
   stopwatch_seconds: number;
   stopwatch_running: boolean;
   stopwatch_started_at: string | null;

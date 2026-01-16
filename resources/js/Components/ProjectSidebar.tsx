@@ -1,9 +1,9 @@
-
 import { useState, useEffect } from "react"
 import { Project, Part } from "@/types"
 import { Button } from "@/Components/ui/button"
 import { Input } from "@/Components/ui/input"
 import { ScrollArea } from "@/Components/ui/scroll-area"
+import { router } from "@inertiajs/react"
 import {
     Home,
     Plus,
@@ -89,29 +89,39 @@ export function ProjectSidebar({
         if (!file) return
 
         setIsUploading(true)
-        try {
-            // Mock upload for now
-            console.log("File upload not implemented yet")
 
-            /*
-            const formData = new FormData()
-            formData.append("file", file)
-      
-            const res = await fetch("/api/upload", {
-              method: "POST",
-              body: formData,
-            })
-      
-            if (res.ok) {
-              const data = await res.json()
-              onPdfUpload(data.url)
+        const formData = new FormData()
+        formData.append("pdf_file", file)
+        formData.append("_method", "POST") // Actually we registered POST route, so no method spoofing needed for my custom route? Wait, I registered POST /projects/{project} which points to update. 
+        // If I used standard resource route (PUT/PATCH), I'd need _method: PATCH.
+        // My route is: Route::post('/projects/{project}', [ProjectController::class, 'update']);
+        // So standard POST is fine.
+
+        // Wait, standard route for update is PUT/PATCH. I defined POST explicitly to avoid issues.
+        // So I just post to route('projects.update', project.id).
+
+        /* 
+        ERROR: 'projects.update' might conflict if resource controller was used? 
+        I manually defined: Route::post('/projects/{project}', ...)->name('projects.update');
+        Standard resource is PUT/PATCH. I am overriding it or adding it?
+        I did NOT use Route::resource. I used individual routes.
+        So POST is correct.
+        */
+
+        router.post(route('projects.update', project.id), {
+            _method: 'PATCH',
+            pdf_file: file,
+        }, {
+            forceFormData: true,
+            preserveScroll: true,
+            onFinish: () => setIsUploading(false),
+            onSuccess: () => {
+                // Determine URL for optimistic? Or just let props update.
+                // onPdfUpload callback might be expected to update something?
+                // The prop onPdfUpload in Show.tsx just logs.
+                // We rely on inertia reload.
             }
-            */
-        } catch (error) {
-            console.error("Upload failed:", error)
-        } finally {
-            setIsUploading(false)
-        }
+        })
     }
 
     const startEditing = (part: Part) => {
@@ -283,7 +293,7 @@ export function ProjectSidebar({
                                     </div>
 
                                     {/* View Options - Hide split view on mobile */}
-                                    {project.pdf_url && (
+                                    {project.pdf_path && (
                                         <div className="space-y-2">
                                             <span className="text-sm font-medium uppercase text-sidebar-foreground/60">View</span>
                                             <div className="grid grid-cols-2 gap-2">
@@ -329,7 +339,7 @@ export function ProjectSidebar({
                                                 disabled={isUploading}
                                             >
                                                 <Upload className="mr-2 h-4 w-4" />
-                                                {isUploading ? "Uploading..." : project.pdf_url ? "Change PDF" : "Upload PDF"}
+                                                {isUploading ? "Uploading..." : project.pdf_path ? "Change PDF" : "Upload PDF"}
                                             </Button>
                                         </div>
                                     </div>
@@ -530,7 +540,7 @@ export function ProjectSidebar({
                     </div>
 
                     {/* View Options */}
-                    {project.pdf_url && (
+                    {project.pdf_path && (
                         <div className="space-y-2">
                             <span className="text-xs font-medium uppercase text-sidebar-foreground/60">View</span>
                             <div className="grid grid-cols-3 gap-1">
@@ -585,7 +595,7 @@ export function ProjectSidebar({
                                 disabled={isUploading}
                             >
                                 <Upload className="mr-2 h-4 w-4" />
-                                {isUploading ? "Uploading..." : project.pdf_url ? "Change PDF" : "Upload PDF"}
+                                {isUploading ? "Uploading..." : project.pdf_path ? "Change PDF" : "Upload PDF"}
                             </Button>
                         </div>
                     </div>

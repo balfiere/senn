@@ -3,6 +3,7 @@
 use App\Http\Controllers\CounterCommentController;
 use App\Http\Controllers\CounterController;
 use App\Http\Controllers\PartController;
+use App\Http\Controllers\PatternController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use Illuminate\Support\Facades\Route;
@@ -26,7 +27,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
     Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
+    Route::patch('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+    Route::get('/projects/{project}/pattern', [PatternController::class, 'show'])->name('projects.pattern');
+    Route::get('/projects/{project}/thumbnail', [PatternController::class, 'thumbnail'])->name('projects.thumbnail');
+    Route::get('/projects/{project}/pattern/cdn', [PatternController::class, 'cdnSignature'])->name('projects.pattern.cdn');
 
     // Parts
     Route::post('/projects/{project}/parts', [PartController::class, 'store'])->name('parts.store');

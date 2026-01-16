@@ -41,7 +41,8 @@ interface Project {
   id: string;
   user_id: number;
   name: string;
-  pdf_url: string | null;
+  pdf_path: string | null;
+  thumbnail_path: string | null;
   stopwatch_seconds: number;
   stopwatch_running: boolean;
   stopwatch_started_at: string | null;
@@ -66,7 +67,7 @@ function CreateProjectDialog() {
   const [open, setOpen] = useState(false);
   const { data, setData, post, processing, errors, reset } = useForm({
     name: '',
-    pdf_url: null as string | null,
+    pdf_file: null as File | null,
   });
 
   const handleSubmit: FormEventHandler = (e) => {
@@ -109,7 +110,18 @@ function CreateProjectDialog() {
                 <p className="text-destructive text-sm">{errors.name}</p>
               )}
             </div>
-            {/* PDF upload will be added in a later phase */}
+            <div className="grid gap-2">
+              <Label htmlFor="pdf_file">Pattern PDF (Optional)</Label>
+              <Input
+                id="pdf_file"
+                type="file"
+                accept=".pdf"
+                onChange={(e) => setData('pdf_file', e.target.files ? e.target.files[0] : null)}
+              />
+              {errors.pdf_file && (
+                <p className="text-destructive text-sm">{errors.pdf_file}</p>
+              )}
+            </div>
           </div>
           <DialogFooter>
             <Button
@@ -174,6 +186,16 @@ function ProjectCard({ project, handleDelete, deletingId }: { project: Project, 
     <Card
       className="border-border hover:border-primary/50 group relative flex flex-col overflow-hidden transition-colors"
     >
+      {project.thumbnail_path && (
+        <div className="relative h-40 w-full border-b border-border bg-muted">
+          <img
+            src={route('projects.thumbnail', project.id)}
+            alt={project.name}
+            className="h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors" />
+        </div>
+      )}
       <Link
         href={route('projects.show', project.id)}
         className="absolute inset-0 z-10"
@@ -221,7 +243,7 @@ function ProjectCard({ project, handleDelete, deletingId }: { project: Project, 
             <Clock className="h-3.5 w-3.5" />
             <span>{formatTime(displaySeconds)}</span>
           </div>
-          {project.pdf_url && (
+          {project.pdf_path && (
             <div className="flex items-center gap-1">
               <FileText className="h-3.5 w-3.5" />
               <span>PDF</span>
