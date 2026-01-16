@@ -256,24 +256,22 @@ export default function Show({
             </div>
           )}
 
-          {/* PDF View */}
-          {effectiveView === 'pdf' && (
-            <div className="absolute inset-0">{renderPdfViewer()}</div>
-          )}
-
-          {/* Split View - Only available on larger screens */}
-          {effectiveView === 'split' && !isMobile && (
-            <div className="absolute inset-0 flex">
-              {/* PDF Side */}
-              <div className="border-border flex-1 border-r">
+          {/* PDF View - Single instance that persists across view changes */}
+          {/* This prevents annotation state loss when switching between pdf/split views */}
+          {pdfUrl && (effectiveView === 'pdf' || effectiveView === 'split') && (
+            <div className={`absolute inset-0 flex ${effectiveView === 'split' ? '' : ''}`}>
+              {/* PDF Side - takes full width in pdf view, flex-1 in split view */}
+              <div className={effectiveView === 'split' && !isMobile ? 'border-border flex-1 border-r' : 'flex-1'}>
                 {renderPdfViewer()}
               </div>
-              {/* Counters Side - Responsive width */}
-              <div className="w-[320px] shrink-0 overflow-y-auto p-3 md:w-[360px] md:p-4 lg:w-[380px]">
-                <div className="mx-auto max-w-[320px]">
-                  {renderCounters(true)}
+              {/* Counters Side - Only visible in split view */}
+              {effectiveView === 'split' && !isMobile && (
+                <div className="w-[320px] shrink-0 overflow-y-auto p-3 md:w-[360px] md:p-4 lg:w-[380px]">
+                  <div className="mx-auto max-w-[320px]">
+                    {renderCounters(true)}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
         </main>

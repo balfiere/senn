@@ -305,62 +305,74 @@ export function PdfViewer({
     annotationsRef.current = annotations;
   }, [annotations]);
 
-  // Load annotations from initial data and import them into the viewer
-  const loadAnnotations = useCallback(async () => {
-    if (!annotationApiRef.current || annotationsLoadedRef.current) {
+  // Synchronize annotations to the engine - only imports annotations not already loaded
+  // This prevents duplicate imports and race conditions when views change
+  const syncAnnotationsToEngine = useCallback(async () => {
+    if (!annotationApiRef.current) {
       return;
     }
 
     try {
-      if (initialAnnotations && initialAnnotations.length > 0) {
-        const annotationsToImport: {
-          annotation: Record<string, unknown>;
-          ctx?: undefined;
-        }[] = [];
-        for (const dbAnnotation of initialAnnotations) {
-          const converted = dbAnnotationToEmbedpdf(dbAnnotation);
+      // Use annotationsRef.current as the single source of truth
+      // It's already initialized from initialAnnotations and updated with new annotations
+      const currentAnnotations = annotationsRef.current;
 
-          if (
-            converted &&
-            converted.annotation &&
-            converted.annotation.id != null &&
-            converted.annotation.pageIndex != null
-          ) {
-            annotationsToImport.push(converted);
-            loadedAnnotationIdsRef.current.add(
-              converted.annotation.id as string,
-            );
-          }
+      const annotationsToImport: {
+        annotation: Record<string, unknown>;
+        ctx?: undefined;
+      }[] = [];
+
+      for (const dbAnnotation of currentAnnotations) {
+        const annotationId = dbAnnotation.embedpdf_annotation_id;
+        
+        // Skip annotations that are already loaded in the engine
+        // This prevents duplicate imports and the resulting duplicate create events
+        if (loadedAnnotationIdsRef.current.has(annotationId)) {
+          continue;
         }
 
-        if (annotationsToImport.length > 0) {
-          const api = annotationApiRef.current as {
-            importAnnotations: (
-              annotations: {
-                annotation: Record<string, unknown>;
-                ctx?: undefined;
-              }[],
-            ) => void;
-          };
-          api.importAnnotations(annotationsToImport);
+        const converted = dbAnnotationToEmbedpdf(dbAnnotation);
+
+        if (
+          converted &&
+          converted.annotation &&
+          converted.annotation.id != null &&
+          converted.annotation.pageIndex != null
+        ) {
+          annotationsToImport.push(converted);
+          // Mark as loaded BEFORE importing to prevent race conditions
+          loadedAnnotationIdsRef.current.add(annotationId);
         }
       }
 
-      // Mark as loaded
-      annotationsLoadedRef.current = true;
+      if (annotationsToImport.length > 0) {
+        const api = annotationApiRef.current as {
+          importAnnotations: (
+            annotations: {
+              annotation: Record<string, unknown>;
+              ctx?: undefined;
+            }[],
+          ) => void;
+        };
+        api.importAnnotations(annotationsToImport);
+      }
     } catch (error) {
-      console.error('Error loading annotations:', error);
+      console.error('Error syncing annotations to engine:', error);
     }
-  }, [initialAnnotations]);
+  }, []);
 
-  // Effect to load annotations when document is loaded
+  // Effect to sync annotations when document is loaded and engine is ready
   useEffect(() => {
-    const timer = setTimeout(() => {
-      loadAnnotations();
-    }, 500);
+    if (activeDocumentId && annotationApiRef.current) {
+      // Small delay to ensure the engine is ready
+      const timer = setTimeout(() => {
+        syncAnnotationsToEngine();
+      }, 300);
 
-    return () => clearTimeout(timer);
-  }, [loadAnnotations, activeDocumentId]);
+      return () => clearTimeout(timer);
+    }
+  }, [activeDocumentId, syncAnnotationsToEngine]);
+
 
   // Check for mobile viewport
   useEffect(() => {
@@ -502,6 +514,11 @@ export function PdfViewer({
           unknown
         >;
 
+        // CRITICAL: Clear loadedAnnotationIdsRef when engine re-initializes
+        // The engine state is reset on re-init, so annotations need to be re-imported
+        // This ensures newly created annotations are properly restored after view changes
+        loadedAnnotationIdsRef.current.clear();
+
         // Set default colors and blend modes for annotation tools
         annotationApi.setToolDefaults('highlight', {
           color:
@@ -640,6 +657,10 @@ export function PdfViewer({
                 return [...prev, newStoredAnnotation];
               });
 
+              // CRITICAL FIX: Immediately add the new annotation ID to loadedAnnotationIdsRef
+              // This prevents the annotation from being lost during view changes/re-initialization
+              loadedAnnotationIdsRef.current.add(annotationId);
+
               // Persist to server
               saveAnnotation('create', annotationData, annotationId);
 
@@ -677,6 +698,9 @@ export function PdfViewer({
               const deleteAnnotationId = annotation.id || annotation.object?.id;
               if (deleteAnnotationId) {
                 saveAnnotation('delete', {}, deleteAnnotationId);
+                
+                // Remove from tracking ref so it can be re-created if needed
+                loadedAnnotationIdsRef.current.delete(deleteAnnotationId);
                 
                 // Remove from local state immediately
                 setAnnotations((prev) =>
