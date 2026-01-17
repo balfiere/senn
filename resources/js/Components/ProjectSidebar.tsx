@@ -147,7 +147,7 @@ export function ProjectSidebar({
         return (
             <>
                 {/* Bottom Bar */}
-                <div className="fixed bottom-0 left-0 right-0 z-50 bg-sidebar border-t border-sidebar-border">
+                <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border">
                     <div className="flex items-center justify-around px-4 py-2">
                         <Button
                             asChild
@@ -181,10 +181,10 @@ export function ProjectSidebar({
                         onClick={() => setIsMobileExpanded(false)}
                     >
                         <div
-                            className="fixed bottom-0 left-0 right-0 bg-sidebar border-t border-sidebar-border rounded-t-lg h-[100dvh] flex flex-col"
+                            className="fixed bottom-0 left-0 right-0 bg-background border-t border-border rounded-t-lg h-[100dvh] flex flex-col"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <div className="flex items-center justify-between p-4 border-b border-sidebar-border flex-shrink-0">
+                            <div className="flex items-center justify-between p-4 border-b border-border flex-shrink-0">
                                 <h2 className="font-medium text-sidebar-foreground">{project.name}</h2>
                                 <Button
                                     variant="ghost"
@@ -219,8 +219,8 @@ export function ProjectSidebar({
                                                     className={cn(
                                                         "group flex items-center gap-2 rounded-md px-3 py-2.5 text-sm",
                                                         currentPartId === part.id
-                                                            ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                                                            : "text-sidebar-foreground hover:bg-sidebar-accent/50",
+                                                            ? "bg-accent/60 text-sidebar-accent-foreground"
+                                                            : "text-sidebar-foreground hover:bg-accent/60/50",
                                                     )}
                                                 >
                                                     {editingPartId === part.id ? (
@@ -228,7 +228,7 @@ export function ProjectSidebar({
                                                             <Input
                                                                 value={editingName}
                                                                 onChange={(e) => setEditingName(e.target.value)}
-                                                                className="flex-1 h-8 text-sm bg-transparent border-sidebar-border"
+                                                                className="flex-1 h-8 text-sm bg-muted/30 border-border"
                                                                 autoFocus
                                                                 onKeyDown={(e) => {
                                                                     if (e.key === "Enter") saveEdit()
@@ -334,7 +334,7 @@ export function ProjectSidebar({
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                className="w-full justify-start bg-transparent border-sidebar-border text-sidebar-foreground"
+                                                className="w-full justify-start bg-muted/30 border-border text-sidebar-foreground"
                                                 onClick={() => document.getElementById("pdf-upload-mobile")?.click()}
                                                 disabled={isUploading}
                                             >
@@ -347,7 +347,7 @@ export function ProjectSidebar({
                                     {/* Stopwatch */}
                                     <div className="space-y-2">
                                         <span className="text-sm font-medium uppercase text-sidebar-foreground/60">Time Tracker</span>
-                                        <div className="rounded-lg border border-sidebar-border bg-sidebar-accent/30 p-3">
+                                        <div className="rounded-lg border border-border p-3">
                                             <div className="flex items-center justify-center mb-2">
                                                 <Clock className="mr-2 h-4 w-4 text-sidebar-foreground/60" />
                                                 <span className="font-mono text-lg text-sidebar-foreground">{formatTime(stopwatchSeconds)}</span>
@@ -374,7 +374,7 @@ export function ProjectSidebar({
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    className="bg-transparent border-sidebar-border"
+                                                    className="bg-muted/30 border-border"
                                                     onClick={onResetStopwatch}
                                                     title="Reset"
                                                 >
@@ -395,8 +395,8 @@ export function ProjectSidebar({
     // Desktop Sidebar Implementation
     if (isCollapsed) {
         return (
-            <aside className="flex w-14 flex-col border-r border-sidebar-border bg-sidebar h-screen">
-                <div className="flex h-14 items-center justify-center border-b border-sidebar-border flex-shrink-0">
+            <aside className="flex w-14 flex-col border-r border-border bg-background h-screen">
+                <div className="flex h-14 items-center justify-center border-b border-border flex-shrink-0">
                     <Button variant="ghost" size="icon" onClick={() => setIsCollapsed(false)} className="text-sidebar-foreground">
                         <PanelLeftClose className="h-5 w-5 rotate-180" />
                     </Button>
@@ -413,9 +413,9 @@ export function ProjectSidebar({
     }
 
     return (
-        <aside className="flex w-64 flex-col border-r border-sidebar-border bg-sidebar h-screen">
+        <aside className="flex w-64 flex-col border-r border-border bg-background h-screen">
             {/* Header */}
-            <div className="flex h-14 items-center justify-between border-b border-sidebar-border px-4 flex-shrink-0">
+            <div className="flex h-14 items-center justify-between border-b border-border px-4 flex-shrink-0">
                 <h2 className="font-medium text-sidebar-foreground truncate" title={project.name}>
                     {project.name}
                 </h2>
@@ -436,7 +436,7 @@ export function ProjectSidebar({
                         <Button
                             asChild
                             variant="ghost"
-                            className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
+                            className="w-full justify-start text-sidebar-foreground hover:bg-accent/60"
                         >
                             <Link href={route('projects.index')}>
                                 <Home className="mr-2 h-4 w-4" />
@@ -466,8 +466,8 @@ export function ProjectSidebar({
                                     className={cn(
                                         "group flex items-center gap-1 rounded-md px-2 py-1.5 text-sm",
                                         currentPartId === part.id
-                                            ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                                            : "text-sidebar-foreground hover:bg-sidebar-accent/50",
+                                            ? "bg-accent/60 text-sidebar-accent-foreground"
+                                            : "text-sidebar-foreground hover:bg-accent/60/50",
                                     )}
                                 >
                                     {editingPartId === part.id ? (
@@ -475,7 +475,7 @@ export function ProjectSidebar({
                                             <Input
                                                 value={editingName}
                                                 onChange={(e) => setEditingName(e.target.value)}
-                                                className="h-6 text-sm bg-transparent border-sidebar-border"
+                                                className="h-6 text-sm bg-muted/30 border-border"
                                                 autoFocus
                                                 onKeyDown={(e) => {
                                                     if (e.key === "Enter") saveEdit()
@@ -590,7 +590,7 @@ export function ProjectSidebar({
                             <Button
                                 variant="outline"
                                 size="sm"
-                                className="w-full justify-start bg-transparent border-sidebar-border text-sidebar-foreground"
+                                className="w-full justify-start bg-muted/30 border-border text-sidebar-foreground"
                                 onClick={() => document.getElementById("pdf-upload")?.click()}
                                 disabled={isUploading}
                             >
@@ -603,7 +603,7 @@ export function ProjectSidebar({
                     {/* Stopwatch */}
                     <div className="space-y-2">
                         <span className="text-xs font-medium uppercase text-sidebar-foreground/60">Time Tracker</span>
-                        <div className="rounded-lg border border-sidebar-border bg-sidebar-accent/30 p-3">
+                        <div className="rounded-lg border border-border p-3">
                             <div className="flex items-center justify-center mb-2">
                                 <Clock className="mr-2 h-4 w-4 text-sidebar-foreground/60" />
                                 <span className="font-mono text-xl text-sidebar-foreground">{formatTime(stopwatchSeconds)}</span>
@@ -630,7 +630,7 @@ export function ProjectSidebar({
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    className="bg-transparent border-sidebar-border"
+                                    className="bg-muted/30 border-border"
                                     onClick={onResetStopwatch}
                                     title="Reset"
                                 >

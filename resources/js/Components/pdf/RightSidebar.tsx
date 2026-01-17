@@ -219,7 +219,7 @@ export function RightSidebar({
                       key={root.id}
                       {...refProps}
                       className={cn(
-                        'scroll-mt-20 overflow-hidden rounded-xl border shadow-sm transition-all duration-200',
+                        'scroll-mt-20 overflow-hidden rounded-xl border shadow-xs transition-all duration-200',
                         isSelected
                           ? 'border-primary bg-primary/[0.02] ring-1 ring-primary/20'
                           : 'border-border bg-card hover:border-primary/40'
@@ -246,7 +246,7 @@ export function RightSidebar({
                       <div className="space-y-3 p-3">
                         <div className="flex items-center gap-2">
                           <div
-                            className="h-2 w-2 rounded-full shadow-sm"
+                            className="h-2 w-2 rounded-full shadow-xs"
                             style={{
                               backgroundColor:
                                 (

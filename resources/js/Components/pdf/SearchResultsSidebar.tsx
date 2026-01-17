@@ -187,7 +187,7 @@ export function SearchResultsSidebar({ documentId, searchQuery, onClose }: Searc
                       key={index}
                       data-result-index={index}
                       className={cn(
-                        'scroll-mt-20 w-full rounded-xl border p-3 text-left shadow-sm transition-all duration-200',
+                        'scroll-mt-20 w-full rounded-xl border p-3 text-left shadow-xs transition-all duration-200',
                         index === state.activeResultIndex
                           ? 'border-primary bg-primary/[0.02] ring-1 ring-primary/20'
                           : 'border-border bg-card hover:border-primary/40'

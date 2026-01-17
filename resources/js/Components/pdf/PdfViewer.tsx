@@ -124,7 +124,7 @@ function PdfViewerContent({
     <DocumentContent documentId={docId}>
       {({ isLoaded }) =>
         isLoaded && (
-          <div className="flex flex-col h-full w-full bg-muted/30" style={{ userSelect: "none" }}>
+          <div className="flex flex-col h-full w-full" style={{ userSelect: "none" }}>
             <AnnotationToolbar
               documentId={docId}
               activeTool={activeTool}
@@ -162,7 +162,7 @@ function PdfViewerContent({
                 <GlobalPointerProvider documentId={docId}>
                   <Viewport
                     documentId={docId}
-                    className={cn("absolute inset-0 bg-muted", darkMode && "invert hue-rotate-180")}
+                    className={cn("absolute inset-0", darkMode && "invert hue-rotate-180")}
                   >
                     <Scroller
                       documentId={docId}

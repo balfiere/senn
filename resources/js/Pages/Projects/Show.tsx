@@ -242,7 +242,7 @@ export default function Show({
           onPdfUpload={handlePdfUpload}
         />
         <main
-          className="bg-muted/20 relative flex flex-1 overflow-hidden"
+          className="relative flex flex-1 overflow-hidden"
           style={
             isMobile
               ? { paddingBottom: 'calc(var(--spacing) * 12)' }

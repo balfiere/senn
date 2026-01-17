@@ -87,7 +87,7 @@ export function CounterCard({ counter }: Props) {
   return (
     <div
       className={cn(
-        'bg-card text-card-foreground group relative flex aspect-square flex-col gap-3 rounded-xl border p-4 shadow-sm',
+        'bg-card text-card-foreground group relative flex aspect-square flex-col gap-3 rounded-xl border p-4 shadow-xs',
         counter.is_global && 'ring-primary/20 ring-2',
       )}
     >
@@ -98,7 +98,7 @@ export function CounterCard({ counter }: Props) {
           </h3>
           <div className="mt-1.5 flex items-center gap-2">
             {counter.is_global && (
-              <span className="text-muted-foreground bg-secondary rounded-md px-1.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">
+              <span className="text-muted-foreground bg-muted/20 rounded-md px-1.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">
                 Global
               </span>
             )}
@@ -229,7 +229,7 @@ export function CounterCard({ counter }: Props) {
             {applicableNotes.slice(0, 2).map((note) => (
               <div
                 key={note.id}
-                className="bg-accent/50 text-accent-foreground rounded-md p-1.5 text-xs"
+                className="bg-secondary/50 text-accent-foreground rounded-md p-1.5 text-xs"
               >
                 {note.comment_text}
               </div>

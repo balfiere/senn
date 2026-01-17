@@ -187,14 +187,13 @@ function ProjectCard({ project, handleDelete, deletingId }: { project: Project, 
       className="border-border hover:border-primary/50 group relative flex flex-col overflow-hidden transition-colors"
     >
       {project.thumbnail_path && (
-        <div className="relative h-40 w-full border-b border-border bg-muted">
-          <img
-            src={route('projects.thumbnail', project.id)}
-            alt={project.name}
-            className="h-full w-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors" />
-        </div>
+        <div className="relative aspect-4/3 w-full border-b border-border bg-muted">
+  <img
+    src={route('projects.thumbnail', project.id)}
+    alt={project.name}
+    className="h-full w-full object-cover"
+  />
+</div>
       )}
       <Link
         href={route('projects.show', project.id)}
