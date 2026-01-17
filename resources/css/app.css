@@ -3,9 +3,9 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-    --background: #f1f0ed;
+    --background: #f7f6f6;
     --foreground: #000500;
-    --card: rgb(248, 246, 244);
+    --card: #faf8f7;
     --card-foreground: #000500;
     --popover: #FFFCF9;
     --popover-foreground: #000500;
