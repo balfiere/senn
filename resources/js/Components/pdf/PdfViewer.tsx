@@ -220,12 +220,12 @@ function PdfViewerContent({
                   <Tabs value={rightSidebarTab} onValueChange={(v) => setRightSidebarTab(v as "comments" | "search")} className="flex flex-col h-full">
                     <TabsList className="w-full rounded-none border-b shrink-0">
                       <TabsTrigger value="comments" className="flex-1 text-xs">
-                        <MessageSquare className="h-3 w-3 mr-1" />
-                        Comments
+                        <MessageSquare className="h-3 w-3" />
+                        <span>Comments</span>
                       </TabsTrigger>
                       <TabsTrigger value="search" className="flex-1 text-xs">
-                        <Search className="h-3 w-3 mr-1" />
-                        Search
+                        <Search className="h-3 w-3" />
+                        <span>Search</span>
                       </TabsTrigger>
                     </TabsList>
                     <TabsContent value="comments" className="flex-1 m-0 overflow-hidden">

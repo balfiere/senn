@@ -22,16 +22,16 @@ export function LeftSidebar({ documentId, activeTab, setActiveTab, activeTool }:
       >
         <TabsList className="w-full shrink-0 rounded-none border-b">
           <TabsTrigger value="thumbnails" className="flex-1 text-xs">
-            <ImageIcon className="mr-1 h-3 w-3" />
-            Pages
+            <ImageIcon className="h-3 w-3" />
+            <span>Pages</span>
           </TabsTrigger>
           <TabsTrigger value="bookmarks" className="flex-1 text-xs">
-            <Bookmark className="mr-1 h-3 w-3" />
-            Bookmarks
+            <Bookmark className="h-3 w-3" />
+            <span>Bookmarks</span>
           </TabsTrigger>
           <TabsTrigger value="styles" className="flex-1 text-xs">
-            <Palette className="mr-1 h-3 w-3" />
-            Styles
+            <Palette className="h-3 w-3" />
+            <span>Styles</span>
           </TabsTrigger>
         </TabsList>
         <TabsContent value="thumbnails" className="m-0 flex-1 overflow-hidden">

@@ -82,3 +82,22 @@
         @apply bg-background text-foreground;
     }
 }
+
+/* Animated tab text reveal */
+/* Left sidebar tabs (w-48, 3 tabs) - max text width: ~28px per tab */
+.tab-text {
+    width: 0px;
+    opacity: 0;
+    transition: all 300ms ease-in-out;
+    max-width: 60px; /* Allow full text expansion for readability */
+}
+
+/* Right sidebar tabs (w-64, 2 tabs) - max text width: ~92px per tab */
+.w-64 .tab-text {
+    max-width: 100px; /* More generous width for right sidebar */
+}
+
+[data-state="active"] .tab-text {
+    width: auto;
+    opacity: 1;
+}

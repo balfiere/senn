@@ -181,10 +181,10 @@ export function ProjectSidebar({
                         onClick={() => setIsMobileExpanded(false)}
                     >
                         <div
-                            className="fixed bottom-0 left-0 right-0 bg-background border-t border-border rounded-t-lg h-[100dvh] flex flex-col"
+                            className="fixed bottom-0 left-0 right-0 bg-background border-t border-border rounded-t-lg h-dvh flex flex-col"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <div className="flex items-center justify-between p-4 border-b border-border flex-shrink-0">
+                            <div className="flex items-center justify-between p-4 border-b border-border shrink-0">
                                 <h2 className="font-medium text-sidebar-foreground">{project.name}</h2>
                                 <Button
                                     variant="ghost"
@@ -415,7 +415,7 @@ export function ProjectSidebar({
     return (
         <aside className="flex w-64 flex-col border-r border-border bg-background h-screen">
             {/* Header */}
-            <div className="flex h-14 items-center justify-between border-b border-border px-4 flex-shrink-0">
+            <div className="flex h-14 items-center justify-between border-b border-border px-4 shrink-0">
                 <h2 className="font-medium text-sidebar-foreground truncate" title={project.name}>
                     {project.name}
                 </h2>
