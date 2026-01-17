@@ -2,11 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { ScrollArea } from '@/Components/ui/scroll-area';
 import { Button } from '@/Components/ui/button';
 import { Textarea } from '@/Components/ui/textarea';
-import { Trash2, MessageSquare, Send, Reply } from 'lucide-react';
+import { Trash2, MessageSquare, Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { StoredAnnotation } from './utils';
-import { PdfAnnotationSubtype } from '@embedpdf/models';
-import { v4 as uuidv4 } from 'uuid';
 import { useScroll } from '@embedpdf/plugin-scroll/react';
 
 interface RightSidebarProps {
@@ -43,8 +41,6 @@ export function RightSidebar({
 }: RightSidebarProps) {
   const { provides: scrollApi } = useScroll(documentId);
   const [editingComment, setEditingComment] = useState('');
-  const [replyingToId, setReplyingToId] = useState<string | null>(null);
-  const [replyText, setReplyText] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -88,21 +84,8 @@ export function RightSidebar({
     }
   }, [isEditing]);
 
-  // Grouping logic: Root annotations (no in_reply_to_id) and their replies
-  const rootAnnotations = annotations.filter((a) => !a.in_reply_to_id);
-  const repliesMap = annotations.reduce(
-    (acc, a) => {
-      if (a.in_reply_to_id) {
-        if (!acc[a.in_reply_to_id]) acc[a.in_reply_to_id] = [];
-        acc[a.in_reply_to_id].push(a);
-      }
-      return acc;
-    },
-    {} as Record<string, StoredAnnotation[]>
-  );
-
   // Group by Page
-  const groupedByPage = rootAnnotations.reduce(
+  const groupedByPage = annotations.reduce(
     (acc, ann) => {
       const page = ann.page_number;
       if (!acc[page]) acc[page] = [];
@@ -142,42 +125,7 @@ export function RightSidebar({
     setIsEditing(false);
   };
 
-  const handleSaveReply = async (parentId: string) => {
-    if (!replyText.trim() || !annotationApi) return;
 
-    const parent = annotations.find((a) => a.embedpdf_annotation_id === parentId);
-    if (!parent) return;
-
-    const rect =
-      parent.position_x !== null && parent.position_y !== null
-        ? {
-            origin: { x: parent.position_x, y: parent.position_y },
-            size: { width: parent.width || 24, height: parent.height || 24 },
-          }
-        : {
-            origin: { x: 0, y: 0 },
-            size: { width: 24, height: 24 },
-          };
-
-    const api = annotationApi as {
-      createAnnotation: (pageIndex: number, data: Record<string, unknown>) => void;
-    };
-    api.createAnnotation(parent.page_number - 1, {
-      id: uuidv4(),
-      type: PdfAnnotationSubtype.TEXT,
-      contents: replyText,
-      comment: replyText,
-      inReplyToId: parentId,
-      pageIndex: parent.page_number - 1,
-      rect: rect,
-      author: 'User',
-      created: new Date(),
-      modified: new Date(),
-    });
-
-    setReplyText('');
-    setReplyingToId(null);
-  };
 
   const handleDeleteAnnotation = (id: string, pageIndex: number) => {
     if (!annotationApi) return;
@@ -209,7 +157,6 @@ export function RightSidebar({
                 </div>
 
                 {groupedByPage[pageNumber].map((root) => {
-                  const replies = repliesMap[root.embedpdf_annotation_id] || [];
                   const isSelected =
                     selectedAnnotation?.embedpdf_annotation_id === root.embedpdf_annotation_id;
                   const refProps = isSelected ? { ref: selectedRef } : {};
@@ -309,14 +256,14 @@ export function RightSidebar({
                           <div className="group/content relative">
                             {root.comment ? (
                               <p
-                                className="break-words text-sm leading-relaxed text-foreground/90"
+                                className="wrap-break-word text-sm leading-relaxed text-foreground/90"
                                 style={{ overflowWrap: 'anywhere' }}
                               >
                                 {root.comment}
                               </p>
                             ) : (
                               <p
-                                className="break-words text-xs italic text-muted-foreground"
+                                className="wrap-break-word text-xs italic text-muted-foreground"
                                 style={{ overflowWrap: 'anywhere' }}
                               >
                                 Click to add comment...
