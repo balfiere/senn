@@ -188,7 +188,7 @@ export function RightSidebar({
   };
 
   return (
-    <div className="flex h-full w-full flex-col border-l border-border bg-card">
+    <div className="flex h-full w-full flex-col border-l border-border bg-background">
       <ScrollArea className="min-h-0 flex-1" ref={scrollAreaRef}>
         <div className="space-y-6 p-3">
           {sortedPages.length === 0 ? (
@@ -202,7 +202,7 @@ export function RightSidebar({
           ) : (
             sortedPages.map((pageNumber) => (
               <div key={pageNumber} className="space-y-3">
-                <div className="sticky top-0 z-10 border-b border-border/50 bg-card/95 py-1">
+                <div className="sticky top-0 z-10 border-b border-border/50 bg-background/95 py-1">
                   <h4 className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Page {pageNumber}
                   </h4>
@@ -221,7 +221,7 @@ export function RightSidebar({
                       className={cn(
                         'scroll-mt-20 overflow-hidden rounded-xl border shadow-xs transition-all duration-200',
                         isSelected
-                          ? 'border-primary bg-primary/[0.02] ring-1 ring-primary/20'
+                          ? 'border-primary bg-primary/2 ring-1 ring-primary/20'
                           : 'border-border bg-card hover:border-primary/40'
                       )}
                       onClick={() => {

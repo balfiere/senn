@@ -220,7 +220,7 @@ export function ProjectSidebar({
                                                         "group flex items-center gap-2 rounded-md px-3 py-2.5 text-sm",
                                                         currentPartId === part.id
                                                             ? "bg-accent/60 text-sidebar-accent-foreground"
-                                                            : "text-sidebar-foreground hover:bg-accent/60/50",
+                                                            : "text-sidebar-foreground hover:bg-muted/60",
                                                     )}
                                                 >
                                                     {editingPartId === part.id ? (
@@ -436,7 +436,7 @@ export function ProjectSidebar({
                         <Button
                             asChild
                             variant="ghost"
-                            className="w-full justify-start text-sidebar-foreground hover:bg-accent/60"
+                            className="w-full justify-start text-sidebar-foreground hover:bg-muted/60"
                         >
                             <Link href={route('projects.index')}>
                                 <Home className="mr-2 h-4 w-4" />
@@ -467,7 +467,7 @@ export function ProjectSidebar({
                                         "group flex items-center gap-1 rounded-md px-2 py-1.5 text-sm",
                                         currentPartId === part.id
                                             ? "bg-accent/60 text-sidebar-accent-foreground"
-                                            : "text-sidebar-foreground hover:bg-accent/60/50",
+                                            : "text-sidebar-foreground hover:bg-muted/60",
                                     )}
                                 >
                                     {editingPartId === part.id ? (

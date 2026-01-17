@@ -1,9 +1,8 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
-import { ScrollArea } from '@/Components/ui/scroll-area';
 import { ImageIcon, Bookmark, Palette } from 'lucide-react';
-import { ThumbnailsPane, ThumbImg } from '@embedpdf/plugin-thumbnail/react';
-import { useScroll } from '@embedpdf/plugin-scroll/react';
 import { AnnotationStyleSidebar } from './AnnotationStyleSidebar';
+import { ThumbnailPane } from './ThumbnailPane';
+import { BookmarkPane } from './BookmarkPane';
 import { type AnnotationToolType } from './utils';
 
 interface LeftSidebarProps {
@@ -14,10 +13,8 @@ interface LeftSidebarProps {
 }
 
 export function LeftSidebar({ documentId, activeTab, setActiveTab, activeTool }: LeftSidebarProps) {
-  const { provides: scroll } = useScroll(documentId);
-
   return (
-    <div className="flex h-full w-48 flex-col border-r border-border bg-card">
+    <div className="flex h-full w-48 flex-col border-r border-border bg-background">
       <Tabs
         value={activeTab}
         onValueChange={(v) => setActiveTab(v as 'thumbnails' | 'bookmarks' | 'styles')}
@@ -38,39 +35,14 @@ export function LeftSidebar({ documentId, activeTab, setActiveTab, activeTool }:
           </TabsTrigger>
         </TabsList>
         <TabsContent value="thumbnails" className="m-0 flex-1 overflow-hidden">
-          <div className="relative h-full overflow-hidden">
-            <ThumbnailsPane documentId={documentId}>
-              {(m) => (
-                <div
-                  key={m.pageIndex}
-                  style={{
-                    position: 'absolute',
-                    top: m.top,
-                    height: m.wrapperHeight,
-                    width: '100%',
-                  }}
-                  onClick={() => scroll?.scrollToPage({ pageNumber: m.pageIndex + 1 })}
-                  className="cursor-pointer transition-colors hover:bg-muted/50"
-                >
-                  <div style={{ width: m.width, height: m.height }}>
-                    <ThumbImg documentId={documentId} meta={m} />
-                  </div>
-                  <div className="mt-1 text-center text-xs text-muted-foreground">
-                    {m.pageIndex + 1}
-                  </div>
-                </div>
-              )}
-            </ThumbnailsPane>
-          </div>
+          <ThumbnailPane documentId={documentId} />
         </TabsContent>
         <TabsContent value="bookmarks" className="m-0 flex-1">
-          <ScrollArea className="h-full">
-            <div className="p-3 text-sm text-muted-foreground">No bookmarks in this document.</div>
-          </ScrollArea>
+          <BookmarkPane />
         </TabsContent>
         <TabsContent value="styles" className="m-0 flex-1">
-          <AnnotationStyleSidebar 
-            documentId={documentId} 
+          <AnnotationStyleSidebar
+            documentId={documentId}
             activeTool={activeTool}
           />
         </TabsContent>

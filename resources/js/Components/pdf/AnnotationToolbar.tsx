@@ -215,7 +215,7 @@ export function AnnotationToolbar({
   };
 
   return (
-    <div className="border-border bg-card flex flex-wrap items-center gap-1 border-b p-2">
+    <div className="border-border bg-background flex flex-wrap items-center gap-1 border-b p-2 h-14">
       {/* Left sidebar toggle */}
       <Button
         variant="ghost"

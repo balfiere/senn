@@ -184,7 +184,7 @@ function ProjectCard({ project, handleDelete, deletingId }: { project: Project, 
 
   return (
     <Card
-      className="border-border hover:border-primary/50 group relative flex flex-col overflow-hidden transition-colors"
+      className="border-border hover:border-secondary/60 group relative flex flex-col overflow-hidden transition-colors"
     >
       {project.thumbnail_path && (
         <div className="relative aspect-4/3 w-full border-b border-border bg-muted">
@@ -301,7 +301,7 @@ export default function Index({ projects }: Props) {
     <>
       <Head title="Projects" />
       <div className="bg-background min-h-svh">
-        <header className="border-border border-b">
+        <header>
           <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
             <h1 className="text-foreground text-xl font-semibold">
               Row Counter

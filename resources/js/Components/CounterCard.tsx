@@ -229,7 +229,7 @@ export function CounterCard({ counter }: Props) {
             {applicableNotes.slice(0, 2).map((note) => (
               <div
                 key={note.id}
-                className="bg-secondary/50 text-accent-foreground rounded-md p-1.5 text-xs"
+                className="bg-muted/30 text-accent-foreground rounded-md p-1.5 text-xs"
               >
                 {note.comment_text}
               </div>

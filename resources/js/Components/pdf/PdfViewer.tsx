@@ -216,7 +216,7 @@ function PdfViewerContent({
               </div>
 
               {rightSidebarOpen && !isMobile && (
-                <div className="w-64 border-l border-border bg-card flex flex-col h-full">
+                <div className="w-64 border-l border-border bg-background flex flex-col h-full">
                   <Tabs value={rightSidebarTab} onValueChange={(v) => setRightSidebarTab(v as "comments" | "search")} className="flex flex-col h-full">
                     <TabsList className="w-full rounded-none border-b shrink-0">
                       <TabsTrigger value="comments" className="flex-1 text-xs">
@@ -395,7 +395,10 @@ export function PdfViewer({
       createPluginRegistration(SelectionPluginPackage),
       createPluginRegistration(HistoryPluginPackage),
       createPluginRegistration(ZoomPluginPackage),
-      createPluginRegistration(ThumbnailPluginPackage),
+      createPluginRegistration(ThumbnailPluginPackage, {
+    width: 120,
+    paddingY: 10,
+  }),
       createPluginRegistration(SearchPluginPackage),
       createPluginRegistration(PanPluginPackage, {
         defaultMode: 'mobile',
