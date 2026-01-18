@@ -29,7 +29,7 @@ function ColorSwatch({
   return (
     <button
       className={cn(
-        'h-6 w-6 rounded border-2 transition-all',
+        'h-4 w-4 rounded border-2 transition-all',
         active
           ? 'border-primary scale-110'
           : 'border-transparent hover:scale-105',
