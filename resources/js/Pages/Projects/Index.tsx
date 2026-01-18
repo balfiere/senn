@@ -301,7 +301,7 @@ export default function Index({ projects }: Props) {
     <>
       <Head title="Projects" />
       <div className="bg-background min-h-svh">
-        <header>
+        <header className="bg-background top-0 z-40 w-full sticky">
           <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
             <h1 className="text-foreground text-xl font-semibold">
               Row Counter
