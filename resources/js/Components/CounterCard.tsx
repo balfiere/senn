@@ -87,7 +87,7 @@ export function CounterCard({ counter }: Props) {
   return (
     <div
       className={cn(
-        'bg-card text-card-foreground group relative flex aspect-square flex-col gap-3 rounded-xl border p-4 shadow-xs',
+        'bg-card text-card-foreground group relative flex aspect-square flex-col gap-3 rounded-xl border p-2 sm:p-4 shadow-xs',
         counter.is_global && 'ring-primary/20 ring-2',
       )}
     >
@@ -158,18 +158,18 @@ export function CounterCard({ counter }: Props) {
         </div>
       </div>
 
-      <div className="flex flex-1 items-center justify-center gap-4">
+      <div className="flex flex-1 items-center justify-center gap-1 sm:gap-4">
         <Button
           variant="outline"
           size="icon"
-          className="h-9 w-9 rounded-full"
+          className="h-8 w-8 sm:h-9 sm:w-9 rounded-full"
           onClick={handleDecrement}
           disabled={counter.current_value <= 1}
         >
-          <Minus className="h-5 w-5" />
+          <Minus className="h-4 w-4 sm:h-5 sm:w-5" />
         </Button>
 
-        <div className="relative" style={{ width: 100, height: 100 }}>
+        <div className="relative h-16 w-16 sm:h-[100px] sm:w-[100px]">
           <svg className="h-full w-full -rotate-90" viewBox="0 0 100 100">
             {/* Background ring */}
             <circle
@@ -201,11 +201,11 @@ export function CounterCard({ counter }: Props) {
           </svg>
 
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="font-mono text-3xl font-bold tracking-tighter">
+            <span className="font-mono text-xl sm:text-3xl font-bold tracking-tighter">
               {counter.current_value}
             </span>
             {counter.reset_at && (
-              <span className="text-muted-foreground text-xs">
+              <span className="text-muted-foreground text-[10px] sm:text-xs">
                 / {counter.reset_at}
               </span>
             )}
@@ -215,10 +215,10 @@ export function CounterCard({ counter }: Props) {
         <Button
           variant="default"
           size="icon"
-          className="h-9 w-9 rounded-full"
+          className="h-8 w-8 sm:h-9 sm:w-9 rounded-full"
           onClick={handleIncrement}
         >
-          <Plus className="h-5 w-5" />
+          <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
         </Button>
       </div>
 

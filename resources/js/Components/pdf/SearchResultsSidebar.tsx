@@ -187,10 +187,10 @@ export function SearchResultsSidebar({ documentId, searchQuery, onClose }: Searc
                       key={index}
                       data-result-index={index}
                       className={cn(
-                        'scroll-mt-20 w-full rounded-xl border p-3 text-left shadow-xs transition-all duration-200',
+                        'scroll-mt-20 w-full overflow-hidden rounded-xl border p-3 text-left shadow-xs transition-all duration-200',
                         index === state.activeResultIndex
-                          ? 'border-primary bg-primary/[0.02] ring-1 ring-primary/20'
-                          : 'border-border bg-card hover:border-primary/40'
+                          ? 'border-primary/30 bg-white/20 ring-1 ring-primary/20'
+                          : 'border-border bg-card hover:border-secondary/60'
                       )}
                       onClick={() => goToResult(index)}
                     >

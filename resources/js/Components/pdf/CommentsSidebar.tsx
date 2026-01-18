@@ -134,7 +134,7 @@ export function CommentsSidebar({
   };
 
   return (
-    <div className="flex h-full w-full flex-col border-l border-border bg-background">
+    <div className="flex h-full w-full flex-col bg-background">
       <ScrollArea className="min-h-0 flex-1" ref={scrollAreaRef}>
         <div className="space-y-6 p-3">
           {sortedPages.length === 0 ? (
@@ -166,8 +166,8 @@ export function CommentsSidebar({
                       className={cn(
                         'scroll-mt-20 overflow-hidden rounded-xl border shadow-xs transition-all duration-200',
                         isSelected
-                          ? 'border-primary bg-primary/2 ring-1 ring-primary/20'
-                          : 'border-border bg-card hover:border-primary/40'
+                          ? 'border-primary/30 bg-white/20 ring-1 ring-primary/20'
+                          : 'border-border bg-card hover:border-secondary/60'
                       )}
                       onClick={() => {
                         setSelectedAnnotation(root);

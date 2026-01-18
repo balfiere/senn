@@ -178,7 +178,7 @@ export default function Show({
               className={
                 isSplitView
                   ? 'space-y-4'
-                  : 'grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 pb-13'
+                  : 'grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4 pb-13'
               }
             >
               {currentPart.counters.map((counter) => (
@@ -266,8 +266,8 @@ export default function Show({
               </div>
               {/* Counters Side - Only visible in split view */}
               {effectiveView === 'split' && !isMobile && (
-                <div className="w-[320px] shrink-0 overflow-y-auto p-3 md:w-[360px] md:p-4 lg:w-[380px]">
-                  <div className="mx-auto max-w-[320px]">
+                <div className="w-[220px] shrink-0 overflow-y-auto p-3 md:w-[260px] md:p-4 lg:w-[280px]">
+                  <div className="mx-auto max-w-[220px]">
                     {renderCounters(true)}
                   </div>
                 </div>
