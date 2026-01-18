@@ -91,7 +91,7 @@ export function CounterCard({ counter }: Props) {
         counter.is_global && 'ring-primary/20 ring-2',
       )}
     >
-      <div className="flex items-start justify-between">
+      <div className="flex items-center justify-between">
         <div>
           <h3 className="text-base leading-none font-semibold tracking-tight">
             {counter.name}
