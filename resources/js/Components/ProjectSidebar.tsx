@@ -212,15 +212,15 @@ export function ProjectSidebar({
                                                 <Plus className="h-4 w-4" />
                                             </Button>
                                         </div>
-                                        <div className="space-y-1">
+                                        <div className="space-y-0">
                                             {parts.map((part) => (
                                                 <div
                                                     key={part.id}
                                                     className={cn(
-                                                        "group flex items-center gap-2 rounded-md px-3 py-2.5 text-sm",
+                                                        "group flex items-center gap-2 px-3 py-2.5 text-sm border border-border transition-all duration-300",
                                                         currentPartId === part.id
-                                                            ? "ring ring-primary text-sidebar-accent-foreground"
-                                                            : "text-sidebar-foreground hover:ring hover:ring-primary/30",
+                                                            ? "bg-foreground text-background"
+                                                            : "text-sidebar-foreground hover:bg-foreground hover:text-background",
                                                     )}
                                                 >
                                                     {editingPartId === part.id ? (
@@ -277,7 +277,7 @@ export function ProjectSidebar({
                                     </div>
 
                                     {/* Counters */}
-                                    <div className="space-y-2">
+                                    <div className="space-y-3">
                                         <div className="flex items-center justify-between">
                                             <span className="text-sm font-medium uppercase text-sidebar-foreground/60">Counters</span>
                                             <Button
@@ -294,7 +294,7 @@ export function ProjectSidebar({
 
                                     {/* View Options - Hide split view on mobile */}
                                     {project.pdf_path && (
-                                        <div className="space-y-2">
+                                        <div className="space-y-3">
                                             <span className="text-sm font-medium uppercase text-sidebar-foreground/60">View</span>
                                             <div className="grid grid-cols-2 gap-2">
                                                 <Button
@@ -320,7 +320,7 @@ export function ProjectSidebar({
                                     )}
 
                                     {/* PDF Upload */}
-                                    <div className="space-y-2">
+                                    <div className="space-y-3">
                                         <span className="text-sm font-medium uppercase text-sidebar-foreground/60">Pattern PDF</span>
                                         <div>
                                             <input
@@ -345,7 +345,7 @@ export function ProjectSidebar({
                                     </div>
 
                                     {/* Stopwatch */}
-                                    <div className="space-y-2">
+                                    <div className="space-y-3">
                                         <span className="text-sm font-medium uppercase text-sidebar-foreground/60">Time Tracker</span>
                                         <div className="rounded-lg border border-border p-3">
                                             <div className="flex items-center justify-center mb-2">
@@ -415,40 +415,40 @@ export function ProjectSidebar({
     return (
         <aside className="flex w-64 flex-col border-r border-border bg-background h-screen">
             {/* Header */}
-            <div className="flex h-14 items-center justify-between border-b border-border px-4 shrink-0">
-                <h2 className="font-medium text-sidebar-foreground truncate" title={project.name}>
+            <div className="flex h-16 items-center justify-between border-b border-border px-5 shrink-0">
+                <h2 className="text-sm uppercase tracking-[0.15em] text-sidebar-foreground truncate" title={project.name}>
                     {project.name}
                 </h2>
                 <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => setIsCollapsed(true)}
-                    className="text-sidebar-foreground shrink-0"
+                    className="text-sidebar-foreground shrink-0 h-7 w-7"
                 >
-                    <PanelLeftClose className="h-5 w-5" />
+                    <PanelLeftClose className="h-4 w-4" />
                 </Button>
             </div>
 
             <ScrollArea className="flex-1 min-h-0">
-                <div className="p-4 space-y-6">
+                <div className="p-5 space-y-8">
                     {/* Navigation */}
                     <div className="space-y-1">
                         <Button
                             asChild
                             variant="ghost"
-                            className="w-full justify-start text-sidebar-foreground hover:bg-muted/60"
+                            className="w-full justify-start text-sidebar-foreground hover:bg-muted/60 text-xs uppercase tracking-wider"
                         >
                             <Link href={route('projects.index')}>
-                                <Home className="mr-2 h-4 w-4" />
+                                <Home className="mr-2 h-3.5 w-3.5" />
                                 All Projects
                             </Link>
                         </Button>
                     </div>
 
                     {/* Parts */}
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs font-medium uppercase text-sidebar-foreground/60">Parts</span>
+                            <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-sidebar-foreground/50">Parts</span>
                             <Button
                                 variant="ghost"
                                 size="icon"
@@ -456,18 +456,18 @@ export function ProjectSidebar({
                                 onClick={onCreatePart}
                                 title="Add part"
                             >
-                                <Plus className="h-4 w-4" />
+                                <Plus className="h-3.5 w-3.5" />
                             </Button>
                         </div>
-                        <div className="space-y-1">
+                        <div className="space-y-0">
                             {parts.map((part) => (
                                 <div
                                     key={part.id}
                                     className={cn(
-                                        "group flex items-center gap-1 rounded-md px-2 py-1.5 text-sm",
+                                        "group flex items-center gap-1 px-2 py-1.5 text-sm border border-border transition-all duration-300",
                                         currentPartId === part.id
-                                            ? "ring ring-primary text-sidebar-accent-foreground"
-                                            : "text-sidebar-foreground hover:ring hover:ring-primary/30",
+                                            ? "bg-foreground text-background"
+                                            : "text-sidebar-foreground hover:bg-foreground hover:text-background",
                                     )}
                                 >
                                     {editingPartId === part.id ? (
@@ -524,7 +524,7 @@ export function ProjectSidebar({
                     </div>
 
                     {/* Counters */}
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-medium uppercase text-sidebar-foreground/60">Counters</span>
                             <Button
@@ -541,7 +541,7 @@ export function ProjectSidebar({
 
                     {/* View Options */}
                     {project.pdf_path && (
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                             <span className="text-xs font-medium uppercase text-sidebar-foreground/60">View</span>
                             <div className="grid grid-cols-3 gap-1">
                                 <Button
@@ -576,7 +576,7 @@ export function ProjectSidebar({
                     )}
 
                     {/* PDF Upload */}
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                         <span className="text-xs font-medium uppercase text-sidebar-foreground/60">Pattern PDF</span>
                         <div>
                             <input
@@ -601,7 +601,7 @@ export function ProjectSidebar({
                     </div>
 
                     {/* Stopwatch */}
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                         <span className="text-xs font-medium uppercase text-sidebar-foreground/60">Time Tracker</span>
                         <div className="rounded-lg border border-border p-3">
                             <div className="flex items-center justify-center mb-2">
