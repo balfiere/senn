@@ -153,7 +153,7 @@ export function ProjectSidebar({
                             asChild
                             variant="ghost"
                             size="sm"
-                            className="flex-1 text-sidebar-foreground"
+                            className="flex-1 text-popover-foreground"
                         >
                             <Link href={route('projects.index')} className="flex flex-col items-center gap-1">
                                 <Home className="h-5 w-5" />
@@ -164,7 +164,7 @@ export function ProjectSidebar({
                             variant="ghost"
                             size="sm"
                             onClick={() => setIsMobileExpanded(!isMobileExpanded)}
-                            className="flex-1 text-sidebar-foreground"
+                            className="flex-1 text-popover-foreground"
                         >
                             <div className="flex flex-col items-center gap-1">
                                 <PanelLeftClose className={cn("h-5 w-5", isMobileExpanded ? "rotate-180" : "")} />
@@ -185,12 +185,12 @@ export function ProjectSidebar({
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="flex items-center justify-between p-4 border-b border-border shrink-0">
-                                <h2 className="font-medium text-sidebar-foreground">{project.name}</h2>
+                                <h2 className="font-medium text-popover-foreground">{project.name}</h2>
                                 <Button
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => setIsMobileExpanded(false)}
-                                    className="text-sidebar-foreground"
+                                    className="text-popover-foreground"
                                 >
                                     <X className="h-5 w-5" />
                                 </Button>
@@ -201,11 +201,11 @@ export function ProjectSidebar({
                                     {/* Parts */}
                                     <div className="space-y-2">
                                         <div className="flex items-center justify-between">
-                                            <span className="text-xs font-medium uppercase text-sidebar-foreground/60">Parts</span>
+                                            <span className="text-xs font-medium uppercase text-popover-foreground/60">Parts</span>
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="h-8 w-8 text-sidebar-foreground"
+                                                className="h-8 w-8 text-popover-foreground"
                                                 onClick={onCreatePart}
                                                 title="Add part"
                                             >
@@ -217,10 +217,10 @@ export function ProjectSidebar({
                                                 <div
                                                     key={part.id}
                                                     className={cn(
-                                                        "group flex items-center gap-2 px-3 py-2.5 text-sm border border-border transition-all duration-300",
+                                                        "group flex items-center gap-2 px-3 py-2.5 text-xs border border-border transition-all duration-300",
                                                         currentPartId === part.id
                                                             ? "bg-foreground text-background"
-                                                            : "text-sidebar-foreground hover:bg-foreground hover:text-background",
+                                                            : "text-popover-foreground hover:bg-foreground hover:text-background",
                                                     )}
                                                 >
                                                     {editingPartId === part.id ? (
@@ -228,7 +228,7 @@ export function ProjectSidebar({
                                                             <Input
                                                                 value={editingName}
                                                                 onChange={(e) => setEditingName(e.target.value)}
-                                                                className="flex-1 h-8 text-sm bg-muted/30 border-border"
+                                                                className="flex-1"
                                                                 autoFocus
                                                                 onKeyDown={(e) => {
                                                                     if (e.key === "Enter") saveEdit()
@@ -279,11 +279,11 @@ export function ProjectSidebar({
                                     {/* Counters */}
                                     <div className="space-y-2">
                                         <div className="flex items-center justify-between">
-                                            <span className="text-sm font-medium uppercase text-sidebar-foreground/60">Counters</span>
+                                            <span className="text-sm font-medium uppercase text-popover-foreground/60">Counters</span>
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="h-8 w-8 text-sidebar-foreground"
+                                                className="h-8 w-8 text-popover-foreground"
                                                 onClick={onCreateCounter}
                                                 title="Add counter"
                                             >
@@ -294,13 +294,13 @@ export function ProjectSidebar({
 
                                     {/* View Options - Hide split view on mobile */}
                                     {project.pdf_path && (
-                                        <div className="space-y-2">
-                                            <span className="text-sm font-medium uppercase text-sidebar-foreground/60">View</span>
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-medium uppercase text-popover-foreground/60 mb-2">View</span>
                                             <div className="grid grid-cols-2 gap-2">
                                                 <Button
                                                     variant={view === "counters" ? "secondary" : "ghost"}
                                                     size="sm"
-                                                    className="text-sidebar-foreground"
+                                                    className="text-popover-foreground"
                                                     onClick={() => onViewChange("counters")}
                                                     title="Counters only"
                                                 >
@@ -309,7 +309,7 @@ export function ProjectSidebar({
                                                 <Button
                                                     variant={view === "pdf" ? "secondary" : "ghost"}
                                                     size="sm"
-                                                    className="text-sidebar-foreground"
+                                                    className="text-popover-foreground"
                                                     onClick={() => onViewChange("pdf")}
                                                     title="PDF only"
                                                 >
@@ -320,8 +320,8 @@ export function ProjectSidebar({
                                     )}
 
                                     {/* PDF Upload */}
-                                    <div className="space-y-2">
-                                        <span className="text-sm font-medium uppercase text-sidebar-foreground/60">Pattern PDF</span>
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-medium uppercase text-popover-foreground/60 mb-2">Pattern PDF</span>
                                         <div>
                                             <input
                                                 type="file"
@@ -334,7 +334,7 @@ export function ProjectSidebar({
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                className="w-full justify-start bg-muted/30 border-border text-sidebar-foreground"
+                                                className="w-full justify-start bg-muted/30 text-popover-foreground "
                                                 onClick={() => document.getElementById("pdf-upload-mobile")?.click()}
                                                 disabled={isUploading}
                                             >
@@ -345,12 +345,12 @@ export function ProjectSidebar({
                                     </div>
 
                                     {/* Stopwatch */}
-                                    <div className="space-y-2">
-                                        <span className="text-sm font-medium uppercase text-sidebar-foreground/60">Time Tracker</span>
-                                        <div className="rounded-lg border border-border p-3">
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-medium uppercase text-popover-foreground/60 mb-2">Time Tracker</span>
+                                        <div className="rounded-none border border-border p-3">
                                             <div className="flex items-center justify-center mb-2">
-                                                <Clock className="mr-2 h-4 w-4 text-sidebar-foreground/60" />
-                                                <span className="font-mono text-lg text-sidebar-foreground">{formatTime(stopwatchSeconds)}</span>
+                                                <Clock className="mr-2 h-4 w-4 text-popover-foreground/60" />
+                                                <span className="font-mono text-lg text-popover-foreground">{formatTime(stopwatchSeconds)}</span>
                                             </div>
                                             <div className="flex gap-2">
                                                 <Button
@@ -397,12 +397,12 @@ export function ProjectSidebar({
         return (
             <aside className="flex w-14 flex-col border-r border-border bg-background h-screen">
                 <div className="flex h-14 items-center justify-center border-b border-border shrink-0">
-                    <Button variant="ghost" size="icon" onClick={() => setIsCollapsed(false)} className="text-sidebar-foreground">
+                    <Button variant="ghost" size="icon" onClick={() => setIsCollapsed(false)} className="text-popover-foreground">
                         <PanelLeftClose className="h-5 w-5 rotate-180" />
                     </Button>
                 </div>
                 <div className="flex flex-1 flex-col items-center gap-2 py-4">
-                    <Button asChild variant="ghost" size="icon" className="text-sidebar-foreground">
+                    <Button asChild variant="ghost" size="icon" className="text-popover-foreground">
                         <Link href={route('projects.index')}>
                             <Home className="h-5 w-5" />
                         </Link>
@@ -416,14 +416,14 @@ export function ProjectSidebar({
         <aside className="flex w-64 flex-col border-r border-border bg-background h-screen">
             {/* Header */}
             <div className="flex h-14 items-center justify-between border-b border-border px-5 shrink-0">
-                <h2 className="text-sm uppercase tracking-[0.15em] text-sidebar-foreground truncate" title={project.name}>
+                <h2 className="text-sm uppercase tracking-[0.15em] text-popover-foreground truncate" title={project.name}>
                     {project.name}
                 </h2>
                 <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => setIsCollapsed(true)}
-                    className="text-sidebar-foreground shrink-0 h-7 w-7"
+                    className="text-popover-foreground shrink-0 h-7 w-7"
                 >
                     <PanelLeftClose className="h-4 w-4" />
                 </Button>
@@ -436,7 +436,7 @@ export function ProjectSidebar({
                         <Button
                             asChild
                             variant="ghost"
-                            className="w-full justify-start text-sidebar-foreground hover:bg-muted/60 text-xs uppercase tracking-wider"
+                            className="w-full justify-start text-popover-foreground hover:bg-muted/60 text-xs uppercase tracking-wider"
                         >
                             <Link href={route('projects.index')}>
                                 <Home className="mr-2 h-3.5 w-3.5" />
@@ -448,11 +448,11 @@ export function ProjectSidebar({
                     {/* Parts */}
                     <div className="flex flex-col gap-1">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs font-medium uppercase text-sidebar-foreground/60">Parts</span>
+                            <span className="text-xs font-medium uppercase text-popover-foreground/60">Parts</span>
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-6 w-6 text-sidebar-foreground"
+                                className="h-6 w-6 text-popover-foreground"
                                 onClick={onCreatePart}
                                 title="Add part"
                             >
@@ -464,10 +464,10 @@ export function ProjectSidebar({
                                 <div
                                     key={part.id}
                                     className={cn(
-                                        "group flex items-center gap-1.5 px-2 py-1.5 text-sm transition-all duration-300",
+                                        "group flex items-center gap-1.5 px-2 py-1.5 text-sm transition-all duration-300 rounded-xs",
                                         currentPartId === part.id
-                                            ? "bg-secondary hover:bg-secondary/80 rounded-sm"
-                                            : "hover:bg-muted/60 hover:text-accent-foreground dark:hover:bg-accent/50 h-9 rounded-sm",
+                                            ? "bg-secondary hover:bg-secondary/80"
+                                            : "hover:bg-muted/60 hover:text-accent-foreground dark:hover:bg-accent/50 h-9",
                                     )}
                                 >
                                     {editingPartId === part.id ? (
@@ -475,7 +475,7 @@ export function ProjectSidebar({
                                             <Input
                                                 value={editingName}
                                                 onChange={(e) => setEditingName(e.target.value)}
-                                                className="h-6 text-sm bg-muted/30 border-border"
+                                                className="h-6"
                                                 autoFocus
                                                 onKeyDown={(e) => {
                                                     if (e.key === "Enter") saveEdit()
@@ -526,11 +526,11 @@ export function ProjectSidebar({
                     {/* Counters */}
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs font-medium uppercase text-sidebar-foreground/60">Counters</span>
+                            <span className="text-xs font-medium uppercase text-popover-foreground/60">Counters</span>
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-6 w-6 text-sidebar-foreground"
+                                className="h-6 w-6 text-popover-foreground"
                                 onClick={onCreateCounter}
                                 title="Add counter"
                             >
@@ -542,12 +542,12 @@ export function ProjectSidebar({
                     {/* View Options */}
                     {project.pdf_path && (
                         <div className="flex flex-col">
-                            <span className="text-xs font-medium uppercase text-sidebar-foreground/60 mb-2">View</span>
+                            <span className="text-xs font-medium uppercase text-popover-foreground/60 mb-2">View</span>
                             <div className="grid grid-cols-3 gap-1">
                                 <Button
                                     variant={view === "counters" ? "secondary" : "ghost"}
                                     size="sm"
-                                    className="text-sidebar-foreground"
+                                    className="text-popover-foreground"
                                     onClick={() => onViewChange("counters")}
                                     title="Counters only"
                                 >
@@ -556,7 +556,7 @@ export function ProjectSidebar({
                                 <Button
                                     variant={view === "pdf" ? "secondary" : "ghost"}
                                     size="sm"
-                                    className="text-sidebar-foreground"
+                                    className="text-popover-foreground"
                                     onClick={() => onViewChange("pdf")}
                                     title="PDF only"
                                 >
@@ -565,7 +565,7 @@ export function ProjectSidebar({
                                 <Button
                                     variant={view === "split" ? "secondary" : "ghost"}
                                     size="sm"
-                                    className="text-sidebar-foreground"
+                                    className="text-popover-foreground"
                                     onClick={() => onViewChange("split")}
                                     title="Split view"
                                 >
@@ -577,7 +577,7 @@ export function ProjectSidebar({
 
                     {/* PDF Upload */}
                     <div className="flex flex-col">
-                        <span className="text-xs font-medium uppercase text-sidebar-foreground/60 mb-2">Pattern PDF</span>
+                        <span className="text-xs font-medium uppercase text-popover-foreground/60 mb-2">Pattern PDF</span>
                         <div>
                             <input
                                 type="file"
@@ -590,7 +590,7 @@ export function ProjectSidebar({
                             <Button
                                 variant="outline"
                                 size="sm"
-                                className="w-full justify-start bg-muted/30 border-border text-sidebar-foreground"
+                                className="w-full justify-start bg-muted/30 border-border text-popover-foreground"
                                 onClick={() => document.getElementById("pdf-upload")?.click()}
                                 disabled={isUploading}
                             >
@@ -602,11 +602,11 @@ export function ProjectSidebar({
 
                     {/* Stopwatch */}
                     <div className="flex flex-col">
-                        <span className="text-xs font-medium uppercase text-sidebar-foreground/60 mb-2">Time Tracker</span>
-                        <div className="rounded-lg border border-border p-3">
+                        <span className="text-xs font-medium uppercase text-popover-foreground/60 mb-2">Time Tracker</span>
+                        <div className="rounded-none border border-border p-3">
                             <div className="flex items-center justify-center mb-2">
-                                <Clock className="mr-2 h-4 w-4 text-sidebar-foreground/60" />
-                                <span className="font-mono text-xl text-sidebar-foreground">{formatTime(stopwatchSeconds)}</span>
+                                <Clock className="mr-2 h-4 w-4 text-popover-foreground/60" />
+                                <span className="font-mono text-xl text-popover-foreground">{formatTime(stopwatchSeconds)}</span>
                             </div>
                             <div className="flex gap-2">
                                 <Button

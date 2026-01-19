@@ -187,14 +187,14 @@ function ProjectCard({ project, handleDelete, deletingId }: { project: Project, 
 
   return (
     <Card
-      className="border-border hover:border-foreground/20 group relative flex flex-col overflow-hidden transition-all duration-300 rounded-none shadow-none hover:shadow-sm gap-0 py-0"
+      className="group relative flex flex-col gap-0 py-0"
     >
       {project.thumbnail_path && (
         <div className="relative aspect-4/3 w-full border-b border-border bg-muted">
           <img
             src={route('projects.thumbnail', project.id)}
             alt={project.name}
-            className="h-full w-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-500"
+            className="h-full w-full object-cover grayscale-20 group-hover:grayscale-0 transition-all duration-500"
           />
         </div>
       )}

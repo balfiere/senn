@@ -98,7 +98,7 @@ export function CounterCard({ counter }: Props) {
           </h3>
           <div className="mt-1.5 flex items-center gap-2">
             {counter.is_global && (
-              <span className="text-muted-foreground bg-muted/20 rounded-md px-1.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">
+              <span className="text-muted-foreground bg-muted/20 rounded-none px-1.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">
                 Global
               </span>
             )}
@@ -229,7 +229,7 @@ export function CounterCard({ counter }: Props) {
             {applicableNotes.slice(0, 2).map((note) => (
               <div
                 key={note.id}
-                className="bg-muted/30 text-accent-foreground rounded-md p-1.5 text-xs"
+                className="bg-muted/30 text-accent-foreground rounded-none p-1.5 text-xs"
               >
                 {note.comment_text}
               </div>
@@ -367,7 +367,7 @@ function EditCounterDialog({
             {counter.comments?.map((comment) => (
               <div
                 key={comment.id}
-                className="bg-muted/30 flex items-start gap-2 rounded-md border p-2 text-sm"
+                className="bg-muted/30 flex items-start gap-2 rounded-none border p-2 text-sm"
               >
                 <div className="flex-1">
                   <p className="font-semibold">Row {comment.row_pattern}</p>
@@ -387,10 +387,10 @@ function EditCounterDialog({
             ))}
           </div>
 
-          <div className="space-y-2 rounded-md border p-3">
+          <div className="space-y-2.5 rounded-none border p-3">
             <div className="grid grid-cols-3 gap-2">
               <div className="col-span-1">
-                <Label className="text-xs">Row(s)</Label>
+                <Label className="text-xs mb-1">Row(s)</Label>
                 <Input
                   value={newPattern}
                   onChange={(e) => setNewPattern(e.target.value)}
@@ -399,7 +399,7 @@ function EditCounterDialog({
                 />
               </div>
               <div className="col-span-2">
-                <Label className="text-xs">Note</Label>
+                <Label className="text-xs mb-1">Note</Label>
                 <Textarea
                   value={newText}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
@@ -417,7 +417,7 @@ function EditCounterDialog({
               className="h-8 w-full"
               onClick={handleAddComment}
             >
-              <Plus className="mr-1 h-3 w-3" /> Add Note
+              <Plus className="mr-1 h-3 w-3 font-light" /> Add Note
             </Button>
           </div>
         </div>

@@ -30,9 +30,9 @@ export function ResponsiveToaster() {
         <Toaster
             position={isMobile ? "bottom-center" : "bottom-right"}
             toastOptions={{
-                className: 'bg-popover text-popover-foreground border-border shadow-lg',
+                className: 'bg-card text-card-foreground border-border shadow-lg',
                 style: {
-                    borderRadius: '8px',
+                    borderRadius: '0px',
                 },
             }}
         />
