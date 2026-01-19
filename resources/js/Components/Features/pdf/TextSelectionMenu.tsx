@@ -6,6 +6,7 @@ import { Highlighter, Underline } from 'lucide-react';
 import type React from 'react';
 import { useCallback } from 'react';
 import { ANNOTATION_COLORS } from './utils';
+import { Button } from '@/Components/ui/button';
 
 interface TextSelectionMenuProps {
   documentId: string;
@@ -162,13 +163,15 @@ export function TextSelectionMenu({
     <div {...menuWrapperProps}>
       <div
         style={menuStyle}
-        className="border-border bg-card rounded-lg border shadow-lg"
+        className="border-border bg-card rounded-none border shadow-lg"
       >
-        <div className="flex items-center gap-1 px-2 py-1.5">
+        <div className="flex items-center gap-1 px-1.5 py-1.5">
           {/* Copy button */}
-          <button
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            className="rounded-sm text-muted-foreground"
             onClick={handleCopy}
-            className="text-muted-foreground hover:bg-muted hover:text-foreground flex items-center justify-center rounded p-1.5 transition-colors"
             title="Copy text"
           >
             <svg
@@ -184,27 +187,30 @@ export function TextSelectionMenu({
                 d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
               />
             </svg>
-          </button>
+          </Button>
 
           <Separator orientation="vertical" className="mx-1 h-4" />
 
-          {/* Highlight button */}
-          <button
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            className="rounded-sm text-muted-foreground"
             onClick={handleHighlight}
-            className="text-muted-foreground hover:bg-muted hover:text-foreground flex items-center justify-center rounded p-1.5 transition-colors"
             title="Highlight text"
           >
             <Highlighter size={16} />
-          </button>
+          </Button>
 
           {/* Underline button */}
-          <button
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            className="rounded-sm text-muted-foreground"
             onClick={handleUnderline}
-            className="text-muted-foreground hover:bg-muted hover:text-foreground flex items-center justify-center rounded p-1.5 transition-colors"
             title="Underline text"
           >
             <Underline size={16} />
-          </button>
+          </Button>
         </div>
       </div>
     </div>

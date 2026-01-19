@@ -14,6 +14,7 @@ import { MessageSquare, Trash2 } from 'lucide-react';
 import type React from 'react';
 import { useCallback, useState } from 'react';
 import { ANNOTATION_COLORS } from './utils';
+import { Button } from '@/Components/ui/button';
 
 interface AnnotationSelectionMenuProps extends BaseProps {
   documentId: string;
@@ -110,32 +111,34 @@ export function AnnotationSelectionMenu({
     <div {...menuWrapperProps}>
       <div
         style={menuStyle}
-        className="border-border bg-card rounded-lg border shadow-lg"
+        className="border-border bg-card rounded-none border shadow-lg"
       >
-        <div className="flex items-center gap-1 px-2 py-1.5">
+        <div className="flex items-center gap-1 px-1.5 py-1.5">
           {/* Color button */}
           <Popover open={showColors} onOpenChange={setShowColors}>
             <PopoverTrigger asChild>
-              <button
-                className="hover:bg-muted flex items-center justify-center rounded p-1.5 transition-colors"
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                className="rounded-sm text-muted-foreground"
                 title="Change color"
               >
                 <div
-                  className="border-border h-4 w-4 rounded border"
+                  className="border-border h-4 w-4 rounded-sm border"
                   style={{ backgroundColor: currentColor }}
                 />
-              </button>
+              </Button>
             </PopoverTrigger>
             <PopoverContent className="w-48 p-2" side="top">
-              <div className="grid grid-cols-8 gap-1">
+              <div className="grid grid-cols-8 gap-1.5">
                 {ANNOTATION_COLORS.map((color) => (
-                  <button
+                  <Button
                     key={color.value}
                     className={cn(
-                      'h-5 w-5 rounded border-2 transition-all',
+                      'h-4 w-4 px-2 rounded-sm ring-ring transition-all',
                       currentColor === color.value
-                        ? 'border-primary scale-110'
-                        : 'border-transparent hover:scale-105',
+                        ? 'ring-1 scale-115'
+                        : 'hover:scale-110',
                     )}
                     style={{ backgroundColor: color.value }}
                     onClick={() => {
@@ -152,22 +155,26 @@ export function AnnotationSelectionMenu({
           <Separator orientation="vertical" className="mx-1 h-4" />
 
           {/* Comment button */}
-          <button
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            className="rounded-sm text-muted-foreground"
             onClick={() => onOpenComment(obj || null)}
-            className="text-muted-foreground hover:bg-muted hover:text-foreground flex items-center justify-center rounded p-1.5 transition-colors"
             title="Add comment"
           >
             <MessageSquare size={16} />
-          </button>
+          </Button>
 
           {/* Delete button */}
-          <button
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            className="rounded-sm text-muted-foreground"
             onClick={handleDelete}
-            className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive flex items-center justify-center rounded p-1.5 transition-colors"
             title="Delete annotation"
           >
             <Trash2 size={16} />
-          </button>
+          </Button>
         </div>
       </div>
     </div>

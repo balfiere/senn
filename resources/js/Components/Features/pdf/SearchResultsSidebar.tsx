@@ -5,6 +5,7 @@ import { useScroll } from '@embedpdf/plugin-scroll/react';
 import { Button } from '@/Components/ui/button';
 import { Checkbox } from '@/Components/ui/checkbox';
 import { ScrollArea } from '@/Components/ui/scroll-area';
+import { Label } from '@/Components/ui/label';
 import { X, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -112,14 +113,14 @@ export function SearchResultsSidebar({ documentId, searchQuery, onClose }: Searc
 
         {/* Search options */}
         <div className="space-y-1">
-          <label className="flex cursor-pointer items-center gap-2 text-xs">
+          <Label className="flex cursor-pointer items-center gap-2 text-xs">
             <Checkbox
               checked={state.flags.includes(MatchFlag.MatchCase)}
               onCheckedChange={(checked) => handleFlagChange(MatchFlag.MatchCase, checked as boolean)}
             />
             <span>Case sensitive</span>
-          </label>
-          <label className="flex cursor-pointer items-center gap-2 text-xs">
+          </Label>
+          <Label className="flex cursor-pointer items-center gap-2 text-xs">
             <Checkbox
               checked={state.flags.includes(MatchFlag.MatchWholeWord)}
               onCheckedChange={(checked) =>
@@ -127,7 +128,7 @@ export function SearchResultsSidebar({ documentId, searchQuery, onClose }: Searc
               }
             />
             <span>Whole word</span>
-          </label>
+          </Label>
         </div>
 
         {/* Results count and navigation */}

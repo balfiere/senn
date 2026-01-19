@@ -14,6 +14,7 @@ import {
 } from '@embedpdf/plugin-annotation/react';
 import { useEffect, useState } from 'react';
 import { ANNOTATION_COLORS, type AnnotationToolType } from './utils';
+import { Button } from '@/Components/ui/button';
 
 // Utility component for color swatches
 function ColorSwatch({
@@ -27,12 +28,12 @@ function ColorSwatch({
 }) {
   const isTransparent = color === 'transparent';
   return (
-    <button
+    <Button
       className={cn(
-        'h-4 w-4 rounded border-2 transition-all',
+        'h-4 w-4 px-2 rounded-sm ring-ring transition-all',
         active
-          ? 'border-primary scale-110'
-          : 'border-transparent hover:scale-105',
+          ? 'ring-1 scale-115'
+          : 'hover:scale-110',
       )}
       style={{
         backgroundColor: isTransparent ? '#fff' : color,
@@ -144,7 +145,7 @@ function TextMarkupPanel({
     <div className="space-y-4">
       <div className="space-y-3">
         <Label className="text-xs font-medium">Color</Label>
-        <div className="grid grid-cols-8 gap-1">
+        <div className="grid grid-cols-8 gap-1.5">
           {ANNOTATION_COLORS.map((colorOption) => (
             <ColorSwatch
               key={colorOption.value}
@@ -248,7 +249,7 @@ function ShapePanel({
     <div className="space-y-4">
       <div className="space-y-3">
         <Label className="text-xs font-medium">Fill Color</Label>
-        <div className="grid grid-cols-8 gap-1">
+        <div className="grid grid-cols-8 gap-1.5">
           {ANNOTATION_COLORS.map((colorOption) => (
             <ColorSwatch
               key={colorOption.value}
@@ -267,7 +268,7 @@ function ShapePanel({
 
       <div className="space-y-3">
         <Label className="text-xs font-medium">Stroke Color</Label>
-        <div className="grid grid-cols-8 gap-1">
+        <div className="grid grid-cols-8 gap-1.5">
           {ANNOTATION_COLORS.map((colorOption) => (
             <ColorSwatch
               key={colorOption.value}
@@ -333,7 +334,7 @@ function FreeTextPanel({
   useEffect(() => setFontSize(baseFontSize), [baseFontSize]);
   useEffect(() => setFontFamily(baseFontFamily), [baseFontFamily]);
 
- const changeFontColor = (c: string) => {
+  const changeFontColor = (c: string) => {
     setFontColor(c);
     applyPatch({ fontColor: String(c) });
   };
@@ -366,7 +367,7 @@ function FreeTextPanel({
     <div className="space-y-4">
       <div className="space-y-3">
         <Label className="text-xs font-medium">Font Color</Label>
-        <div className="grid grid-cols-8 gap-1">
+        <div className="grid grid-cols-8 gap-1.5">
           {ANNOTATION_COLORS.map((colorOption) => (
             <ColorSwatch
               key={colorOption.value}
@@ -444,7 +445,7 @@ function LinePanel({
   useEffect(() => setOpacity(baseOpacity), [baseOpacity]);
   useEffect(() => setStrokeWidth(baseStrokeWidth), [baseStrokeWidth]);
 
- const changeColor = (c: string) => {
+  const changeColor = (c: string) => {
     setColor(c);
     applyPatch({ strokeColor: c });
   };
@@ -472,7 +473,7 @@ function LinePanel({
     <div className="space-y-4">
       <div className="space-y-3">
         <Label className="text-xs font-medium">Color</Label>
-        <div className="grid grid-cols-8 gap-1">
+        <div className="grid grid-cols-8 gap-1.5">
           {ANNOTATION_COLORS.map((colorOption) => (
             <ColorSwatch
               key={colorOption.value}

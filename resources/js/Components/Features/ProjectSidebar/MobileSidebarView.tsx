@@ -1,6 +1,7 @@
 import { Link } from "@inertiajs/react"
 import { Home, PanelLeftClose, X, Plus, Upload } from "lucide-react"
 import { Button } from "@/Components/ui/button"
+import { Input } from '@/Components/ui/input';
 import { Project, Part } from "@/types"
 import { cn } from "@/lib/utils"
 import { SidebarPartItem } from "./SidebarPartItem"
@@ -163,7 +164,7 @@ export function MobileSidebarView({
                                 <div className="flex flex-col">
                                     <span className="text-sm font-medium uppercase text-popover-foreground/60 mb-2">Pattern PDF</span>
                                     <div>
-                                        <input
+                                        <Input
                                             type="file"
                                             accept="application/pdf"
                                             onChange={handleFileUpload}
@@ -174,7 +175,7 @@ export function MobileSidebarView({
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            className="w-full justify-start bg-muted/30 text-popover-foreground "
+                                            className="w-full justify-start bg-muted/30 text-popover-foreground font-light"
                                             onClick={() => document.getElementById("pdf-upload-mobile")?.click()}
                                             disabled={isUploading}
                                         >
