@@ -1,7 +1,7 @@
 import { Head, router } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 
-import { CounterCard } from '@/Components/Features/CounterCard';
+import { CounterCard } from '@/Components/Features/Counter/CounterCard';
 import { PdfViewer } from '@/Components/Features/pdf/PdfViewer';
 import { ProjectSidebar } from '@/Components/ProjectSidebar';
 import { ResponsiveToaster } from '@/Components/Features/ResponsiveToaster';
