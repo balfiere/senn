@@ -83,40 +83,42 @@ function CreateProjectDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm">
-          <Plus className="mr-2 h-4 w-4" />
+        <Button size="sm" className="rounded-none text-xs uppercase tracking-wider">
+          <Plus className="mr-2 h-3.5 w-3.5" />
           New Project
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md rounded-none">
         <DialogHeader>
-          <DialogTitle>Create New Project</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="font-light tracking-tight text-xl">Create New Project</DialogTitle>
+          <DialogDescription className="text-sm tracking-wide">
             Start tracking a new knitting or crochet project.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-5 py-6">
             <div className="grid gap-2">
-              <Label htmlFor="name">Project Name</Label>
+              <Label htmlFor="name" className="text-xs uppercase tracking-wider text-muted-foreground">Project Name</Label>
               <Input
                 id="name"
                 placeholder="My Sweater"
                 value={data.name}
                 onChange={(e) => setData('name', e.target.value)}
                 required
+                className="rounded-none"
               />
               {errors.name && (
                 <p className="text-destructive text-sm">{errors.name}</p>
               )}
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="pdf_file">Pattern PDF (Optional)</Label>
+              <Label htmlFor="pdf_file" className="text-xs uppercase tracking-wider text-muted-foreground">Pattern PDF (Optional)</Label>
               <Input
                 id="pdf_file"
                 type="file"
                 accept=".pdf"
                 onChange={(e) => setData('pdf_file', e.target.files ? e.target.files[0] : null)}
+                className="rounded-none"
               />
               {errors.pdf_file && (
                 <p className="text-destructive text-sm">{errors.pdf_file}</p>
@@ -128,10 +130,11 @@ function CreateProjectDialog() {
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
+              className="rounded-none"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={processing || !data.name}>
+            <Button type="submit" disabled={processing || !data.name} className="rounded-none">
               {processing ? 'Creating...' : 'Create Project'}
             </Button>
           </DialogFooter>
@@ -147,8 +150,8 @@ function LogoutButton() {
   };
 
   return (
-    <Button variant="ghost" size="sm" onClick={handleLogout}>
-      <LogOut className="mr-2 h-4 w-4" />
+    <Button variant="ghost" size="sm" onClick={handleLogout} className="text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground">
+      <LogOut className="mr-2 h-3.5 w-3.5" />
       Sign Out
     </Button>
   );
@@ -184,16 +187,16 @@ function ProjectCard({ project, handleDelete, deletingId }: { project: Project, 
 
   return (
     <Card
-      className="border-border hover:border-secondary/60 group relative flex flex-col overflow-hidden transition-colors"
+      className="border-border hover:border-foreground/20 group relative flex flex-col overflow-hidden transition-all duration-300 rounded-none shadow-none hover:shadow-sm gap-0 py-0"
     >
       {project.thumbnail_path && (
         <div className="relative aspect-4/3 w-full border-b border-border bg-muted">
-  <img
-    src={route('projects.thumbnail', project.id)}
-    alt={project.name}
-    className="h-full w-full object-cover"
-  />
-</div>
+          <img
+            src={route('projects.thumbnail', project.id)}
+            alt={project.name}
+            className="h-full w-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-500"
+          />
+        </div>
       )}
       <Link
         href={route('projects.show', project.id)}
@@ -201,9 +204,9 @@ function ProjectCard({ project, handleDelete, deletingId }: { project: Project, 
       >
         <span className="sr-only">Open {project.name}</span>
       </Link>
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-2 pt-4 px-6">
         <div className="flex items-start justify-between">
-          <CardTitle className="text-foreground line-clamp-1 text-base font-medium">
+          <CardTitle className="text-foreground line-clamp-1 text-base font-normal tracking-tight">
             {project.name}
           </CardTitle>
           <DropdownMenu>
@@ -211,7 +214,7 @@ function ProjectCard({ project, handleDelete, deletingId }: { project: Project, 
               <Button
                 variant="ghost"
                 size="icon"
-                className="relative z-20 h-8 w-8 opacity-0 group-hover:opacity-100"
+                className="relative z-20 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
                 onClick={(e) => e.stopPropagation()}
               >
                 <MoreHorizontal className="h-4 w-4" />
@@ -232,20 +235,20 @@ function ProjectCard({ project, handleDelete, deletingId }: { project: Project, 
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <CardDescription className="text-muted-foreground text-xs">
-          Updated {new Date(project.updated_at).toLocaleDateString()}
+        <CardDescription className="text-muted-foreground text-xs uppercase tracking-wider">
+          Updated {new Date(project.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="text-muted-foreground flex items-center gap-4 text-sm">
-          <div className={cn("flex items-center gap-1", project.stopwatch_running && "text-primary animate-pulse")}>
-            <Clock className="h-3.5 w-3.5" />
-            <span>{formatTime(displaySeconds)}</span>
+      <CardContent className="pt-0 pb-4 px-6">
+        <div className="text-muted-foreground flex items-center gap-4 text-xs tracking-wide">
+          <div className={cn("flex items-center gap-1.5", project.stopwatch_running && "text-foreground")}>
+            <Clock className="h-3 w-3" />
+            <span className="font-mono">{formatTime(displaySeconds)}</span>
           </div>
           {project.pdf_path && (
-            <div className="flex items-center gap-1">
-              <FileText className="h-3.5 w-3.5" />
-              <span>PDF</span>
+            <div className="flex items-center gap-1.5">
+              <FileText className="h-3 w-3" />
+              <span>Pattern</span>
             </div>
           )}
         </div>
@@ -268,15 +271,15 @@ function ProjectsList({ projects }: { projects: Project[] }) {
 
   if (projects.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="bg-muted rounded-full p-4">
-          <FileText className="text-muted-foreground h-8 w-8" />
+      <div className="flex flex-col items-center justify-center py-24 text-center">
+        <div className="bg-muted/50 rounded-full p-6 mb-6">
+          <FileText className="text-muted-foreground h-10 w-10" />
         </div>
-        <h2 className="text-foreground mt-4 text-lg font-medium">
-          No projects yet
+        <h2 className="text-foreground text-2xl font-light tracking-tight">
+          No projects <span className="font-serif italic">yet</span>
         </h2>
-        <p className="text-muted-foreground mt-1 text-sm">
-          Create your first project to start tracking your work.
+        <p className="text-muted-foreground mt-3 text-sm tracking-wide max-w-xs">
+          Create your first project to start tracking your knitting or crochet work.
         </p>
       </div>
     );
@@ -301,18 +304,26 @@ export default function Index({ projects }: Props) {
     <>
       <Head title="Projects" />
       <div className="bg-background min-h-svh">
-        <header className="bg-background top-0 z-40 w-full sticky">
-          <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-            <h1 className="text-foreground text-xl font-semibold">
+        <header className="bg-background/80 backdrop-blur-sm top-0 z-40 w-full sticky border-b border-border">
+          <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
+            <h1 className="text-foreground text-sm uppercase tracking-[0.2em] font-medium">
               Row Counter
             </h1>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <CreateProjectDialog />
               <LogoutButton />
             </div>
           </div>
         </header>
-        <main className="mx-auto max-w-5xl px-4 py-8">
+        <main className="mx-auto max-w-5xl px-6 py-12">
+          <div className="mb-10">
+            <h2 className="text-3xl sm:text-4xl font-light tracking-tight">
+              Your <span className="font-serif italic">projects</span>
+            </h2>
+            <p className="text-muted-foreground mt-2 text-sm tracking-wide">
+              {projects.length} active project{projects.length !== 1 ? 's' : ''}
+            </p>
+          </div>
           <ProjectsList projects={projects} />
         </main>
       </div>

@@ -219,8 +219,8 @@ export function ProjectSidebar({
                                                     className={cn(
                                                         "group flex items-center gap-2 rounded-md px-3 py-2.5 text-sm",
                                                         currentPartId === part.id
-                                                            ? "bg-accent/60 text-sidebar-accent-foreground"
-                                                            : "text-sidebar-foreground hover:bg-muted/60",
+                                                            ? "ring ring-primary text-sidebar-accent-foreground"
+                                                            : "text-sidebar-foreground hover:ring hover:ring-primary/30",
                                                     )}
                                                 >
                                                     {editingPartId === part.id ? (
@@ -466,8 +466,8 @@ export function ProjectSidebar({
                                     className={cn(
                                         "group flex items-center gap-1 rounded-md px-2 py-1.5 text-sm",
                                         currentPartId === part.id
-                                            ? "bg-accent/60 text-sidebar-accent-foreground"
-                                            : "text-sidebar-foreground hover:bg-muted/60",
+                                            ? "ring ring-primary text-sidebar-accent-foreground"
+                                            : "text-sidebar-foreground hover:ring hover:ring-primary/30",
                                     )}
                                 >
                                     {editingPartId === part.id ? (
