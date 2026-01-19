@@ -199,28 +199,28 @@ export function ProjectSidebar({
                             <div className="flex-1 overflow-y-auto overscroll-contain">
                                 <div className="p-4 space-y-6" style={isMobile ? { paddingBottom: "calc(var(--spacing) * 17)" } : undefined}>
                                     {/* Parts */}
-                                    <div className="space-y-2">
+                                    <div className="flex flex-col gap-1">
                                         <div className="flex items-center justify-between">
                                             <span className="text-xs font-medium uppercase text-popover-foreground/60">Parts</span>
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="h-8 w-8 text-popover-foreground"
+                                                className="h-6 w-6 text-popover-foreground"
                                                 onClick={onCreatePart}
                                                 title="Add part"
                                             >
-                                                <Plus className="h-4 w-4" />
+                                                <Plus className="h-3.5 w-3.5" />
                                             </Button>
                                         </div>
-                                        <div className="space-y-0">
+                                        <div className="flex flex-col gap-1">
                                             {parts.map((part) => (
                                                 <div
                                                     key={part.id}
                                                     className={cn(
-                                                        "group flex items-center gap-2 px-3 py-2.5 text-xs border border-border transition-all duration-300",
+                                                        "group flex items-center gap-1.5 px-2 py-1.5 text-sm transition-all duration-300 rounded-xs",
                                                         currentPartId === part.id
-                                                            ? "bg-foreground text-background"
-                                                            : "text-popover-foreground hover:bg-foreground hover:text-background",
+                                                            ? "bg-secondary hover:bg-secondary/80"
+                                                            : "hover:bg-muted/60 hover:text-accent-foreground dark:hover:bg-accent/50 h-9",
                                                     )}
                                                 >
                                                     {editingPartId === part.id ? (
@@ -235,11 +235,11 @@ export function ProjectSidebar({
                                                                     if (e.key === "Escape") cancelEdit()
                                                                 }}
                                                             />
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={saveEdit}>
-                                                                <Check className="h-4 w-4" />
+                                                            <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0" onClick={saveEdit}>
+                                                                <Check className="h-3 w-3" />
                                                             </Button>
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={cancelEdit}>
-                                                                <X className="h-4 w-4" />
+                                                            <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0" onClick={cancelEdit}>
+                                                                <X className="h-3 w-3" />
                                                             </Button>
                                                         </>
                                                     ) : (
@@ -254,19 +254,19 @@ export function ProjectSidebar({
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                className="h-8 w-8 shrink-0"
+                                                                className="h-6 w-6 shrink-0"
                                                                 onClick={() => startEditing(part)}
                                                             >
-                                                                <Pencil className="h-4 w-4" />
+                                                                <Pencil className="h-3 w-3" />
                                                             </Button>
                                                             {parts.length > 1 && (
                                                                 <Button
                                                                     variant="ghost"
                                                                     size="icon"
-                                                                    className="h-8 w-8 text-destructive shrink-0"
+                                                                    className="h-6 w-6 text-destructive shrink-0"
                                                                     onClick={() => onDeletePart(part.id)}
                                                                 >
-                                                                    <Trash2 className="h-4 w-4" />
+                                                                    <Trash2 className="h-3 w-3" />
                                                                 </Button>
                                                             )}
                                                         </>

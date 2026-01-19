@@ -1,10 +1,12 @@
 import { Head, router } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 
-import { CounterCard } from '@/Components/CounterCard';
-import { PdfViewer } from '@/Components/pdf/PdfViewer';
+import { CounterCard } from '@/Components/Features/CounterCard';
+import { PdfViewer } from '@/Components/Features/pdf/PdfViewer';
 import { ProjectSidebar } from '@/Components/ProjectSidebar';
-import { ResponsiveToaster } from '@/Components/ResponsiveToaster';
+import { ResponsiveToaster } from '@/Components/Features/ResponsiveToaster';
+import { useProjectViewState } from '@/hooks/useProjectViewState';
+import { useStopwatch } from '@/hooks/useStopwatch';
 import { Part, PdfAnnotation, Project } from '@/types';
 
 interface Props {
@@ -18,58 +20,19 @@ export default function Show({
   parts = [],
   pdfAnnotations = [],
 }: Props) {
+  const { view, setView, isMobile, effectiveView } = useProjectViewState({
+    hasPdf: !!project.pdf_path,
+  });
+
+  const displaySeconds = useStopwatch(project);
+
   const [currentPartId, setCurrentPartId] = useState<string>(
     parts[0]?.id || '',
   );
-  const [view, setView] = useState<'counters' | 'pdf' | 'split'>('counters');
-  const [displaySeconds, setDisplaySeconds] = useState(
-    project.stopwatch_seconds,
-  );
-  const [isMobile, setIsMobile] = useState(false);
 
   const prevPartsLength = useRef(parts.length);
 
-  // Detect mobile viewport
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 880);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
   const currentPart = parts.find((p) => p.id === currentPartId);
-
-  // Stopwatch effect
-  useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-
-    const updateDisplay = () => {
-      if (project.stopwatch_running && project.stopwatch_started_at) {
-        const start = new Date(project.stopwatch_started_at).getTime();
-        const now = Date.now();
-        const elapsed = Math.max(0, Math.floor((now - start) / 1000));
-        setDisplaySeconds(project.stopwatch_seconds + elapsed);
-      } else {
-        setDisplaySeconds(project.stopwatch_seconds);
-      }
-    };
-
-    updateDisplay(); // initial
-
-    if (project.stopwatch_running) {
-      interval = setInterval(updateDisplay, 1000);
-    }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [
-    project.stopwatch_running,
-    project.stopwatch_seconds,
-    project.stopwatch_started_at,
-  ]);
 
   // Auto-select logic
   useEffect(() => {
@@ -93,7 +56,6 @@ export default function Show({
   };
 
   const handleUpdatePart = (partId: string, updates: Partial<Part>) => {
-    // Only send scalar fields that can be updated
     const { name, position } = updates;
     router.patch(route('parts.update', partId), { name, position });
   };
@@ -151,13 +113,6 @@ export default function Show({
   const handlePdfUpload = (url: string | null) => {
     console.log('PDF Upload', url);
   };
-
-  // Determine view based on PDF availability and viewport
-  const effectiveView = !project.pdf_path
-    ? 'counters'
-    : isMobile && view === 'split'
-      ? 'counters'
-      : view;
 
   // Generate PDF URL
   const pdfUrl = project.pdf_path
@@ -257,7 +212,6 @@ export default function Show({
           )}
 
           {/* PDF View - Single instance that persists across view changes */}
-          {/* This prevents annotation state loss when switching between pdf/split views */}
           {pdfUrl && (effectiveView === 'pdf' || effectiveView === 'split') && (
             <div className={`absolute inset-0 flex ${effectiveView === 'split' ? '' : ''}`}>
               {/* PDF Side - takes full width in pdf view, flex-1 in split view */}
