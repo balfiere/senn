@@ -201,7 +201,7 @@ export function ProjectSidebar({
                                     {/* Parts */}
                                     <div className="space-y-2">
                                         <div className="flex items-center justify-between">
-                                            <span className="text-sm font-medium uppercase text-sidebar-foreground/60">Parts</span>
+                                            <span className="text-xs font-medium uppercase text-sidebar-foreground/60">Parts</span>
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
@@ -277,7 +277,7 @@ export function ProjectSidebar({
                                     </div>
 
                                     {/* Counters */}
-                                    <div className="space-y-3">
+                                    <div className="space-y-2">
                                         <div className="flex items-center justify-between">
                                             <span className="text-sm font-medium uppercase text-sidebar-foreground/60">Counters</span>
                                             <Button
@@ -294,7 +294,7 @@ export function ProjectSidebar({
 
                                     {/* View Options - Hide split view on mobile */}
                                     {project.pdf_path && (
-                                        <div className="space-y-3">
+                                        <div className="space-y-2">
                                             <span className="text-sm font-medium uppercase text-sidebar-foreground/60">View</span>
                                             <div className="grid grid-cols-2 gap-2">
                                                 <Button
@@ -320,7 +320,7 @@ export function ProjectSidebar({
                                     )}
 
                                     {/* PDF Upload */}
-                                    <div className="space-y-3">
+                                    <div className="space-y-2">
                                         <span className="text-sm font-medium uppercase text-sidebar-foreground/60">Pattern PDF</span>
                                         <div>
                                             <input
@@ -345,7 +345,7 @@ export function ProjectSidebar({
                                     </div>
 
                                     {/* Stopwatch */}
-                                    <div className="space-y-3">
+                                    <div className="space-y-2">
                                         <span className="text-sm font-medium uppercase text-sidebar-foreground/60">Time Tracker</span>
                                         <div className="rounded-lg border border-border p-3">
                                             <div className="flex items-center justify-center mb-2">
@@ -396,7 +396,7 @@ export function ProjectSidebar({
     if (isCollapsed) {
         return (
             <aside className="flex w-14 flex-col border-r border-border bg-background h-screen">
-                <div className="flex h-14 items-center justify-center border-b border-border flex-shrink-0">
+                <div className="flex h-14 items-center justify-center border-b border-border shrink-0">
                     <Button variant="ghost" size="icon" onClick={() => setIsCollapsed(false)} className="text-sidebar-foreground">
                         <PanelLeftClose className="h-5 w-5 rotate-180" />
                     </Button>
@@ -415,7 +415,7 @@ export function ProjectSidebar({
     return (
         <aside className="flex w-64 flex-col border-r border-border bg-background h-screen">
             {/* Header */}
-            <div className="flex h-16 items-center justify-between border-b border-border px-5 shrink-0">
+            <div className="flex h-14 items-center justify-between border-b border-border px-5 shrink-0">
                 <h2 className="text-sm uppercase tracking-[0.15em] text-sidebar-foreground truncate" title={project.name}>
                     {project.name}
                 </h2>
@@ -446,9 +446,9 @@ export function ProjectSidebar({
                     </div>
 
                     {/* Parts */}
-                    <div className="space-y-3">
+                    <div className="flex flex-col gap-1">
                         <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-sidebar-foreground/50">Parts</span>
+                            <span className="text-xs font-medium uppercase text-sidebar-foreground/60">Parts</span>
                             <Button
                                 variant="ghost"
                                 size="icon"
@@ -459,15 +459,15 @@ export function ProjectSidebar({
                                 <Plus className="h-3.5 w-3.5" />
                             </Button>
                         </div>
-                        <div className="space-y-0">
+                        <div className="flex flex-col gap-1">
                             {parts.map((part) => (
                                 <div
                                     key={part.id}
                                     className={cn(
-                                        "group flex items-center gap-1 px-2 py-1.5 text-sm border border-border transition-all duration-300",
+                                        "group flex items-center gap-1.5 px-2 py-1.5 text-sm transition-all duration-300",
                                         currentPartId === part.id
-                                            ? "bg-foreground text-background"
-                                            : "text-sidebar-foreground hover:bg-foreground hover:text-background",
+                                            ? "bg-secondary hover:bg-secondary/80 rounded-sm"
+                                            : "hover:bg-muted/60 hover:text-accent-foreground dark:hover:bg-accent/50 h-9 rounded-sm",
                                     )}
                                 >
                                     {editingPartId === part.id ? (
@@ -524,7 +524,7 @@ export function ProjectSidebar({
                     </div>
 
                     {/* Counters */}
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-medium uppercase text-sidebar-foreground/60">Counters</span>
                             <Button
@@ -541,8 +541,8 @@ export function ProjectSidebar({
 
                     {/* View Options */}
                     {project.pdf_path && (
-                        <div className="space-y-3">
-                            <span className="text-xs font-medium uppercase text-sidebar-foreground/60">View</span>
+                        <div className="flex flex-col">
+                            <span className="text-xs font-medium uppercase text-sidebar-foreground/60 mb-2">View</span>
                             <div className="grid grid-cols-3 gap-1">
                                 <Button
                                     variant={view === "counters" ? "secondary" : "ghost"}
@@ -576,8 +576,8 @@ export function ProjectSidebar({
                     )}
 
                     {/* PDF Upload */}
-                    <div className="space-y-3">
-                        <span className="text-xs font-medium uppercase text-sidebar-foreground/60">Pattern PDF</span>
+                    <div className="flex flex-col">
+                        <span className="text-xs font-medium uppercase text-sidebar-foreground/60 mb-2">Pattern PDF</span>
                         <div>
                             <input
                                 type="file"
@@ -601,8 +601,8 @@ export function ProjectSidebar({
                     </div>
 
                     {/* Stopwatch */}
-                    <div className="space-y-3">
-                        <span className="text-xs font-medium uppercase text-sidebar-foreground/60">Time Tracker</span>
+                    <div className="flex flex-col">
+                        <span className="text-xs font-medium uppercase text-sidebar-foreground/60 mb-2">Time Tracker</span>
                         <div className="rounded-lg border border-border p-3">
                             <div className="flex items-center justify-center mb-2">
                                 <Clock className="mr-2 h-4 w-4 text-sidebar-foreground/60" />
