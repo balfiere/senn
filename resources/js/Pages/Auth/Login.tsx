@@ -1,6 +1,7 @@
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Checkbox } from '@/Components/ui/checkbox';
+import { FormField } from '@/Components/ui/form-field';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import GuestLayout from '@/Layouts/GuestLayout';
@@ -33,38 +34,26 @@ export default function Login({ status, canResetPassword }: { status?: string; c
 
                     <form onSubmit={submit}>
                         <div className="flex flex-col gap-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="email" className="text-foreground">
-                                    Email
-                                </Label>
+                            <FormField label="Email" error={errors.email} required>
                                 <Input
-                                    id="email"
                                     type="email"
                                     placeholder="you@example.com"
                                     required
                                     value={data.email}
                                     onChange={(e) => setData('email', e.target.value)}
-                                    className="border-input"
                                     autoComplete="username"
                                     autoFocus
                                 />
-                                {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="password" className="text-foreground">
-                                    Password
-                                </Label>
+                            </FormField>
+                            <FormField label="Password" error={errors.password} required>
                                 <Input
-                                    id="password"
                                     type="password"
                                     required
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
-                                    className="border-input"
                                     autoComplete="current-password"
                                 />
-                                {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
-                            </div>
+                            </FormField>
                             <div className="flex items-center gap-2">
                                 <Checkbox
                                     id="remember-me"

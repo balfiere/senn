@@ -2,6 +2,9 @@ import { Label } from '@/Components/ui/label';
 import { ScrollArea } from '@/Components/ui/scroll-area';
 import { Select } from '@/Components/ui/select';
 import { Slider } from '@/Components/ui/slider';
+import { FormField } from '@/Components/ui/form-field';
+import { FormGroup } from '@/Components/ui/form-group';
+import { SliderField } from '@/Components/ui/slider-field';
 import { cn } from '@/lib/utils';
 import {
   PdfAnnotationSubtype,
@@ -143,7 +146,7 @@ function TextMarkupPanel({
   }
 
   return (
-    <div className="space-y-4">
+    <FormGroup title="Text Markup">
       <div className="space-y-3">
         <Label className="text-xs font-medium">Color</Label>
         <div className="grid grid-cols-8 gap-1.5">
@@ -158,7 +161,7 @@ function TextMarkupPanel({
         </div>
       </div>
 
-      <SliderControl
+      <SliderField
         label="Opacity"
         value={opacity}
         onChange={changeOpacity}
@@ -168,8 +171,7 @@ function TextMarkupPanel({
         displayValue={(value) => `${Math.round(value * 100)}%`}
       />
 
-      <div className="space-y-2">
-        <Label className="text-xs">Blend Mode</Label>
+      <FormField label="Blend Mode">
         <Select
           value={blendMode}
           onChange={(e) => changeBlendMode(parseInt(e.target.value, 10))}
@@ -180,8 +182,8 @@ function TextMarkupPanel({
             </option>
           ))}
         </Select>
-      </div>
-    </div>
+      </FormField>
+    </FormGroup>
   );
 }
 
@@ -399,10 +401,8 @@ function FreeTextPanel({
         suffix="px"
       />
 
-      <div className="space-y-2">
-        <Label className="text-xs">Font Family</Label>
-        <select
-          className="w-full bg-background border border-input h-8 rounded-md px-2 text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+      <FormField label="Font Family">
+        <Select
           value={fontFamily}
           onChange={(e) => changeFontFamily(e.target.value)}
         >
@@ -411,8 +411,8 @@ function FreeTextPanel({
           <option value="Courier">Courier</option>
           <option value="Symbol">Symbol</option>
           <option value="ZapfDingbats">ZapfDingbats</option>
-        </select>
-      </div>
+        </Select>
+      </FormField>
     </div>
   );
 }

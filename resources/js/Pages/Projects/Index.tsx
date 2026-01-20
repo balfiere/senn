@@ -34,7 +34,7 @@ import {
   DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
 import { Input } from '@/Components/ui/input';
-import { Label } from '@/Components/ui/label';
+import { FormField } from '@/Components/ui/form-field';
 import { ResponsiveToaster } from '@/Components/Features/ResponsiveToaster';
 
 interface Project {
@@ -97,33 +97,30 @@ function CreateProjectDialog() {
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-5 py-6">
-            <div className="grid gap-2">
-              <Label htmlFor="name" className="text-xs uppercase tracking-wider text-muted-foreground">Project Name</Label>
+            <FormField
+              label="Project Name"
+              error={errors.name}
+              required
+              description="Give your project a descriptive name"
+            >
               <Input
-                id="name"
                 placeholder="My Sweater"
                 value={data.name}
                 onChange={(e) => setData('name', e.target.value)}
                 required
-                className="rounded-none"
               />
-              {errors.name && (
-                <p className="text-destructive text-sm">{errors.name}</p>
-              )}
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="pdf_file" className="text-xs uppercase tracking-wider text-muted-foreground">Pattern PDF (Optional)</Label>
+            </FormField>
+            <FormField
+              label="Pattern PDF (Optional)"
+              error={errors.pdf_file}
+              description="Upload a PDF pattern for your project"
+            >
               <Input
-                id="pdf_file"
                 type="file"
                 accept=".pdf"
                 onChange={(e) => setData('pdf_file', e.target.files ? e.target.files[0] : null)}
-                className="rounded-none"
               />
-              {errors.pdf_file && (
-                <p className="text-destructive text-sm">{errors.pdf_file}</p>
-              )}
-            </div>
+            </FormField>
           </div>
           <DialogFooter>
             <Button

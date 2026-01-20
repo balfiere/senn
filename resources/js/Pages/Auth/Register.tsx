@@ -1,7 +1,7 @@
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import { FormField } from '@/Components/ui/form-field';
 import { Input } from '@/Components/ui/input';
-import { Label } from '@/Components/ui/label';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
@@ -33,69 +33,45 @@ export default function Register() {
                 <CardContent>
                     <form onSubmit={submit}>
                         <div className="flex flex-col gap-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="name" className="text-foreground">
-                                    Name
-                                </Label>
+                            <FormField label="Name" error={errors.name} required>
                                 <Input
-                                    id="name"
                                     type="text"
                                     placeholder="Your name"
                                     required
                                     value={data.name}
                                     onChange={(e) => setData('name', e.target.value)}
-                                    className="border-input"
                                     autoComplete="name"
                                     autoFocus
                                 />
-                                {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="email" className="text-foreground">
-                                    Email
-                                </Label>
+                            </FormField>
+                            <FormField label="Email" error={errors.email} required>
                                 <Input
-                                    id="email"
                                     type="email"
                                     placeholder="you@example.com"
                                     required
                                     value={data.email}
                                     onChange={(e) => setData('email', e.target.value)}
-                                    className="border-input"
                                     autoComplete="username"
                                 />
-                                {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="password" className="text-foreground">
-                                    Password
-                                </Label>
+                            </FormField>
+                            <FormField label="Password" error={errors.password} required>
                                 <Input
-                                    id="password"
                                     type="password"
                                     required
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
-                                    className="border-input"
                                     autoComplete="new-password"
                                 />
-                                {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation" className="text-foreground">
-                                    Confirm Password
-                                </Label>
+                            </FormField>
+                            <FormField label="Confirm Password" error={errors.password_confirmation} required>
                                 <Input
-                                    id="password_confirmation"
                                     type="password"
                                     required
                                     value={data.password_confirmation}
                                     onChange={(e) => setData('password_confirmation', e.target.value)}
-                                    className="border-input"
                                     autoComplete="new-password"
                                 />
-                                {errors.password_confirmation && <p className="text-sm text-destructive">{errors.password_confirmation}</p>}
-                            </div>
+                            </FormField>
                             <Button type="submit" className="w-full" disabled={processing}>
                                 {processing ? 'Creating account...' : 'Sign Up'}
                             </Button>

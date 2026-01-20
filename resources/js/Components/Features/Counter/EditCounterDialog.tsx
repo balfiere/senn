@@ -5,6 +5,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/Components/ui/dialog';
+import { FormField } from '@/Components/ui/form-field';
+import { FormGroup } from '@/Components/ui/form-group';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Switch } from '@/Components/ui/switch';
@@ -90,54 +92,50 @@ export function EditCounterDialog({
                 <DialogTitle>Edit Counter</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                    <Label htmlFor="name">Name</Label>
+                <FormField label="Name" required>
                     <Input
-                        id="name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                     />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="current_value">Current Value</Label>
+                </FormField>
+                <FormField label="Current Value" required>
                     <Input
-                        id="current_value"
                         type="number"
                         value={currentValue}
                         onChange={(e) => setCurrentValue(e.target.value)}
                     />
-                </div>
+                </FormField>
                 {!counter.is_global && (
-                    <>
-                        <div className="space-y-2">
-                            <Label htmlFor="reset_at">Reset At (Optional)</Label>
+                    <FormGroup title="Auto-Reset Settings">
+                        <FormField
+                            label="Reset At (Optional)"
+                            description="Automatically reset to 1 after this number"
+                        >
                             <Input
-                                id="reset_at"
                                 type="number"
                                 value={resetAt}
                                 onChange={(e) => setResetAt(e.target.value)}
                                 placeholder="e.g. 10"
                             />
-                            <p className="text-muted-foreground text-xs">
-                                Automatically reset to 1 after this number.
-                            </p>
-                        </div>
+                        </FormField>
                         {resetAt && (
-                            <div className="flex items-center justify-between space-x-2">
-                                <Label htmlFor="show_reset">Show reset count</Label>
-                                <Switch
-                                    id="show_reset"
-                                    checked={showResetCount}
-                                    onCheckedChange={setShowResetCount}
-                                />
-                            </div>
+                            <FormField label="Show reset count">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-muted-foreground">
+                                        Display reset counter in UI
+                                    </span>
+                                    <Switch
+                                        checked={showResetCount}
+                                        onCheckedChange={setShowResetCount}
+                                    />
+                                </div>
+                            </FormField>
                         )}
-                    </>
+                    </FormGroup>
                 )}
 
                 {/* row comments section */}
-                <div className="space-y-3 border-t pt-6">
-                    <Label>Row Notes</Label>
+                <FormGroup title="Row Notes" className="border-t pt-6">
                     <div className="space-y-2">
                         {counter.comments?.map((comment) => (
                             <div
@@ -162,27 +160,29 @@ export function EditCounterDialog({
                         ))}
                     </div>
 
-                    <div className="space-y-2.5 rounded-none border p-3">
+                    <FormGroup
+                        title="Add New Note"
+                        className="rounded-none border p-3"
+                    >
                         <div className="grid grid-cols-3 gap-2">
-                            <div className="col-span-1">
-                                <Label className="text-xs mb-1">Row(s)</Label>
+                            <FormField label="Row(s)">
                                 <Input
                                     value={newPattern}
                                     onChange={(e) => setNewPattern(e.target.value)}
                                     placeholder="1,3,5-10"
-                                    className="h-8 text-xs"
                                 />
-                            </div>
+                            </FormField>
                             <div className="col-span-2">
-                                <Label className="text-xs mb-1">Note</Label>
-                                <Textarea
-                                    value={newText}
-                                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                                        setNewText(e.target.value)
-                                    }
-                                    placeholder="Remind me..."
-                                    className="min-h-[50px] py-1 text-xs"
-                                />
+                                <FormField label="Note">
+                                    <Textarea
+                                        value={newText}
+                                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                                            setNewText(e.target.value)
+                                        }
+                                        placeholder="Remind me..."
+                                        className="min-h-[50px] py-1"
+                                    />
+                                </FormField>
                             </div>
                         </div>
                         <Button
@@ -194,8 +194,8 @@ export function EditCounterDialog({
                         >
                             <Plus className="mr-1 h-3 w-3 font-light" /> Add Note
                         </Button>
-                    </div>
-                </div>
+                    </FormGroup>
+                </FormGroup>
             </div>
             <DialogFooter className="flex w-full justify-between sm:justify-between">
                 {!counter.is_global ? (
