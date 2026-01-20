@@ -164,7 +164,7 @@ export function CommentsSidebar({
                       key={root.id}
                       {...refProps}
                       className={cn(
-                        'scroll-mt-20 overflow-hidden rounded-xl border shadow-xs transition-all duration-200',
+                        'scroll-mt-20 overflow-hidden rounded-none border shadow-xs transition-all duration-200',
                         isSelected
                           ? 'border-primary/30 bg-white/20 ring-1 ring-primary/20'
                           : 'border-border bg-card hover:border-secondary/60'

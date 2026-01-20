@@ -177,7 +177,7 @@ export function SearchResultsSidebar({ documentId, searchQuery, onClose }: Searc
           ) : (
             Object.entries(groupedResults).map(([page, hits]) => (
               <div key={page} className="space-y-3">
-                <div className="sticky top-0 z-0 border-b border-border/50 bg-card/95 py-1">
+                <div className="sticky top-0 z-0 border-b border-border/50 bg-background w-full py-2">
                   <h4 className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Page {Number(page) + 1}
                   </h4>
@@ -188,16 +188,16 @@ export function SearchResultsSidebar({ documentId, searchQuery, onClose }: Searc
                       key={index}
                       data-result-index={index}
                       className={cn(
-                        'scroll-mt-20 w-full overflow-hidden rounded-xl border p-3 text-left shadow-xs transition-all duration-200',
+                        'scroll-mt-20 w-full overflow-hidden rounded-none border p-3 text-left shadow-xs transition-all duration-200',
                         index === state.activeResultIndex
-                          ? 'border-primary/30 bg-white/20 ring-1 ring-primary/20'
+                          ? 'border-primary/30 bg-white/20'
                           : 'border-border bg-card hover:border-secondary/60'
                       )}
                       onClick={() => goToResult(index)}
                     >
                       <div className="space-y-2">
                         <p
-                          className="break-words text-sm leading-relaxed text-foreground/90"
+                          className="wrap-break-word text-sm leading-relaxed text-foreground/90"
                           style={{ overflowWrap: 'anywhere' }}
                         >
                           <span className="text-muted-foreground">

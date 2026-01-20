@@ -189,10 +189,10 @@ export function EditCounterDialog({
                             type="button"
                             variant="outline"
                             size="sm"
-                            className="h-8 w-full"
+                            className="h-8 w-full font-light bg-muted/30"
                             onClick={handleAddComment}
                         >
-                            <Plus className="mr-1 h-3 w-3 font-light" /> Add Note
+                            <Plus className="mr-1 h-3 w-3" /> Add Note
                         </Button>
                     </FormGroup>
                 </FormGroup>

@@ -60,7 +60,7 @@ export function CounterCard({ counter }: Props) {
   return (
     <div
       className={cn(
-        'bg-card text-card-foreground group relative flex aspect-square flex-col gap-3 rounded-xl border p-2 sm:p-4 shadow-xs',
+        'bg-card text-card-foreground group relative flex aspect-square flex-col gap-3 rounded-none border p-2 sm:p-4 shadow-xs',
         counter.is_global && 'ring-primary/20 ring-2',
       )}
     >

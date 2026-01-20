@@ -141,7 +141,7 @@ export default function Show({
               ))}
             </div>
           ) : (
-            <div className="text-muted-foreground rounded-xl border-2 border-dashed py-12 text-center">
+            <div className="text-muted-foreground rounded-none border-2 border-dashed py-12 text-center">
               <p>No counters yet.</p>
               <p className="mt-2 text-sm">Create one from the sidebar.</p>
             </div>
