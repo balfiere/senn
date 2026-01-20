@@ -1,5 +1,6 @@
 import { Label } from '@/Components/ui/label';
 import { ScrollArea } from '@/Components/ui/scroll-area';
+import { Select } from '@/Components/ui/select';
 import { Slider } from '@/Components/ui/slider';
 import { cn } from '@/lib/utils';
 import {
@@ -169,8 +170,7 @@ function TextMarkupPanel({
 
       <div className="space-y-2">
         <Label className="text-xs">Blend Mode</Label>
-        <select
-          className="border-input bg-background focus-visible:ring-ring h-8 w-full rounded-md border px-2 text-xs focus-visible:ring-1 focus-visible:outline-none"
+        <Select
           value={blendMode}
           onChange={(e) => changeBlendMode(parseInt(e.target.value, 10))}
         >
@@ -179,7 +179,7 @@ function TextMarkupPanel({
               {PdfBlendMode[mode] || `Mode ${mode}`}
             </option>
           ))}
-        </select>
+        </Select>
       </div>
     </div>
   );
