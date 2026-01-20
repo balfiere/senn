@@ -94,7 +94,7 @@ export function DesktopSidebarView({
                             variant="ghost"
                             className="w-full justify-start text-popover-foreground hover:bg-muted/60 text-xs uppercase tracking-wider"
                         >
-                            <Link href={route('projects.index')}>
+                            <Link href={route('projects.index')} prefetch>
                                 <Home className="mr-2 h-3.5 w-3.5" />
                                 All Projects
                             </Link>
