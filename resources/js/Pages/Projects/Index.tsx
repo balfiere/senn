@@ -1,4 +1,4 @@
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, Link, router, Form } from '@inertiajs/react';
 import {
   Clock,
   FileText,
@@ -7,7 +7,7 @@ import {
   Plus,
   Trash2,
 } from 'lucide-react';
-import { FormEventHandler, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 import { Button } from '@/Components/ui/button';
 import { cn } from '@/lib/utils';
@@ -65,20 +65,6 @@ function formatTime(seconds: number): string {
 
 function CreateProjectDialog() {
   const [open, setOpen] = useState(false);
-  const { data, setData, post, processing, errors, reset } = useForm({
-    name: '',
-    pdf_file: null as File | null,
-  });
-
-  const handleSubmit: FormEventHandler = (e) => {
-    e.preventDefault();
-    post(route('projects.store'), {
-      onSuccess: () => {
-        setOpen(false);
-        reset();
-      },
-    });
-  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -95,47 +81,60 @@ function CreateProjectDialog() {
             Start tracking a new knitting or crochet project.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-5 py-6">
-            <FormField
-              label="Project Name"
-              error={errors.name}
-              required
-              description="Give your project a descriptive name"
-            >
-              <Input
-                placeholder="My Sweater"
-                value={data.name}
-                onChange={(e) => setData('name', e.target.value)}
+        <Form
+          action={route('projects.store')}
+          method="post"
+          resetOnSuccess
+          className="grid gap-5 py-6"
+          onSuccess={() => setOpen(false)}
+        >
+          {({ processing, errors }) => (
+            <>
+              <FormField
+                label="Project Name"
+                error={errors.name}
                 required
-              />
-            </FormField>
-            <FormField
-              label="Pattern PDF (Optional)"
-              error={errors.pdf_file}
-              description="Upload a PDF pattern for your project"
-            >
-              <Input
-                type="file"
-                accept=".pdf"
-                onChange={(e) => setData('pdf_file', e.target.files ? e.target.files[0] : null)}
-              />
-            </FormField>
-          </div>
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-              className="rounded-none"
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={processing || !data.name} className="rounded-none">
-              {processing ? 'Creating...' : 'Create Project'}
-            </Button>
-          </DialogFooter>
-        </form>
+                description="Give your project a descriptive name"
+              >
+                <Input
+                  name="name"
+                  placeholder="My Sweater"
+                  required
+                />
+              </FormField>
+              <FormField
+                label="Pattern PDF (Optional)"
+                error={errors.pdf_file}
+                description="Upload a PDF pattern for your project"
+              >
+                <Input
+                  type="file"
+                  name="pdf_file"
+                  accept=".pdf"
+                />
+              </FormField>
+
+              <DialogFooter className="mt-6">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setOpen(false)}
+                  className="rounded-none"
+                  disabled={processing}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={processing}
+                  className="rounded-none"
+                >
+                  {processing ? 'Creating...' : 'Create Project'}
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </Form>
       </DialogContent>
     </Dialog>
   );
