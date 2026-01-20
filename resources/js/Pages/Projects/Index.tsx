@@ -197,6 +197,7 @@ function ProjectCard({ project, handleDelete, deletingId }: { project: Project, 
       <Link
         href={route('projects.show', project.id)}
         className="absolute inset-0 z-10"
+        prefetch
       >
         <span className="sr-only">Open {project.name}</span>
       </Link>
