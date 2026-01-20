@@ -211,9 +211,15 @@ export default function Show({
             </div>
           )}
 
-          {/* PDF View - Single instance that persists across view changes */}
-          {pdfUrl && (effectiveView === 'pdf' || effectiveView === 'split') && (
-            <div className={`absolute inset-0 flex ${effectiveView === 'split' ? '' : ''}`}>
+          {/* PDF View - Always mounted but controlled by CSS visibility */}
+          {pdfUrl && (
+            <div
+              className={`absolute inset-0 flex ${effectiveView === 'split' ? '' : ''}
+                         ${effectiveView === 'pdf' || effectiveView === 'split' ? 'visible opacity-100 z-0' : 'invisible opacity-0 -z-10'}`}
+              style={{
+                pointerEvents: effectiveView === 'pdf' || effectiveView === 'split' ? 'auto' : 'none',
+              }}
+            >
               {/* PDF Side - takes full width in pdf view, flex-1 in split view */}
               <div className={effectiveView === 'split' && !isMobile ? 'border-border flex-1 border-r' : 'flex-1'}>
                 {renderPdfViewer()}
