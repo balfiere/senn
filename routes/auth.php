@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
+// Guest routes (available only to unauthenticated users)
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');
@@ -31,14 +32,15 @@ Route::middleware('guest')->group(function () {
 
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
         ->name('password.email');
-
-    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
-        ->name('password.reset');
-
-    Route::post('reset-password', [NewPasswordController::class, 'store'])
-        ->name('password.store');
 });
 
+Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
+    ->name('password.reset');
+
+Route::post('reset-password', [NewPasswordController::class, 'store'])
+    ->name('password.store');
+
+// Authenticated user routes
 Route::middleware('auth')->group(function () {
     Route::get('register/success', [AuthInfoController::class, 'registerSuccess'])
         ->name('register.success');
@@ -63,4 +65,17 @@ Route::middleware('auth')->group(function () {
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
+
+    // Route for authenticated users to request password reset
+    Route::post('account/password-reset', [PasswordResetLinkController::class, 'sendAuthenticatedResetLink'])
+        ->name('account.password.reset');
+
+    // New route for authenticated users to submit password reset (this will handle the actual reset for authenticated users)
+    Route::post('account/password-reset/submit', [NewPasswordController::class, 'storeAuthenticated'])
+        ->name('account.password.reset.submit');
 });
+
+// Public route for password reset success page (accessible to all users)
+Route::get('password-reset-success', function () {
+    return inertia('Auth/PasswordResetSuccess');
+})->name('password.reset.success');

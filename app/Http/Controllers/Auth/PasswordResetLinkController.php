@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
@@ -47,5 +48,21 @@ class PasswordResetLinkController extends Controller
         throw ValidationException::withMessages([
             'email' => [trans($status)],
         ]);
+    }
+
+    /**
+     * Handle an incoming password reset link request for authenticated users.
+     */
+    public function sendAuthenticatedResetLink(Request $request)
+    {
+        $user = $request->user();
+        
+        $status = Password::sendResetLink(['email' => $user->email]);
+
+        if ($status == Password::RESET_LINK_SENT) {
+            return back()->with('success', __($status));
+        }
+
+        return back()->with('error', trans($status));
     }
 }

@@ -2,10 +2,10 @@ import { Head, Link, router, Form } from '@inertiajs/react';
 import {
   Clock,
   FileText,
-  LogOut,
   MoreHorizontal,
   Plus,
   Trash2,
+  User,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
@@ -140,15 +140,13 @@ function CreateProjectDialog() {
   );
 }
 
-function LogoutButton() {
-  const handleLogout = () => {
-    router.post(route('logout'));
-  };
-
+function AccountButton() {
   return (
-    <Button variant="ghost" size="sm" onClick={handleLogout} className="text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground">
-      <LogOut className="mr-2 h-3.5 w-3.5" />
-      Sign Out
+    <Button variant="ghost" size="sm" asChild className="text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground">
+      <Link href={route('account')}>
+        <User className="mr-2 h-3.5 w-3.5" />
+        Account
+      </Link>
     </Button>
   );
 }
@@ -308,7 +306,7 @@ export default function Index({ projects }: Props) {
             </h1>
             <div className="flex items-center gap-4">
               <CreateProjectDialog />
-              <LogoutButton />
+              <AccountButton />
             </div>
           </div>
         </header>
