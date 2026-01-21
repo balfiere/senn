@@ -31,7 +31,7 @@ export function ThumbnailPane({ documentId }: ThumbnailPaneProps) {
                 className={cn(
                   'overflow-hidden rounded-sm transition-all',
                   isActive
-                    ? 'ring-2 ring-primary/20 ring-offset-2 ring-offset-background'
+                    ? 'ring-1 ring-primary/20 ring-offset-2 ring-offset-background'
                     : 'ring-1 ring-border hover:ring-border/80'
                 )}
                 style={{

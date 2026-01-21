@@ -8,7 +8,7 @@
     --foreground: var(--color-stone-900);
     --card: var(--color-stone-50);
     --card-foreground: var(--color-stone-900);
-    --popover: var(--color-stone-50);
+    --popover: color-mix(in oklab, var(--color-white) 50%, var(--color-stone-50));
     --popover-foreground: var(--color-stone-900);
     --primary: var(--color-stone-900);
     --primary-foreground: var(--color-stone-50);
@@ -28,23 +28,23 @@
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --background: var(--color-stone-800);
+        --background: color-mix(in oklab, var(--color-stone-800) 90%, var(--color-stone-900));
         --foreground: var(--color-stone-200);
-        --card: color-mix(in oklab, var(--color-stone-800) 70%, var(--color-stone-700));
+        --card: color-mix(in oklab, var(--color-stone-800) 80%, var(--color-stone-700));
         --card-foreground: var(--color-stone-100);
         --popover: color-mix(in oklab, var(--color-stone-800) 50%, var(--color-stone-700));
-        --popover-foreground: var(--color-stone-50);
+        --popover-foreground: var(--color-stone-100);
         --primary: var(--color-stone-200);
         --primary-foreground: var(--color-stone-800);
         --secondary: var(--color-stone-700);
-        --secondary-foreground: var(--color-stone-50);
+        --secondary-foreground: var(--color-stone-100);
         --muted: var(--color-stone-700);
         --muted-foreground: var(--color-stone-400);
         --accent: var(--color-stone-700);
-        --accent-foreground: var(--color-stone-50);
+        --accent-foreground: var(--color-stone-100);
         --destructive: hsl(357, 71%, 57%);
         --destructive-foreground: hsl(0 0% 100%);
-        --border: var(--color-stone-700);
+        --border: color-mix(in oklab, var(--color-stone-800) 40%, var(--color-stone-700));
         --input: var(--color-stone-700);
         --ring: var(--color-stone-500);
     }

@@ -190,7 +190,7 @@ export function SearchResultsSidebar({ documentId, searchQuery, onClose }: Searc
                       className={cn(
                         'scroll-mt-20 w-full overflow-hidden rounded-none border p-3 text-left shadow-xs transition-all duration-200',
                         index === state.activeResultIndex
-                          ? 'border-primary/30 bg-white/20'
+                          ? 'border-primary/30 bg-popover'
                           : 'border-border bg-card hover:border-secondary/60'
                       )}
                       onClick={() => goToResult(index)}
