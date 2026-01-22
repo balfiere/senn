@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, router } from '@inertiajs/react';
 import { PageProps } from '@/types';
-import { ArrowLeft, ExternalLink, KeyRound, LogOut, Mail, RotateCcw, Trash2 } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, ExternalLink, KeyRound, LogOut, Mail, RotateCcw, Trash2 } from 'lucide-react';
 
 import { SettingAction } from '@/Components/ui/setting-action';
 import { SettingGroup } from '@/Components/ui/setting-group';
@@ -86,6 +86,10 @@ function ChangePasswordSection() {
         >
             {({ setExpanded }) => (
                 <>
+                    <p className="text-sm text-amber-600 dark:text-amber-400 mb-4">
+                        <AlertTriangle className="inline h-4 w-4 mr-2" />
+                        Changing your password will log you out of all other devices.
+                    </p>
                     <p className="text-sm text-muted-foreground mb-4">
                         Enter your current password and choose a new one.
                     </p>
@@ -315,8 +319,8 @@ export default function Account(props: AccountPageProps) {
 
                 {/* Sign Out */}
                 <Button
-                    variant="outline"
-                    className="w-full justify-center rounded-none border-border bg-transparent hover:bg-foreground hover:text-background transition-all duration-300"
+                    variant="default"
+                    className="w-full justify-center"
                     onClick={handleLogout}
                 >
                     <LogOut className="mr-3 h-4 w-4" />

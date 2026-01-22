@@ -44,7 +44,7 @@ export function SettingAction({
     );
 
     const buttonClasses = cn(
-        'w-full flex items-center justify-between py-4 text-left transition-colors px-1',
+        'w-full flex items-center justify-between py-4 px-4 text-left transition-colors',
         variant === 'destructive'
             ? 'hover:bg-destructive/5'
             : 'hover:bg-muted/30',

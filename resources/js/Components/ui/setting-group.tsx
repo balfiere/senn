@@ -36,7 +36,7 @@ export function SettingGroup({
     );
 
     const buttonClasses = cn(
-        'w-full flex items-center justify-between py-4 text-left transition-colors px-1',
+        'w-full flex items-center justify-between py-4 px-4 text-left transition-colors',
         variant === 'destructive'
             ? 'hover:bg-destructive/5'
             : 'hover:bg-muted/30'
@@ -84,7 +84,7 @@ export function SettingGroup({
             </button>
 
             {expanded && (
-                <div className="pb-6 px-1">
+                <div className="pb-6 pt-3 px-1">
                     {children({
                         expanded,
                         setExpanded,
