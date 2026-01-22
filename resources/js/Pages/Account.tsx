@@ -77,6 +77,7 @@ function ChangePasswordSection() {
         password: '',
         password_confirmation: '',
     });
+    const [showSuccess, setShowSuccess] = useState(false);
 
     return (
         <SettingGroup
@@ -98,8 +99,10 @@ function ChangePasswordSection() {
                         method="put"
                         resetOnSuccess={['password', 'password_confirmation']}
                         onSuccess={() => {
-                            setExpanded(false);
                             setFormData({ currentPassword: '', password: '', password_confirmation: '' });
+                            setShowSuccess(true);
+                            // Hide success message after 5 seconds
+                            setTimeout(() => setShowSuccess(false), 5000);
                         }}
                         className="space-y-4"
                     >
@@ -150,6 +153,11 @@ function ChangePasswordSection() {
                                         Cancel
                                     </Button>
                                 </div>
+                                {showSuccess && (
+                                    <div className="text-sm text-green-600 dark:text-green-400 mt-4">
+                                        Your password has been successfully updated!
+                                    </div>
+                                )}
                             </>
                         )}
                     </Form>
