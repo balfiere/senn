@@ -22,7 +22,7 @@
     --destructive-foreground: hsl(0 0% 100%);
     --border: var(--color-stone-200);
     --input: var(--color-stone-200);
-    --ring: var(--color-stone-400);
+    --ring: var(--color-stone-500);
     --radius: 0.375rem;
 }
 
@@ -46,7 +46,7 @@
         --destructive-foreground: hsl(0 0% 100%);
         --border: color-mix(in oklab, var(--color-stone-800) 40%, var(--color-stone-700));
         --input: var(--color-stone-700);
-        --ring: var(--color-stone-500);
+        --ring: var(--color-stone-600);
     }
 }
 
