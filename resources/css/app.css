@@ -5,15 +5,15 @@
 
 :root {
     --background: var(--color-stone-100);
-    --foreground: var(--color-stone-900);
+    --foreground: var(--color-stone-800);
     --card: var(--color-stone-50);
-    --card-foreground: var(--color-stone-900);
+    --card-foreground: var(--color-stone-800);
     --popover: color-mix(in oklab, var(--color-white) 50%, var(--color-stone-50));
     --popover-foreground: var(--color-stone-900);
     --primary: var(--color-stone-900);
     --primary-foreground: var(--color-stone-50);
     --secondary: var(--color-stone-400);
-    --secondary-foreground: var(--color-stone-900);
+    --secondary-foreground: var(--color-stone-700);
     --muted: var(--color-stone-300);
     --muted-foreground: var(--color-stone-500);
     --accent: var(--color-stone-400);
@@ -37,7 +37,7 @@
         --primary: var(--color-stone-200);
         --primary-foreground: var(--color-stone-800);
         --secondary: var(--color-stone-700);
-        --secondary-foreground: var(--color-stone-100);
+        --secondary-foreground: var(--color-stone-300);
         --muted: var(--color-stone-700);
         --muted-foreground: var(--color-stone-400);
         --accent: var(--color-stone-700);

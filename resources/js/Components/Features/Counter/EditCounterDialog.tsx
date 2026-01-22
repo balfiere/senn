@@ -70,7 +70,7 @@ export function EditCounterDialog({
                 action={route('counters.update', counter.id)}
                 method="patch"
                 onSuccess={() => onClose()}
-                className="space-y-4 py-4"
+                className="space-y-4"
             >
                 {({ processing, errors }) => (
                     <>

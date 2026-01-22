@@ -1,7 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import { MailIcon } from '@/Components/ui/mail-icon';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { Mail, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 
 interface Props {
@@ -15,9 +16,7 @@ export default function VerifyEmail({ status }: Props) {
 
             <Card className="border-border text-center">
                 <CardHeader>
-                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                        <Mail className="h-6 w-6 text-primary" />
-                    </div>
+                    <MailIcon />
                     <CardTitle className="text-2xl text-foreground">Email Verification</CardTitle>
                     <CardDescription className="text-muted-foreground">
                         Before proceeding, please check your email for a verification link.
@@ -26,7 +25,7 @@ export default function VerifyEmail({ status }: Props) {
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {status === 'verification-link-sent' && (
-                        <div className="text-sm text-green-600 bg-green-50 dark:bg-green-900/20 p-3 rounded-md">
+                        <div className="text-sm p-3">
                             A new verification link has been sent to your email address.
                         </div>
                     )}

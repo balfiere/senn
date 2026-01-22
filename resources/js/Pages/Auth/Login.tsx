@@ -18,7 +18,7 @@ export default function Login({ status, canResetPassword }: { status?: string; c
                     <CardDescription className="text-muted-foreground">Sign in to manage your knitting projects</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {status && <div className="mb-4 text-sm font-medium text-green-600">{status}</div>}
+                    {status && <div className="mb-4 text-sm font-medium">{status}</div>}
 
                     <Form action={route('login')} method="post" className="flex flex-col gap-4">
                         {({ processing, errors }) => (

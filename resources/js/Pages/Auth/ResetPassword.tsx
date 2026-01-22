@@ -1,12 +1,18 @@
+import { Form, Head } from '@inertiajs/react';
+import { AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
-import { Head, Form } from '@inertiajs/react';
-import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 import { Button } from '@/Components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/Components/ui/card';
 import { FormField } from '@/Components/ui/form-field';
 import { Input } from '@/Components/ui/input';
-import { Label } from '@/Components/ui/label';
+import GuestLayout from '@/Layouts/GuestLayout';
 
 interface ResetPasswordProps {
     token: string;
@@ -18,12 +24,14 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     return (
-        <div className="min-h-svh flex items-center justify-center bg-muted/30 p-4">
+        <GuestLayout>
             <Head title="Reset Password" />
 
-            <Card className="w-full max-w-md">
+            <Card className="border-border">
                 <CardHeader className="text-center">
-                    <CardTitle className="text-2xl font-bold">Reset Password</CardTitle>
+                    <CardTitle className="text-2xl font-bold">
+                        Reset Password
+                    </CardTitle>
                     <CardDescription>
                         Enter your new password below
                     </CardDescription>
@@ -38,21 +46,39 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                         {({ processing, errors }) => (
                             <>
                                 {/* Hidden fields */}
-                                <input type="hidden" name="token" defaultValue={token} />
-                                <input type="hidden" name="email" defaultValue={email || ''} />
+                                <input
+                                    type="hidden"
+                                    name="token"
+                                    defaultValue={token}
+                                />
+                                <input
+                                    type="hidden"
+                                    name="email"
+                                    defaultValue={email || ''}
+                                />
 
                                 {(errors.email || errors.token) && (
-                                    <div className="mb-4 p-3 rounded-md bg-destructive/15 text-destructive flex items-center gap-2 text-sm">
+                                    <div className="bg-destructive/15 text-destructive mb-4 flex items-center gap-2 rounded-md p-3 text-sm">
                                         <AlertCircle className="h-4 w-4 shrink-0" />
-                                        <span>{errors.email || errors.token}</span>
+                                        <span>
+                                            {errors.email || errors.token}
+                                        </span>
                                     </div>
                                 )}
 
                                 {/* Password Field */}
-                                <FormField label="New Password" error={errors.password} required>
+                                <FormField
+                                    label="New Password"
+                                    error={errors.password}
+                                    required
+                                >
                                     <div className="relative">
                                         <Input
-                                            type={showPassword ? "text" : "password"}
+                                            type={
+                                                showPassword
+                                                    ? 'text'
+                                                    : 'password'
+                                            }
                                             name="password"
                                             placeholder="Enter your new password"
                                             required
@@ -61,8 +87,10 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                                         />
                                         <button
                                             type="button"
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2"
+                                            onClick={() =>
+                                                setShowPassword(!showPassword)
+                                            }
                                         >
                                             {showPassword ? (
                                                 <EyeOff className="h-4 w-4" />
@@ -74,10 +102,18 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                                 </FormField>
 
                                 {/* Confirm Password Field */}
-                                <FormField label="Confirm Password" error={errors.password_confirmation} required>
+                                <FormField
+                                    label="Confirm Password"
+                                    error={errors.password_confirmation}
+                                    required
+                                >
                                     <div className="relative">
                                         <Input
-                                            type={showConfirmPassword ? "text" : "password"}
+                                            type={
+                                                showConfirmPassword
+                                                    ? 'text'
+                                                    : 'password'
+                                            }
                                             name="password_confirmation"
                                             placeholder="Confirm your new password"
                                             required
@@ -86,8 +122,12 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                                         />
                                         <button
                                             type="button"
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2"
+                                            onClick={() =>
+                                                setShowConfirmPassword(
+                                                    !showConfirmPassword,
+                                                )
+                                            }
                                         >
                                             {showConfirmPassword ? (
                                                 <EyeOff className="h-4 w-4" />
@@ -104,23 +144,25 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                                     className="w-full"
                                     disabled={processing}
                                 >
-                                    {processing ? 'Resetting Password...' : 'Reset Password'}
+                                    {processing
+                                        ? 'Resetting Password...'
+                                        : 'Reset Password'}
                                 </Button>
                             </>
                         )}
                     </Form>
 
-                    <div className="mt-4 text-center text-sm text-muted-foreground">
+                    <div className="text-muted-foreground mt-4 text-center text-sm">
                         Remember your password?{' '}
                         <a
                             href={route('login')}
-                            className="font-semibold text-primary hover:underline"
+                            className="text-primary hover:text-primary/80 underline underline-offset-4"
                         >
                             Sign in
                         </a>
                     </div>
                 </CardContent>
             </Card>
-        </div>
+        </GuestLayout>
     );
 }

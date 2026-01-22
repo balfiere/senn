@@ -41,7 +41,7 @@ export function SidebarPartItem({
 
     if (isEditing) {
         return (
-            <div className={cn("group flex items-center gap-1.5 px-2 py-1.5 text-sm transition-all duration-300 rounded-xs", className)}>
+            <div className={cn("group flex items-center gap-1.5 px-2 py-1.5 text-sm transition-all duration-300", className)}>
                 <Input
                     value={editingName}
                     onChange={(e) => setEditingName(e.target.value)}
@@ -65,7 +65,7 @@ export function SidebarPartItem({
     return (
         <div
             className={cn(
-                "group flex items-center gap-1.5 px-2 py-1.5 text-sm transition-all duration-300 rounded-xs",
+                "group flex items-center gap-1.5 px-2 py-1.5 text-sm transition-all duration-300",
                 isCurrent
                     ? "bg-secondary hover:bg-secondary/80"
                     : "hover:bg-muted/60 hover:text-accent-foreground dark:hover:bg-accent/50 h-9",

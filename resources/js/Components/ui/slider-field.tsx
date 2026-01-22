@@ -48,7 +48,7 @@ export function SliderField({
           className={cn('text-xs', error && 'text-destructive')}
         >
           {label}
-          {required && <span className="text-destructive ml-1">*</span>}
+          {required && <span className="text-destructive">*</span>}
         </Label>
         <span className="text-muted-foreground text-xs">{display}</span>
       </div>

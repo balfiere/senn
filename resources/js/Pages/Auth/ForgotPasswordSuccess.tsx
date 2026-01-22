@@ -19,7 +19,7 @@ export default function ForgotPasswordSuccess() {
                 </CardHeader>
 
                 <CardContent className="space-y-4">
-                    <div className="text-foreground p-4">
+                    <div className="text-secondary-foreground p-4">
                         <div className="flex items-center gap-2 mb-2">
                             <Clock className="h-4 w-4" />
                             <span className="font-medium">Important:</span>

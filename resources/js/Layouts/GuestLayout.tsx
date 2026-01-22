@@ -1,4 +1,3 @@
-import { Link } from '@inertiajs/react';
 import { PropsWithChildren } from 'react';
 import { ResponsiveToaster } from '@/Components/Features/ResponsiveToaster';
 

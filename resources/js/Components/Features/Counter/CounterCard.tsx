@@ -66,15 +66,10 @@ export function CounterCard({ counter }: Props) {
     >
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-base leading-none font-semibold tracking-tight">
+          <h3 className="text-base leading-none tracking-tighter">
             {counter.name}
           </h3>
           <div className="mt-1.5 flex items-center gap-2">
-            {counter.is_global && (
-              <span className="text-muted-foreground bg-muted/20 rounded-none px-1.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">
-                Global
-              </span>
-            )}
             {counter.show_reset_count && (
               <span className="text-muted-foreground text-xs">
                 Repeats: {counter.reset_count}
