@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -41,13 +39,13 @@ class PasswordResetLinkController extends Controller
             $request->only('email')
         );
 
+        // Always redirect to success page for security reasons (don't reveal if email exists)
         if ($status == Password::RESET_LINK_SENT) {
-            return back()->with('status', __($status));
+            return redirect()->route('password.request.success')->with('status', __($status));
+        } else {
+            // For invalid emails or other errors, still redirect to success but without status message
+            return redirect()->route('password.request.success');
         }
-
-        throw ValidationException::withMessages([
-            'email' => [trans($status)],
-        ]);
     }
 
     /**
@@ -56,7 +54,7 @@ class PasswordResetLinkController extends Controller
     public function sendAuthenticatedResetLink(Request $request)
     {
         $user = $request->user();
-        
+
         $status = Password::sendResetLink(['email' => $user->email]);
 
         if ($status == Password::RESET_LINK_SENT) {

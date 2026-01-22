@@ -32,7 +32,11 @@ Route::middleware('guest')->group(function () {
 
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
         ->name('password.email');
+
 });
+
+Route::get('forgot-password/success', [AuthInfoController::class, 'forgotPasswordSuccess'])
+    ->name('password.request.success');
 
 Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
     ->name('password.reset');
@@ -75,7 +79,5 @@ Route::middleware('auth')->group(function () {
         ->name('account.password.reset.submit');
 });
 
-// Public route for password reset success page (accessible to all users)
-Route::get('password-reset-success', function () {
-    return inertia('Auth/PasswordResetSuccess');
-})->name('password.reset.success');
+Route::get('password-reset-success', [AuthInfoController::class, 'passwordResetSuccess'])
+    ->name('password.reset.success');

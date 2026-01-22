@@ -31,5 +31,7 @@ yarn-error.log
 /.zed
 /.gemini
 /.cursor
+/.kilocode
+.kilocodemodes
 AGENTS.md
 DESIGN_SYSTEM.md

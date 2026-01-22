@@ -17,10 +17,26 @@ class AuthInfoController extends Controller
     }
 
     /**
-     * Display the authentication error page.
+     * Display authentication error page.
      */
     public function error(): Response
     {
         return Inertia::render('Auth/Error');
+    }
+
+    /**
+     * Display forgot password success page.
+     */
+    public function forgotPasswordSuccess(): Response
+    {
+        return Inertia::render('Auth/ForgotPasswordSuccess');
+    }
+
+    /**
+     * Display password reset success page.
+     */
+    public function passwordResetSuccess(): Response
+    {
+        return Inertia::render('Auth/PasswordResetSuccess');
     }
 }
