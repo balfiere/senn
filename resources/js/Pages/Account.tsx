@@ -1,39 +1,28 @@
 import { useState } from 'react';
 import { Link, router } from '@inertiajs/react';
 import { PageProps } from '@/types';
-import { ArrowLeft, ChevronDown, ChevronUp, ExternalLink, KeyRound, LogOut, Mail, RotateCcw, Trash2 } from 'lucide-react';
+import { ArrowLeft, ExternalLink, KeyRound, LogOut, Mail, RotateCcw, Trash2 } from 'lucide-react';
 
+import { SettingAction } from '@/Components/ui/setting-action';
+import { SettingGroup } from '@/Components/ui/setting-group';
 import { Button } from '@/Components/ui/button';
 import { FormField } from '@/Components/ui/form-field';
 import { FormGroup } from '@/Components/ui/form-group';
 import { Input } from '@/Components/ui/input';
-import { Label } from '@/Components/ui/label';
 import { Separator } from '@/Components/ui/separator';
 import { Form } from '@inertiajs/react';
 
 function ChangeEmailSection() {
-    const [expanded, setExpanded] = useState(false);
     const [email, setEmail] = useState('');
 
     return (
-        <div className="border-b border-border">
-            <button
-                onClick={() => setExpanded(!expanded)}
-                className="w-full flex items-center justify-between py-4 text-left hover:bg-muted/30 transition-colors px-1"
-            >
-                <div className="flex items-center gap-3">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm uppercase tracking-wider">Change Email</span>
-                </div>
-                {expanded ? (
-                    <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                ) : (
-                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                )}
-            </button>
-
-            {expanded && (
-                <div className="pb-6 px-1">
+        <SettingGroup
+            icon={<Mail />}
+            title="Change Email"
+            variant="default"
+        >
+            {({ setExpanded }) => (
+                <>
                     <p className="text-sm text-muted-foreground mb-4">
                         Enter your new email address. You'll need to verify it before the change takes effect.
                     </p>
@@ -76,14 +65,13 @@ function ChangeEmailSection() {
                             </>
                         )}
                     </Form>
-                </div>
+                </>
             )}
-        </div>
+        </SettingGroup>
     );
 }
 
 function ChangePasswordSection() {
-    const [expanded, setExpanded] = useState(false);
     const [formData, setFormData] = useState({
         currentPassword: '',
         password: '',
@@ -91,24 +79,13 @@ function ChangePasswordSection() {
     });
 
     return (
-        <div className="border-b border-border">
-            <button
-                onClick={() => setExpanded(!expanded)}
-                className="w-full flex items-center justify-between py-4 text-left hover:bg-muted/30 transition-colors px-1"
-            >
-                <div className="flex items-center gap-3">
-                    <KeyRound className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm uppercase tracking-wider">Change Password</span>
-                </div>
-                {expanded ? (
-                    <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                ) : (
-                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                )}
-            </button>
-
-            {expanded && (
-                <div className="pb-6 px-1">
+        <SettingGroup
+            icon={<KeyRound />}
+            title="Change Password"
+            variant="default"
+        >
+            {({ setExpanded }) => (
+                <>
                     <p className="text-sm text-muted-foreground mb-4">
                         Enter your current password and choose a new one.
                     </p>
@@ -172,82 +149,58 @@ function ChangePasswordSection() {
                             </>
                         )}
                     </Form>
-                </div>
+                </>
             )}
-        </div>
+        </SettingGroup>
     );
 }
 
 function ResetPasswordSection() {
-    const [processing, setProcessing] = useState(false);
-
-    const handleReset = () => {
-        setProcessing(true);
-        router.post(route('account.password.reset'), {}, {
-            onSuccess: (page) => {
-                setProcessing(false);
-                // Check if there's a success message in the flash data
-                const flash = page?.props?.flash as { success?: string; error?: string } | undefined;
-                if (flash?.success) {
-                    alert(flash.success);
-                } else {
-                    alert('Password reset email sent! Check your inbox.');
-                }
-            },
-            onError: (errors) => {
-                setProcessing(false);
-                console.error('Password reset error:', errors);
-                // Check if there's an error message in the response
-                if (errors?.error) {
-                    alert(errors.error);
-                } else {
-                    alert('Failed to send password reset email. Please try again.');
-                }
-            }
-        });
-    };
-
     return (
-        <div className="border-b border-border">
-            <button
-                onClick={handleReset}
-                disabled={processing}
-                className="w-full flex items-center justify-between py-4 text-left hover:bg-muted/30 transition-colors px-1 disabled:opacity-50"
-            >
-                <div className="flex items-center gap-3">
-                    <RotateCcw className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm uppercase tracking-wider">
-                        {processing ? 'Sending...' : 'Reset Password via Email'}
-                    </span>
-                </div>
-            </button>
-        </div>
+        <SettingAction
+            icon={<RotateCcw />}
+            title="Reset Password via Email"
+            variant="default"
+            processingText="Sending..."
+            action={async () => {
+                await new Promise((resolve, reject) => {
+                    router.post(route('account.password.reset'), {}, {
+                        onSuccess: (page) => {
+                            const flash = page?.props?.flash as { success?: string; error?: string } | undefined;
+                            if (flash?.success) {
+                                alert(flash.success);
+                            } else {
+                                alert('Password reset email sent! Check your inbox.');
+                            }
+                            resolve(void 0);
+                        },
+                        onError: (errors) => {
+                            console.error('Password reset error:', errors);
+                            if (errors?.error) {
+                                alert(errors.error);
+                            } else {
+                                alert('Failed to send password reset email. Please try again.');
+                            }
+                            reject(errors);
+                        }
+                    });
+                });
+            }}
+        />
     );
 }
 
 function DeleteAccountSection() {
-    const [expanded, setExpanded] = useState(false);
     const [confirmation, setConfirmation] = useState('');
 
     return (
-        <div className="border-b border-destructive/30">
-            <button
-                onClick={() => setExpanded(!expanded)}
-                className="w-full flex items-center justify-between py-4 text-left hover:bg-destructive/5 transition-colors px-1"
-            >
-                <div className="flex items-center gap-3">
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                    <span className="text-sm uppercase tracking-wider text-destructive">Delete Account</span>
-                </div>
-                {expanded ? (
-                    <ChevronUp className="h-4 w-4 text-destructive" />
-                ) : (
-                    <ChevronDown className="h-4 w-4 text-destructive" />
-                )}
-            </button>
-
-            {expanded && (
-                <div className="pb-6 px-1">
+        <SettingGroup
+            icon={<Trash2 />}
+            title="Delete Account"
+            variant="destructive"
+        >
+            {({ setExpanded }) => (
+                <>
                     <p className="text-sm text-muted-foreground mb-4">
                         This action is permanent and cannot be undone. All your projects and data will be permanently deleted.
                     </p>
@@ -291,9 +244,9 @@ function DeleteAccountSection() {
                             </>
                         )}
                     </Form>
-                </div>
+                </>
             )}
-        </div>
+        </SettingGroup>
     );
 }
 
