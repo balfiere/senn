@@ -203,7 +203,7 @@ function ResetPasswordSection() {
 }
 
 function DeleteAccountSection() {
-    const [confirmation, setConfirmation] = useState('');
+    const [password, setPassword] = useState('');
 
     return (
         <SettingGroup
@@ -224,13 +224,13 @@ function DeleteAccountSection() {
                     >
                         {({ processing, errors }) => (
                             <>
-                                <FormField label='Type "DELETE" to confirm' error={errors.password} required>
+                                <FormField label="Enter your password to confirm" error={errors.password} required>
                                     <Input
-                                        type="text"
+                                        type="password"
                                         name="password"
-                                        placeholder="DELETE"
-                                        value={confirmation}
-                                        onChange={(e) => setConfirmation(e.target.value)}
+                                        placeholder="Enter your password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
                                         required
                                     />
                                 </FormField>
@@ -238,7 +238,7 @@ function DeleteAccountSection() {
                                     <Button
                                         type="submit"
                                         variant="destructive"
-                                        disabled={processing || confirmation !== 'DELETE'}
+                                        disabled={processing || !password}
                                     >
                                         {processing ? 'Deleting...' : 'Delete Account'}
                                     </Button>
@@ -247,7 +247,7 @@ function DeleteAccountSection() {
                                         variant="outline"
                                         onClick={() => {
                                             setExpanded(false);
-                                            setConfirmation('');
+                                            setPassword('');
                                         }}
                                     >
                                         Cancel
