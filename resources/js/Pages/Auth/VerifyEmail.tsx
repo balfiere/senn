@@ -4,12 +4,16 @@ import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { RefreshCw } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
+import { Form } from '@inertiajs/react';
+import { useState } from 'react';
 
 interface Props {
-    status?: string;
+    // status prop no longer needed - success handled client-side
 }
 
-export default function VerifyEmail({ status }: Props) {
+export default function VerifyEmail({ }: Props) {
+    const [showSuccess, setShowSuccess] = useState(false);
+
     return (
         <GuestLayout>
             <Head title="Email Verification" />
@@ -24,23 +28,27 @@ export default function VerifyEmail({ status }: Props) {
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    {status === 'verification-link-sent' && (
+                    {showSuccess && (
                         <div className="text-sm p-3">
                             A new verification link has been sent to your email address.
                         </div>
                     )}
 
-                    <Link
-                        href={route('verification.send')}
+                    <Form
+                        action={route('verification.send')}
                         method="post"
-                        as="button"
+                        onSuccess={() => {
+                            setShowSuccess(true);
+                            // Hide success message after 5 seconds
+                            setTimeout(() => setShowSuccess(false), 5000);
+                        }}
                         className="w-full"
                     >
-                        <Button className="w-full">
+                        <Button type="submit" className="w-full">
                             <RefreshCw className="mr-2 h-4 w-4" />
                             Resend Verification Email
                         </Button>
-                    </Link>
+                    </Form>
 
                     <Link
                         href={route('logout')}

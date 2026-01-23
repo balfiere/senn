@@ -1,16 +1,17 @@
 <?php
 
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\AuthInfoController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
-use App\Http\Controllers\Auth\EmailVerificationNotificationController;
-use App\Http\Controllers\Auth\EmailVerificationPromptController;
-use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
-use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
+use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
+use Laravel\Fortify\Http\Controllers\EmailVerificationNotificationController;
+use Laravel\Fortify\Http\Controllers\EmailVerificationPromptController;
+use Laravel\Fortify\Http\Controllers\NewPasswordController;
+use Laravel\Fortify\Http\Controllers\PasswordResetLinkController as FortifyPasswordResetLinkController;
+use Laravel\Fortify\Http\Controllers\RegisteredUserController;
+use Laravel\Fortify\Http\Controllers\VerifyEmailController;
 
 // Guest routes (available only to unauthenticated users)
 Route::middleware('guest')->group(function () {
@@ -27,10 +28,10 @@ Route::middleware('guest')->group(function () {
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
-    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
+    Route::get('forgot-password', [FortifyPasswordResetLinkController::class, 'create'])
         ->name('password.request');
 
-    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
+    Route::post('forgot-password', [FortifyPasswordResetLinkController::class, 'store'])
         ->name('password.email');
 
 });
@@ -38,11 +39,13 @@ Route::middleware('guest')->group(function () {
 Route::get('forgot-password/success', [AuthInfoController::class, 'forgotPasswordSuccess'])
     ->name('password.request.success');
 
-Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
-    ->name('password.reset');
+Route::middleware('web')->group(function () {
+    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
+        ->name('password.reset');
 
-Route::post('reset-password', [NewPasswordController::class, 'store'])
-    ->name('password.store');
+    Route::post('reset-password', [NewPasswordController::class, 'store'])
+        ->name('password.store');
+});
 
 // Authenticated user routes
 Route::middleware('auth')->group(function () {

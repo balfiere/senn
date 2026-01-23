@@ -32,6 +32,10 @@ yarn-error.log
 /.gemini
 /.cursor
 /.kilocode
+/.github/copilot-instructions.md
 .kilocodemodes
 AGENTS.md
 DESIGN_SYSTEM.md
+GEMINI.md
+opencode.json
+boost.json

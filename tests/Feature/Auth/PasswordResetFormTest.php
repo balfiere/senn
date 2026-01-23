@@ -14,11 +14,12 @@ test('guest can access password reset form with valid token', function () {
 
     Notification::assertSentTo($user, ResetPassword::class, function ($notification) use (&$token) {
         $token = $notification->token;
+
         return true;
     });
 
     // Access the password reset form with valid token
-    $response = $this->get('/reset-password/' . $token);
+    $response = $this->get('/reset-password/'.$token);
 
     $response->assertSuccessful();
     // Just check that the page loads successfully with the token
@@ -32,10 +33,21 @@ test('guest cannot access password reset form with invalid token', function () {
 });
 
 test('password reset form validates required fields', function () {
+    Notification::fake();
+
     $user = User::factory()->create();
 
+    // Request password reset to generate token
+    $this->post('/forgot-password', ['email' => $user->email]);
+
+    Notification::assertSentTo($user, ResetPassword::class, function ($notification) use (&$token) {
+        $token = $notification->token;
+
+        return true;
+    });
+
     $response = $this->post('/reset-password', [
-        'token' => 'invalid-token',
+        'token' => $token,
         'email' => $user->email,
         'password' => '',
         'password_confirmation' => '',
@@ -45,10 +57,21 @@ test('password reset form validates required fields', function () {
 });
 
 test('password reset form validates password confirmation', function () {
+    Notification::fake();
+
     $user = User::factory()->create();
 
+    // Request password reset to generate token
+    $this->post('/forgot-password', ['email' => $user->email]);
+
+    Notification::assertSentTo($user, ResetPassword::class, function ($notification) use (&$token) {
+        $token = $notification->token;
+
+        return true;
+    });
+
     $response = $this->post('/reset-password', [
-        'token' => 'valid-token',
+        'token' => $token,
         'email' => $user->email,
         'password' => 'new-password',
         'password_confirmation' => 'different-password',
@@ -58,10 +81,21 @@ test('password reset form validates password confirmation', function () {
 });
 
 test('password reset form validates password length', function () {
+    Notification::fake();
+
     $user = User::factory()->create();
 
+    // Request password reset to generate token
+    $this->post('/forgot-password', ['email' => $user->email]);
+
+    Notification::assertSentTo($user, ResetPassword::class, function ($notification) use (&$token) {
+        $token = $notification->token;
+
+        return true;
+    });
+
     $response = $this->post('/reset-password', [
-        'token' => 'valid-token',
+        'token' => $token,
         'email' => $user->email,
         'password' => '123', // Too short
         'password_confirmation' => '123',
@@ -146,10 +180,21 @@ test('authenticated user can reset password successfully', function () {
 });
 
 test('password reset form shows validation errors', function () {
+    Notification::fake();
+
     $user = User::factory()->create();
 
+    // Request password reset to generate token
+    $this->post('/forgot-password', ['email' => $user->email]);
+
+    Notification::assertSentTo($user, ResetPassword::class, function ($notification) use (&$token) {
+        $token = $notification->token;
+
+        return true;
+    });
+
     $response = $this->post('/reset-password', [
-        'token' => 'valid-token',
+        'token' => $token,
         'email' => $user->email,
         'password' => 'short',
         'password_confirmation' => 'short',

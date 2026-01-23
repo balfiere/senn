@@ -73,7 +73,7 @@ test('password reset email can be sent', function () {
             'email' => $this->user->email,
         ])
         ->assertSessionHasNoErrors()
-        ->assertRedirect('/dashboard');
+        ->assertRedirect('/projects');
 });
 
 test('account deletion requires password confirmation', function () {

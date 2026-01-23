@@ -15,7 +15,7 @@ test('forgot password page is not accessible to authenticated users', function (
 
     $response = $this->actingAs($user)->get('/forgot-password');
 
-    $response->assertRedirect('/dashboard');
+    $response->assertRedirect('/projects');
 });
 
 test('forgot password form validation works', function () {
