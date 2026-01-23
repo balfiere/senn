@@ -300,7 +300,7 @@ export default function Account(props: AccountPageProps) {
             <main className="mx-auto max-w-2xl px-6 py-12">
                 <div className="mb-10">
                     <h2 className="text-3xl sm:text-4xl font-light tracking-tight">
-                        Account <span className="font-serif italic">settings</span>
+                        Account <span className="ml-1 font-serif italic tracking-wide">settings</span>
                     </h2>
                     <p className="text-muted-foreground mt-2 text-sm tracking-wide">
                         Manage your account preferences and security

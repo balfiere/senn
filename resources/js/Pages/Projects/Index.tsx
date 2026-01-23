@@ -271,7 +271,7 @@ function ProjectsList({ projects }: { projects: Project[] }) {
           <FileText className="text-muted-foreground h-10 w-10" />
         </div>
         <h2 className="text-foreground text-2xl font-light tracking-tight">
-          No projects <span className="font-serif italic">yet</span>
+          No projects <span className="ml-1 font-serif italic tracking-wide">yet</span>
         </h2>
         <p className="text-muted-foreground mt-3 text-sm tracking-wide max-w-xs">
           Create your first project to start tracking your knitting or crochet work.
@@ -302,7 +302,7 @@ export default function Index({ projects }: Props) {
         <header className="bg-background/80 backdrop-blur-sm top-0 z-40 w-full sticky border-b border-border">
           <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
             <h1 className="text-foreground text-sm uppercase tracking-[0.2em] font-medium">
-              Row Counter
+              Senn.
             </h1>
             <div className="flex items-center gap-4">
               <CreateProjectDialog />
@@ -313,7 +313,7 @@ export default function Index({ projects }: Props) {
         <main className="mx-auto max-w-5xl px-6 py-12">
           <div className="mb-10">
             <h2 className="text-3xl sm:text-4xl font-light tracking-tight">
-              Your <span className="font-serif italic">projects</span>
+              Your <span className="ml-0.5 font-serif italic tracking-wide">projects</span>
             </h2>
             <p className="text-muted-foreground mt-2 text-sm tracking-wide">
               {projects.length} active project{projects.length !== 1 ? 's' : ''}

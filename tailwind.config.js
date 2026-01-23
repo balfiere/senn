@@ -15,7 +15,7 @@ export default {
         extend: {
             fontFamily: {
                 sans: [
-  				'Figtree',
+  				'Instrument Sans',
   				'ui-sans-serif',
   				'system-ui',
   				'sans-serif',
@@ -25,7 +25,7 @@ export default {
   				'Noto Color Emoji'
   			],
   			serif: [
-  				'Lora',
+  				'Instrument Serif',
   				'ui-serif',
   				'Georgia',
   				'Cambria',
