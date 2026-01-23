@@ -76,10 +76,6 @@ Route::middleware('auth')->group(function () {
     // Route for authenticated users to request password reset
     Route::post('account/password-reset', [PasswordResetLinkController::class, 'sendAuthenticatedResetLink'])
         ->name('account.password.reset');
-
-    // New route for authenticated users to submit password reset (this will handle the actual reset for authenticated users)
-    Route::post('account/password-reset/submit', [NewPasswordController::class, 'storeAuthenticated'])
-        ->name('account.password.reset.submit');
 });
 
 Route::get('password-reset-success', [AuthInfoController::class, 'passwordResetSuccess'])
