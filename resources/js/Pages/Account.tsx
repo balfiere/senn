@@ -292,7 +292,7 @@ export default function Account(props: AccountPageProps) {
                         Back to Projects
                     </Link>
                     <h1 className="text-foreground text-sm uppercase tracking-[0.2em] font-medium">
-                        Account
+                        {user.email}
                     </h1>
                 </div>
             </header>
