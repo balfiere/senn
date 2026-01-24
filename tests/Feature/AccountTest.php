@@ -1,7 +1,9 @@
 <?php
 
 use App\Models\User;
+use App\Models\Project;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 beforeEach(function () {
     $this->user = User::factory()->create([
@@ -89,12 +91,36 @@ test('account deletion requires password confirmation', function () {
 });
 
 test('account deletion works', function () {
+    // Create a project with files for the user
+    $project = Project::factory()->create([
+        'user_id' => $this->user->id,
+        'pdf_path' => 'projects/' . $this->user->id . '/test.pdf',
+        'thumbnail_path' => 'projects/' . $this->user->id . '/thumbnails/test_thumb.png',
+    ]);
+
+    // Create mock files in storage
+    Storage::disk('patterns')->put($project->pdf_path, 'test pdf content');
+    Storage::disk('patterns')->put($project->thumbnail_path, 'test thumbnail content');
+
+    // Verify files exist before deletion
+    $this->assertTrue(Storage::disk('patterns')->exists($project->pdf_path));
+    $this->assertTrue(Storage::disk('patterns')->exists($project->thumbnail_path));
+
     $this->actingAs($this->user)
         ->delete('/profile', [
             'password' => 'password123',
         ])
         ->assertRedirect('/');
 
+    // Verify files are deleted after account deletion
+    $this->assertFalse(Storage::disk('patterns')->exists($project->pdf_path));
+    $this->assertFalse(Storage::disk('patterns')->exists($project->thumbnail_path));
+
+    // Verify directories are also cleaned up
+    $this->assertFalse(Storage::disk('patterns')->exists('projects/' . $this->user->id . '/thumbnails'));
+    $this->assertFalse(Storage::disk('patterns')->exists('projects/' . $this->user->id));
+
+    // Verify user is deleted from database
     $this->assertDatabaseMissing('users', [
         'id' => $this->user->id,
     ]);
