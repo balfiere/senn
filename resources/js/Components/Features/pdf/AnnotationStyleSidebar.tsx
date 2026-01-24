@@ -34,7 +34,7 @@ function ColorSwatch({
   return (
     <Button
       className={cn(
-        'h-4 w-4 px-2 rounded-sm ring-ring transition-all',
+        'h-4 w-4 px-2 rounded-sm ring-ring transition-all border-none',
         active
           ? 'ring-1 scale-115'
           : 'hover:scale-110',

@@ -135,7 +135,7 @@ export function AnnotationSelectionMenu({
                   <Button
                     key={color.value}
                     className={cn(
-                      'h-4 w-4 px-2 rounded-sm ring-ring transition-all',
+                      'h-4 w-4 px-2 rounded-sm ring-ring transition-all border-none',
                       currentColor === color.value
                         ? 'ring-1 scale-115'
                         : 'hover:scale-110',
