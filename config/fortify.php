@@ -8,9 +8,9 @@ return [
 
     'passwords' => 'users',
 
-    'username' => 'email',
+    'username' => config('auth.mode') === 'simple' ? 'username' : 'email',
 
-    'email' => 'email',
+    'email' => config('auth.mode') === 'simple' ? 'username' : 'email',
 
     'home' => '/projects',
 
@@ -25,12 +25,12 @@ return [
         'two-factor' => 'two-factor',
     ],
 
-    'views' => true,
+    'views' => config('auth.mode') === 'production',
 
     'features' => [
         Features::registration(),
         Features::resetPasswords(),
-        Features::emailVerification(),
+        config('auth.mode') !== 'simple' ? Features::emailVerification() : null,
         Features::updateProfileInformation(),
     ],
 

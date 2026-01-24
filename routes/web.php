@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\SimpleAuthController;
 use App\Http\Controllers\CounterCommentController;
 use App\Http\Controllers\CounterController;
 use App\Http\Controllers\PartController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Laravel\Fortify\Fortify;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -18,10 +20,39 @@ Route::get('/', function () {
     return Inertia::render('Welcome');
 });
 
+// Conditional route registration
+if (config('auth.mode') === 'simple') {
+    Route::middleware('guest')->group(function () {
+        Route::get('/register', [SimpleAuthController::class, 'showRegister'])->name('register');
+        Route::post('/register', [SimpleAuthController::class, 'register']);
+        Route::get('/login', [SimpleAuthController::class, 'showLogin'])->name('login');
+        Route::post('/login', [SimpleAuthController::class, 'login']);
+    });
+
+    // Disable Fortify routes
+    Fortify::$registersRoutes = false;
+} else {
+    // Use default Fortify routes
+    // (already registered via FortifyServiceProvider)
+
+}
+
+// Logout works for both modes
+Route::post('/logout', function (Request $request) {
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect('/');
+})->name('logout');
+
+// Conditional middleware based on auth mode
+$authMiddleware = config('auth.mode') === 'simple' ? ['auth'] : ['auth', 'verified'];
+
 // Legacy dashboard route - redirect to projects
 Route::get('/dashboard', function () {
     return redirect()->route('projects.index');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware($authMiddleware)->name('dashboard');
 
 // Project routes
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -71,4 +102,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/account', fn () => Inertia::render('Account'))->name('account');
 });
 
-require __DIR__.'/auth.php';
+// CONDITIONALLY INCLUDE auth.php based on auth mode
+if (config('auth.mode') === 'production') {
+    require __DIR__.'/auth.php';
+}

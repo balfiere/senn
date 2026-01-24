@@ -112,4 +112,19 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Authentication Mode
+    |--------------------------------------------------------------------------
+    |
+    | This option controls the authentication mode for the application.
+    | "production" mode uses email and password for authentication
+    / and requires a working email server.
+    | "simple" mode uses only password for authentication.
+    | Supported: "production", "simple"
+    |
+    */
+
+    'mode' => env('AUTH_MODE', 'production'),
+
 ];

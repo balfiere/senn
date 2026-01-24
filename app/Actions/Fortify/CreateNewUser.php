@@ -19,6 +19,21 @@ class CreateNewUser implements CreatesNewUsers
      */
     public function create(array $input): User
     {
+        if (config('auth.mode') === 'simple') {
+            Validator::make($input, [
+                'name' => ['required', 'string', 'max:255'],
+                'username' => ['required', 'string', 'max:255', 'unique:users'],
+                'password' => $this->passwordRules(),
+            ])->validate();
+
+            return User::create([
+                'name' => $input['name'],
+                'username' => $input['username'],
+                'password' => Hash::make($input['password']),
+            ]);
+        }
+
+        // original email-based validation
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'email' => [
