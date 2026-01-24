@@ -15,16 +15,23 @@ test('profile page is displayed', function () {
 test('profile information can be updated', function () {
     $user = User::factory()->create();
 
+    // First confirm password
+    $this->actingAs($user)
+        ->post('/user/confirm-password', [
+            'password' => 'password',
+        ]);
+
     $response = $this
         ->actingAs($user)
         ->patch('/profile', [
             'name' => 'Test User',
             'email' => 'test@example.com',
+            'password' => 'password',
         ]);
 
     $response
         ->assertSessionHasNoErrors()
-        ->assertRedirect('/profile');
+        ->assertRedirect('/account');
 
     $user->refresh();
 
@@ -36,16 +43,23 @@ test('profile information can be updated', function () {
 test('email verification status is unchanged when the email address is unchanged', function () {
     $user = User::factory()->create();
 
+    // First confirm password
+    $this->actingAs($user)
+        ->post('/user/confirm-password', [
+            'password' => 'password',
+        ]);
+
     $response = $this
         ->actingAs($user)
         ->patch('/profile', [
             'name' => 'Test User',
             'email' => $user->email,
+            'password' => 'password',
         ]);
 
     $response
         ->assertSessionHasNoErrors()
-        ->assertRedirect('/profile');
+        ->assertRedirect('/account');
 
     $this->assertNotNull($user->refresh()->email_verified_at);
 });

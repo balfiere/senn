@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
+use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Http\Responses\FailedPasswordResetLinkRequestResponse;
 use App\Http\Responses\LoginResponse;
 use App\Http\Responses\PasswordResetResponse;
@@ -63,6 +64,7 @@ class FortifyServiceProvider extends ServiceProvider
     {
         Fortify::createUsersUsing(CreateNewUser::class);
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
+        Fortify::updateUserProfileInformationUsing(UpdateUserProfileInformation::class);
 
         Fortify::loginView(function () {
             return Inertia::render('Auth/Login', [

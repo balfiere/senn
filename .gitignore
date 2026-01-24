@@ -33,6 +33,7 @@ yarn-error.log
 /.cursor
 /.kilocode
 /.github/copilot-instructions.md
+/plans
 .kilocodemodes
 AGENTS.md
 DESIGN_SYSTEM.md

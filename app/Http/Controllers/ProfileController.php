@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
+use App\Actions\Fortify\UpdateUserProfileInformation;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,17 +27,18 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        try {
+            app(UpdateUserProfileInformation::class)->update(
+                $request->user(),
+                $request->only(['name', 'email', 'password'])
+            );
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+            return Redirect::route('account')->with('status', 'profile-information-updated');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors(), 'defaultProfileInformation')->withInput();
         }
-
-        $request->user()->save();
-
-        return Redirect::route('profile.edit');
     }
 
     /**

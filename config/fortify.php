@@ -31,6 +31,7 @@ return [
         Features::registration(),
         Features::resetPasswords(),
         Features::emailVerification(),
+        Features::updateProfileInformation(),
     ],
 
 ];

@@ -24,9 +24,11 @@ test('account page is not accessible to guests', function () {
 test('email change form validation works', function () {
     $this->actingAs($this->user)
         ->patch('/profile', [
+            'name' => $this->user->name,
             'email' => 'invalid-email',
+            'password' => 'password123',
         ])
-        ->assertSessionHasErrors(['email']);
+        ->assertSessionHasErrorsIn('defaultProfileInformation', ['email']);
 });
 
 test('email change works', function () {
@@ -34,13 +36,15 @@ test('email change works', function () {
         ->patch('/profile', [
             'name' => $this->user->name,
             'email' => 'new@example.com',
+            'password' => 'password123',
         ])
         ->assertSessionHasNoErrors()
-        ->assertRedirect('/profile');
+        ->assertRedirect('/account');
 
     $this->assertDatabaseHas('users', [
         'id' => $this->user->id,
         'email' => 'new@example.com',
+        'email_verified_at' => null, // Email verification should be reset
     ]);
 });
 

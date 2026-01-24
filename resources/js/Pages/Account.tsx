@@ -12,8 +12,10 @@ import { Input } from '@/Components/ui/input';
 import { Separator } from '@/Components/ui/separator';
 import { Form } from '@inertiajs/react';
 
-function ChangeEmailSection() {
+function ChangeEmailSection({ currentName }: { currentName: string }) {
     const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [showSuccess, setShowSuccess] = useState(false);
 
     return (
         <SettingGroup
@@ -24,19 +26,34 @@ function ChangeEmailSection() {
             {({ setExpanded }) => (
                 <>
                     <p className="text-sm text-muted-foreground mb-4">
-                        Enter your new email address. You'll need to verify it before the change takes effect.
+                        Enter your new email address and current password. You'll need to verify the new email before the change takes effect.
                     </p>
                     <Form
                         action={route('profile.update')}
                         method="patch"
+                        errorBag="defaultProfileInformation"
                         onSuccess={() => {
-                            setExpanded(false);
                             setEmail('');
+                            setPassword('');
+                            setShowSuccess(true);
+                            // Hide success message after 5 seconds
+                            setTimeout(() => setShowSuccess(false), 5000);
                         }}
                         className="space-y-4"
                     >
                         {({ processing, errors }) => (
                             <>
+                                <input type="hidden" name="name" value={currentName} />
+                                <FormField label="Current Password" error={errors.password} required>
+                                    <Input
+                                        type="password"
+                                        name="password"
+                                        placeholder="Enter your current password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                    />
+                                </FormField>
                                 <FormField label="New Email Address" error={errors.email} required>
                                     <Input
                                         type="email"
@@ -48,7 +65,7 @@ function ChangeEmailSection() {
                                     />
                                 </FormField>
                                 <div className="flex gap-3">
-                                    <Button type="submit" disabled={processing || !email}>
+                                    <Button type="submit" disabled={processing || !email || !password}>
                                         {processing ? 'Updating...' : 'Update Email'}
                                     </Button>
                                     <Button
@@ -57,11 +74,17 @@ function ChangeEmailSection() {
                                         onClick={() => {
                                             setExpanded(false);
                                             setEmail('');
+                                            setPassword('');
                                         }}
                                     >
                                         Cancel
                                     </Button>
                                 </div>
+                                {showSuccess && (
+                                    <div className="text-sm text-green-600 dark:text-green-400 mt-4">
+                                        Email updated successfully! Please check your inbox to verify the new email address.
+                                    </div>
+                                )}
                             </>
                         )}
                     </Form>
@@ -272,6 +295,7 @@ interface AccountPageProps extends PageProps {
     auth: {
         user: User;
     };
+    status?: string;
 }
 
 export default function Account(props: AccountPageProps) {
@@ -310,7 +334,7 @@ export default function Account(props: AccountPageProps) {
                 {/* Email & Password Section */}
                 <FormGroup title="Email & Password" className="mb-12">
                     <div>
-                        <ChangeEmailSection />
+                        <ChangeEmailSection currentName={user.name} />
                         <ChangePasswordSection />
                         <ResetPasswordSection />
                     </div>
