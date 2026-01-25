@@ -55,6 +55,8 @@ test('email change works', function () {
             ->assertSessionHasNoErrors()
             ->assertRedirect('/account');
 
+        $this->assertAuthenticatedAs($this->user);
+
         $this->assertDatabaseHas('users', [
             'id' => $this->user->id,
             'email' => 'new@example.com',
@@ -70,6 +72,8 @@ test('email change works', function () {
             ])
             ->assertSessionHasNoErrors()
             ->assertRedirect('/account');
+
+        $this->assertAuthenticatedAs($this->user);
 
         $this->assertDatabaseHas('users', [
             'id' => $this->user->id,

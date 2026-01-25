@@ -76,7 +76,7 @@ class User extends Authenticatable implements MustVerifyEmail
             return true; // No-op in simple mode
         }
 
-        if (! $this->email_verified_at) {
+        if (!$this->email_verified_at) {
             $this->forceFill([
                 'email_verified_at' => $this->freshTimestamp(),
             ])->save();
@@ -115,27 +115,9 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Get the identifier that will be used to represent the user.
-     */
-    public function getAuthIdentifierName(): string
-    {
-        if (config('auth.mode') === 'simple') {
-            return 'username';
-        }
-
-        return 'email';
-    }
-
-    /**
-     * Get the name of the unique identifier for the user.
-     */
-    public function getAuthIdentifier()
-    {
-        return $this->{$this->getAuthIdentifierName()};
-    }
-
-    /**
      * Get the password for the user.
+     * 
+     * @return string
      */
     public function getAuthPassword()
     {
@@ -143,27 +125,29 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Get the token value for the "remember me" session.
+     * Get the identifier for the user.
+     * 
+     * This override ensures we don't crash when transitioning from 
+     * email-based to ID-based sessions.
+     * 
+     * @return mixed
      */
-    public function getRememberToken()
+    public function getAuthIdentifier()
     {
-        return $this->remember_token;
-    }
+        $identifier = $this->{$this->getAuthIdentifierName()};
 
-    /**
-     * Set the token value for the "remember me" session.
-     */
-    public function setRememberToken($value)
-    {
-        $this->remember_token = $value;
-    }
+        // If we are in production and use IDs, but the session has an email (string),
+        // we return null to force a logout instead of a SQL error.
+        if (
+            config('auth.mode') === 'production' &&
+            $this->getAuthIdentifierName() === 'id' &&
+            !is_numeric($identifier) &&
+            is_string($identifier)
+        ) {
+            return null;
+        }
 
-    /**
-     * Get the column name for the "remember me" token.
-     */
-    public function getRememberTokenName()
-    {
-        return 'remember_token';
+        return $identifier;
     }
 
     /**
