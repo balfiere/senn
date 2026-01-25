@@ -5,12 +5,20 @@ use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Notification;
 
 test('forgot password page is accessible to guests', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Password reset is not implemented in simple mode.');
+    }
+
     $response = $this->get('/forgot-password');
 
     $response->assertSuccessful();
 });
 
 test('forgot password page is not accessible to authenticated users', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Password reset is not implemented in simple mode.');
+    }
+
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->get('/forgot-password');
@@ -19,6 +27,10 @@ test('forgot password page is not accessible to authenticated users', function (
 });
 
 test('forgot password form validation works', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Password reset is not implemented in simple mode.');
+    }
+
     $response = $this->post('/forgot-password', [
         'email' => 'invalid-email',
     ]);
@@ -27,12 +39,20 @@ test('forgot password form validation works', function () {
 });
 
 test('forgot password form requires email', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Password reset is not implemented in simple mode.');
+    }
+
     $response = $this->post('/forgot-password', []);
 
     $response->assertSessionHasErrors(['email']);
 });
 
 test('forgot password redirects to success page on valid email', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Password reset is not implemented in simple mode.');
+    }
+
     Notification::fake();
 
     $user = User::factory()->create([
@@ -50,6 +70,10 @@ test('forgot password redirects to success page on valid email', function () {
 });
 
 test('forgot password sends notification to existing user', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Password reset is not implemented in simple mode.');
+    }
+
     Notification::fake();
 
     $user = User::factory()->create([
@@ -66,6 +90,10 @@ test('forgot password sends notification to existing user', function () {
 });
 
 test('forgot password redirects to success even for non-existent user', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Password reset is not implemented in simple mode.');
+    }
+
     Notification::fake();
 
     $response = $this->post('/forgot-password', [
@@ -80,12 +108,20 @@ test('forgot password redirects to success even for non-existent user', function
 });
 
 test('forgot password success page is accessible', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Password reset is not implemented in simple mode.');
+    }
+
     $response = $this->get('/forgot-password/success');
 
     $response->assertSuccessful();
 });
 
 test('forgot password success page shows status message when present', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Password reset is not implemented in simple mode.');
+    }
+
     $response = $this->withSession(['status' => 'We have emailed your password reset link.'])
         ->get('/forgot-password/success');
 
@@ -93,6 +129,10 @@ test('forgot password success page shows status message when present', function 
 });
 
 test('forgot password success page is accessible to authenticated users', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Password reset is not implemented in simple mode.');
+    }
+
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->get('/forgot-password/success');

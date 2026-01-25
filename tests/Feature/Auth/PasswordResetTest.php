@@ -5,12 +5,20 @@ use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Notification;
 
 test('reset password link screen can be rendered', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Password reset is not implemented in simple mode.');
+    }
+
     $response = $this->get('/forgot-password');
 
     $response->assertStatus(200);
 });
 
 test('reset password link can be requested', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Password reset is not implemented in simple mode.');
+    }
+
     Notification::fake();
 
     $user = User::factory()->create();
@@ -21,6 +29,10 @@ test('reset password link can be requested', function () {
 });
 
 test('reset password screen can be rendered', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Password reset is not implemented in simple mode.');
+    }
+
     Notification::fake();
 
     $user = User::factory()->create();
@@ -37,6 +49,10 @@ test('reset password screen can be rendered', function () {
 });
 
 test('password can be reset with valid token', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Password reset is not implemented in simple mode.');
+    }
+
     Notification::fake();
 
     $user = User::factory()->create();

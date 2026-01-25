@@ -5,6 +5,10 @@ use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Notification;
 
 test('guest can access password reset form with valid token', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Password reset is not implemented in simple mode.');
+    }
+
     Notification::fake();
 
     $user = User::factory()->create();
@@ -27,12 +31,20 @@ test('guest can access password reset form with valid token', function () {
 });
 
 test('guest cannot access password reset form with invalid token', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Password reset is not implemented in simple mode.');
+    }
+
     $response = $this->get('/reset-password/invalid-token');
 
     $response->assertStatus(200); // Should still load the form but validation will happen on submission
 });
 
 test('password reset form validates required fields', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Password reset is not implemented in simple mode.');
+    }
+
     Notification::fake();
 
     $user = User::factory()->create();
@@ -57,6 +69,10 @@ test('password reset form validates required fields', function () {
 });
 
 test('password reset form validates password confirmation', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Password reset is not implemented in simple mode.');
+    }
+
     Notification::fake();
 
     $user = User::factory()->create();
@@ -81,6 +97,10 @@ test('password reset form validates password confirmation', function () {
 });
 
 test('password reset form validates password length', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Password reset is not implemented in simple mode.');
+    }
+
     Notification::fake();
 
     $user = User::factory()->create();
@@ -105,6 +125,10 @@ test('password reset form validates password length', function () {
 });
 
 test('successful password reset redirects to success page', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Password reset is not implemented in simple mode.');
+    }
+
     Notification::fake();
 
     $user = User::factory()->create();
@@ -131,6 +155,10 @@ test('successful password reset redirects to success page', function () {
 });
 
 test('authenticated user can access password reset form', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Password reset is not implemented in simple mode.');
+    }
+
     $user = User::factory()->create();
     $this->actingAs($user);
 
@@ -141,6 +169,10 @@ test('authenticated user can access password reset form', function () {
 });
 
 test('authenticated user can reset password successfully', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Password reset is not implemented in simple mode.');
+    }
+
     Notification::fake();
 
     $user = User::factory()->create();
@@ -180,6 +212,10 @@ test('authenticated user can reset password successfully', function () {
 });
 
 test('password reset form shows validation errors', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Password reset is not implemented in simple mode.');
+    }
+
     Notification::fake();
 
     $user = User::factory()->create();

@@ -7,13 +7,22 @@ test('registration screen can be rendered', function () {
 });
 
 test('new users can register', function () {
-    $response = $this->post('/register', [
+    $data = [
         'name' => 'Test User',
-        'email' => 'test@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
-    ]);
+    ];
+
+    if (config('auth.mode') === 'simple') {
+        $data['username'] = 'testuser';
+        $targetRoute = '/dashboard'; // SimpleAuthController returns redirect()->intended('/dashboard')
+    } else {
+        $data['email'] = 'test@example.com';
+        $targetRoute = route('register.success', absolute: false);
+    }
+
+    $response = $this->post('/register', $data);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('register.success', absolute: false));
+    $response->assertRedirect($targetRoute);
 });

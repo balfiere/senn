@@ -2,10 +2,13 @@
 
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
 
 test('email verification screen can be rendered', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Email verification is not implemented in simple mode.');
+    }
+
     $user = User::factory()->unverified()->create();
 
     $response = $this->actingAs($user)->get('/verify-email');
@@ -32,6 +35,10 @@ test('email can be verified', function () {
             ->assertRedirectContains('verified=1');
     } else {
         // In simple mode, email verification is not implemented
+        if (! Route::has('verification.verify')) {
+            $this->markTestSkipped('Email verification routes are not defined in simple mode.');
+        }
+
         $user = User::factory()->unverified()->create();
 
         $verificationUrl = URL::temporarySignedRoute(
@@ -48,6 +55,10 @@ test('email can be verified', function () {
 });
 
 test('email is not verified with invalid hash', function () {
+    if (config('auth.mode') === 'simple') {
+        $this->markTestSkipped('Email verification is not implemented in simple mode.');
+    }
+
     $user = User::factory()->unverified()->create();
 
     $verificationUrl = URL::temporarySignedRoute(

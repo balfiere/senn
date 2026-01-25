@@ -11,20 +11,25 @@ test('login screen can be rendered', function () {
 test('users can authenticate using the login screen', function () {
     $user = User::factory()->create();
 
+    $identifier = config('auth.mode') === 'simple' ? 'username' : 'email';
+
     $response = $this->post('/login', [
-        'email' => $user->email,
+        $identifier => $user->{$identifier},
         'password' => 'password',
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('projects.index', absolute: false));
+    $target = config('auth.mode') === 'simple' ? '/dashboard' : route('projects.index', absolute: false);
+    $response->assertRedirect($target);
 });
 
 test('users can not authenticate with invalid password', function () {
     $user = User::factory()->create();
 
+    $identifier = config('auth.mode') === 'simple' ? 'username' : 'email';
+
     $this->post('/login', [
-        'email' => $user->email,
+        $identifier => $user->{$identifier},
         'password' => 'wrong-password',
     ]);
 
