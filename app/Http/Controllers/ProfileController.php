@@ -4,13 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Models\Project;
+use App\Notifications\PasswordChanged;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -28,14 +31,41 @@ class ProfileController extends Controller
     }
 
     /**
+     * Display the user's account page.
+     */
+    public function account(Request $request): Response
+    {
+        return Inertia::render('Account', [
+            'auth' => [
+                'user' => [
+                    'id' => $request->user()->id,
+                    'name' => $request->user()->name,
+                    'email' => $request->user()->email,
+                    'username' => $request->user()->username,
+                ],
+            ],
+            'authMode' => config('auth.mode'),
+            'status' => session('status'),
+        ]);
+    }
+
+    /**
      * Update the user's profile information.
      */
     public function update(Request $request): RedirectResponse
     {
         try {
+            $data = ['name', 'password'];
+            
+            if (config('auth.mode') === 'simple') {
+                $data[] = 'username';
+            } else {
+                $data[] = 'email';
+            }
+
             app(UpdateUserProfileInformation::class)->update(
                 $request->user(),
-                $request->only(['name', 'email', 'password'])
+                $request->only($data)
             );
 
             return Redirect::route('account')->with('status', 'profile-information-updated');
@@ -84,24 +114,51 @@ class ProfileController extends Controller
     }
 
     /**
-     * Clean up individual project files.
+     * Clean up project files when a project is deleted.
      */
     private function cleanupProjectFiles(Project $project): void
     {
         $disk = Storage::disk('patterns');
 
-        // Clean up PDF file
+        // Delete PDF file if it exists
         if ($project->pdf_path && $disk->exists($project->pdf_path)) {
             $disk->delete($project->pdf_path);
         }
 
-        // Clean up Thumbnail
+        // Delete thumbnail file if it exists
         if ($project->thumbnail_path && $disk->exists($project->thumbnail_path)) {
             $disk->delete($project->thumbnail_path);
         }
 
-        // Clean up empty directories after file deletion
+        // Clean up empty directories
         $this->cleanEmptyDirectories($project);
+    }
+
+    /**
+     * Update the user's password.
+     */
+    public function updatePassword(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password' => ['required', 'confirmed', Password::defaults()],
+        ]);
+
+        // For simple auth mode, logout other devices when password changes
+        if (config('auth.mode') === 'production') {
+            Auth::logoutOtherDevices($validated['current_password']);
+        } else {
+            // For simple auth mode, also logout other devices for security
+            Auth::logoutOtherDevices($validated['current_password']);
+        }
+
+        $request->user()->update([
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        $request->user()->notify(new PasswordChanged());
+
+        return back()->with('status', 'password-updated');
     }
 
     /**

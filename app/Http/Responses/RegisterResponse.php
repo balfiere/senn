@@ -2,7 +2,10 @@
 
 namespace App\Http\Responses;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\Contracts\RegisterResponse as RegisterResponseContract;
+use Laravel\Fortify\Fortify;
 
 class RegisterResponse implements RegisterResponseContract
 {
@@ -11,6 +14,12 @@ class RegisterResponse implements RegisterResponseContract
      */
     public function toResponse($request)
     {
+        if (config('auth.mode') === 'simple') {
+            return redirect()->intended(route('projects.index', absolute: false));
+        }
+
+        // For production mode - redirect to register success page
+        // Fortify will handle email verification automatically
         return redirect()->route('register.success');
     }
 }

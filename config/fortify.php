@@ -30,7 +30,7 @@ return [
     'features' => [
         Features::registration(),
         Features::resetPasswords(),
-        config('auth.mode') !== 'simple' ? Features::emailVerification() : null,
+        ...(config('auth.mode') !== 'simple' ? [Features::emailVerification()] : []),
         Features::updateProfileInformation(),
     ],
 

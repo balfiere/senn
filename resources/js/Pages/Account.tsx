@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, router } from '@inertiajs/react';
-import { PageProps } from '@/types';
-import { AlertTriangle, ArrowLeft, ExternalLink, KeyRound, LogOut, Mail, RotateCcw, Trash2 } from 'lucide-react';
+import { PageProps, User } from '@/types';
+import { AlertTriangle, ArrowLeft, ExternalLink, KeyRound, LogOut, Mail, RotateCcw, Trash2, User as UserIcon } from 'lucide-react';
 
 import { SettingAction } from '@/Components/ui/setting-action';
 import { SettingGroup } from '@/Components/ui/setting-group';
@@ -127,6 +127,12 @@ function ChangePasswordSection() {
                             // Hide success message after 5 seconds
                             setTimeout(() => setShowSuccess(false), 5000);
                         }}
+                        onError={(errors) => {
+                            console.error('Password update error:', errors);
+                            if (Object.keys(errors).length > 0) {
+                                alert('Error updating password: ' + Object.values(errors)[0]);
+                            }
+                        }}
                         className="space-y-4"
                     >
                         {({ processing, errors }) => (
@@ -225,6 +231,89 @@ function ResetPasswordSection() {
     );
 }
 
+function ChangeUsernameSection({ currentName }: { currentName: string }) {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [showSuccess, setShowSuccess] = useState(false);
+
+    return (
+        <SettingGroup
+            icon={<UserIcon />}
+            title="Change Username"
+            variant="default"
+        >
+            {({ setExpanded }) => (
+                <>
+                    <p className="text-sm text-muted-foreground mb-4">
+                        Enter your new username and current password to update your account.
+                    </p>
+                    <Form
+                        action={route('profile.update')}
+                        method="patch"
+                        errorBag="defaultProfileInformation"
+                        onSuccess={() => {
+                            setUsername('');
+                            setPassword('');
+                            setShowSuccess(true);
+                            // Hide success message after 5 seconds
+                            setTimeout(() => setShowSuccess(false), 5000);
+                        }}
+                        className="space-y-4"
+                    >
+                        {({ processing, errors }) => (
+                            <>
+                                <input type="hidden" name="name" value={currentName} />
+                                <input type="hidden" name="email" value="" />
+                                <FormField label="Current Password" error={errors.password} required>
+                                    <Input
+                                        type="password"
+                                        name="password"
+                                        placeholder="Enter your current password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                    />
+                                </FormField>
+                                <FormField label="New Username" error={errors.username} required>
+                                    <Input
+                                        type="text"
+                                        name="username"
+                                        placeholder="your_new_username"
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                        required
+                                    />
+                                </FormField>
+                                <div className="flex gap-3">
+                                    <Button type="submit" disabled={processing || !username || !password}>
+                                        {processing ? 'Updating...' : 'Update Username'}
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => {
+                                            setExpanded(false);
+                                            setUsername('');
+                                            setPassword('');
+                                        }}
+                                    >
+                                        Cancel
+                                    </Button>
+                                </div>
+                                {showSuccess && (
+                                    <div className="text-sm text-green-600 dark:text-green-400 mt-4">
+                                        Username updated successfully!
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </Form>
+                </>
+            )}
+        </SettingGroup>
+    );
+}
+
 function DeleteAccountSection() {
     const [password, setPassword] = useState('');
 
@@ -285,21 +374,19 @@ function DeleteAccountSection() {
     );
 }
 
-interface User {
-    id: number;
-    name: string;
-    email: string;
-}
-
 interface AccountPageProps extends PageProps {
     auth: {
-        user: User;
+        user: User & {
+            username: string | null;
+        };
     };
+    authMode: 'simple' | 'production';
     status?: string;
 }
 
 export default function Account(props: AccountPageProps) {
     const { user } = props.auth;
+    const { authMode } = props;
     const handleLogout = () => {
         router.post(route('logout'));
     };
@@ -316,7 +403,7 @@ export default function Account(props: AccountPageProps) {
                         Back to Projects
                     </Link>
                     <h1 className="text-foreground text-sm uppercase tracking-[0.2em] font-medium">
-                        {user.email}
+                        {user.email || user.username}
                     </h1>
                 </div>
             </header>
@@ -331,12 +418,16 @@ export default function Account(props: AccountPageProps) {
                     </p>
                 </div>
 
-                {/* Email & Password Section */}
-                <FormGroup title="Email & Password" className="mb-12">
+                {/* Account Settings Section */}
+                <FormGroup title="Account Settings" className="mb-12">
                     <div>
-                        <ChangeEmailSection currentName={user.name} />
+                        {authMode === 'production' ? (
+                            <ChangeEmailSection currentName={user.name} />
+                        ) : (
+                            <ChangeUsernameSection currentName={user.name} />
+                        )}
                         <ChangePasswordSection />
-                        <ResetPasswordSection />
+                        {authMode === 'production' && <ResetPasswordSection />}
                     </div>
                 </FormGroup>
 

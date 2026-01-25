@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -59,10 +60,11 @@ class User extends Authenticatable
     public function hasVerifiedEmail(): bool
     {
         if (config('auth.mode') === 'simple') {
-            return true; // Always considered verified in simple mode
+            return true; // Always verified in simple mode
         }
 
-        return ! is_null($this->email_verified_at);
+        // In production mode, respect the actual email verification status
+        return !is_null($this->email_verified_at);
     }
 
     /**
@@ -79,10 +81,25 @@ class User extends Authenticatable
                 'email_verified_at' => $this->freshTimestamp(),
             ])->save();
 
-            $this->dispatch(new Verified($this));
+            \Illuminate\Support\Facades\Event::dispatch(new \Illuminate\Auth\Events\Verified($this));
         }
 
         return true;
+    }
+
+    /**
+     * Send the email verification notification.
+     * Override from MustVerifyEmail contract.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        // In simple mode, don't send verification emails
+        if (config('auth.mode') === 'simple') {
+            return;
+        }
+
+        // In production mode, send the notification
+        $this->notify(new \Illuminate\Auth\Notifications\VerifyEmail);
     }
 
     /**
@@ -91,7 +108,7 @@ class User extends Authenticatable
     public function getEmailForVerification(): string
     {
         if (config('auth.mode') === 'simple') {
-            return ''; // No email for verification in simple mode
+            return null; // No email for verification in simple mode
         }
 
         return $this->email;

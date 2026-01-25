@@ -33,7 +33,7 @@ class CreateNewUser implements CreatesNewUsers
             ]);
         }
 
-        // original email-based validation
+        // For production mode - create user but ensure they need email verification
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'email' => [
@@ -50,6 +50,7 @@ class CreateNewUser implements CreatesNewUsers
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
+            // Don't set email_verified_at - let Fortify handle email verification
         ]);
     }
 }

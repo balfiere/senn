@@ -38,16 +38,20 @@ if (config('auth.mode') === 'simple') {
 }
 
 // Logout works for both modes
-Route::post('/logout', function (Request $request) {
+Route::post('/logout', function () {
     Auth::logout();
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
 
     return redirect('/');
 })->name('logout');
 
 // Conditional middleware based on auth mode
-$authMiddleware = config('auth.mode') === 'simple' ? ['auth'] : ['auth', 'verified'];
+if (config('auth.mode') === 'simple') {
+    $authMiddleware = ['auth'];
+} else {
+    $authMiddleware = ['auth', 'verified'];
+}
 
 // Legacy dashboard route - redirect to projects
 Route::get('/dashboard', function () {
@@ -99,7 +103,12 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/account', fn () => Inertia::render('Account'))->name('account');
+    Route::get('/account', [ProfileController::class, 'account'])->name('account');
+    
+    // Add password update route for simple auth mode
+    if (config('auth.mode') === 'simple') {
+        Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
+    }
 });
 
 // CONDITIONALLY INCLUDE auth.php based on auth mode

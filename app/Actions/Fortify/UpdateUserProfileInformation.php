@@ -16,26 +16,44 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      */
     public function update(User $user, array $input): User
     {
-        Validator::make($input, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique(User::class)->ignore($user->id),
-            ],
-            'password' => ['required', 'current_password'],
-        ])->validateWithBag('defaultProfileInformation');
+        if (config('auth.mode') === 'simple') {
+            // Validate for username instead of email in simple mode
+            Validator::make($input, [
+                'name' => ['required', 'string', 'max:255'],
+                'username' => ['required', 'string', 'max:255', 'alpha_dash', Rule::unique(User::class)->ignore($user->id)],
+                'password' => ['required', 'current_password'],
+            ])->validateWithBag('defaultProfileInformation');
 
-        if ($input['email'] !== $user->email &&
-            $user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail) {
-            $this->updateVerifiedUser($user, $input);
-        } else {
+            $oldUsername = $user->username;
+            $newUsername = $input['username'];
+            
             $user->forceFill([
                 'name' => $input['name'],
-                'email' => $input['email'],
+                'username' => $newUsername,
             ])->save();
+        } else {
+            // Original email-based validation for production mode
+            Validator::make($input, [
+                'name' => ['required', 'string', 'max:255'],
+                'email' => [
+                    'required',
+                    'string',
+                    'email',
+                    'max:255',
+                    Rule::unique(User::class)->ignore($user->id),
+                ],
+                'password' => ['required', 'current_password'],
+            ])->validateWithBag('defaultProfileInformation');
+
+            if ($input['email'] !== $user->email &&
+                $user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail) {
+                $this->updateVerifiedUser($user, $input);
+            } else {
+                $user->forceFill([
+                    'name' => $input['name'],
+                    'email' => $input['email'],
+                ])->save();
+            }
         }
 
         return $user;
