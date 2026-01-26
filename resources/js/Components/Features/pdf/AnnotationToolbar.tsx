@@ -40,7 +40,7 @@ interface AnnotationToolbarProps {
   settings: AnnotationSettings;
   setSettings: (settings: AnnotationSettings) => void;
   searchQuery: string;
-  setSearchQuery: (query: string) => void;
+  onSearch: (query: string) => void;
   zoom: number;
   setZoom: (zoom: number) => void;
   darkMode: boolean;
@@ -65,7 +65,7 @@ export function AnnotationToolbar({
   settings,
   setSettings,
   searchQuery,
-  setSearchQuery,
+  onSearch,
   zoom,
   setZoom,
   darkMode,
@@ -98,8 +98,8 @@ export function AnnotationToolbar({
 
   // Notify parent when search bar visibility changes
   useEffect(() => {
-    onSearchBarVisibilityChange?.(!showSearchBar);
-  }, [showSearchBar, onSearchBarVisibilityChange]);
+    onSearchBarVisibilityChange?.(!showSearchBar || isMobile);
+  }, [showSearchBar, isMobile, onSearchBarVisibilityChange]);
 
   useEffect(() => {
     if (!zoomState || zoomState.currentZoomLevel == null) return;
@@ -164,28 +164,7 @@ export function AnnotationToolbar({
     setZoom(100);
   };
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    if (!searchApi) return;
 
-    const api = searchApi as unknown as Record<string, unknown>;
-    const trimmed = query.trim();
-
-    if (trimmed) {
-      if (typeof api.setShowAllResults === 'function') {
-        api.setShowAllResults(true);
-      }
-      if (typeof api.searchAllPages === 'function') {
-        api.searchAllPages(trimmed);
-      } else if (typeof api.startSearch === 'function') {
-        api.startSearch(trimmed);
-      }
-    } else {
-      if (typeof api.stopSearch === 'function') {
-        api.stopSearch();
-      }
-    }
-  };
 
   const tools: {
     id: AnnotationToolType;
@@ -315,7 +294,7 @@ export function AnnotationToolbar({
         <Palette className="h-4 w-4" />
       </Button>
 
-      {showSearchBar && (
+      {showSearchBar && !isMobile && (
         <>
           <Separator
             orientation="vertical"
@@ -323,65 +302,63 @@ export function AnnotationToolbar({
           />
 
           {/* Search */}
-          {!isMobile && (
-            <div className="flex items-center gap-1">
-              <div className="relative">
-                <Search className="text-muted-foreground absolute top-1/2 left-2 h-3 w-3 -translate-y-1/2" />
-                <Input
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={(e) => handleSearch(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      if (rightSidebarOpen && rightSidebarTab === 'search') {
-                        // If search sidebar is already open, go to next result
-                        if (
-                          searchApi &&
-                          scrollApi &&
-                          searchState.results.length > 0
-                        ) {
-                          // Calculate the next index
-                          const currentIndex =
-                            searchState.activeResultIndex >= 0
-                              ? searchState.activeResultIndex
-                              : -1;
-                          const nextIndex =
-                            currentIndex >= searchState.results.length - 1
-                              ? 0
-                              : currentIndex + 1;
-                          const nextResult = searchState.results[nextIndex];
+          <div className="flex items-center gap-1">
+            <div className="relative">
+              <Search className="text-muted-foreground absolute top-1/2 left-2 h-3 w-3 -translate-y-1/2" />
+              <Input
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => onSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    if (rightSidebarOpen && rightSidebarTab === 'search') {
+                      // If search sidebar is already open, go to next result
+                      if (
+                        searchApi &&
+                        scrollApi &&
+                        searchState.results.length > 0
+                      ) {
+                        // Calculate the next index
+                        const currentIndex =
+                          searchState.activeResultIndex >= 0
+                            ? searchState.activeResultIndex
+                            : -1;
+                        const nextIndex =
+                          currentIndex >= searchState.results.length - 1
+                            ? 0
+                            : currentIndex + 1;
+                        const nextResult = searchState.results[nextIndex];
 
-                          // Scroll to the next result
-                          const minCoordinates = nextResult.rects.reduce(
-                            (min, rect) => ({
-                              x: Math.min(min.x, rect.origin.x),
-                              y: Math.min(min.y, rect.origin.y),
-                            }),
-                            { x: Infinity, y: Infinity },
-                          );
+                        // Scroll to the next result
+                        const minCoordinates = nextResult.rects.reduce(
+                          (min, rect) => ({
+                            x: Math.min(min.x, rect.origin.x),
+                            y: Math.min(min.y, rect.origin.y),
+                          }),
+                          { x: Infinity, y: Infinity },
+                        );
 
-                          scrollApi.scrollToPage({
-                            pageNumber: nextResult.pageIndex + 1,
-                            pageCoordinates: minCoordinates,
-                            alignX: 50,
-                            alignY: 50,
-                          });
+                        scrollApi.scrollToPage({
+                          pageNumber: nextResult.pageIndex + 1,
+                          pageCoordinates: minCoordinates,
+                          alignX: 50,
+                          alignY: 50,
+                        });
 
-                          // Update the active result
-                          searchApi.goToResult(nextIndex);
-                        }
-                      } else {
-                        // Open the search sidebar
-                        setRightSidebarOpen(true);
-                        setRightSidebarTab('search');
+                        // Update the active result
+                        searchApi.goToResult(nextIndex);
                       }
+                    } else {
+                      // Open the search sidebar
+                      setRightSidebarOpen(true);
+                      setRightSidebarTab('search');
                     }
-                  }}
-                  className="h-8 w-32 pl-7 text-xs"
-                />
-              </div>
+                  }
+                }}
+                className="h-8 w-32 pl-7 text-xs"
+              />
             </div>
-          )}
+          </div>
         </>
       )}
 

@@ -128,6 +128,15 @@ export function SearchResultsSidebar({
               placeholder="Search..."
               value={searchQuery}
               onChange={(e) => onSearch?.(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  if (state.results.length > 0) {
+                    const currentIndex = state.activeResultIndex >= 0 ? state.activeResultIndex : -1;
+                    const nextIndex = currentIndex >= state.results.length - 1 ? 0 : currentIndex + 1;
+                    goToResult(nextIndex);
+                  }
+                }
+              }}
               className="h-8 pl-7 text-xs"
             />
           </div>

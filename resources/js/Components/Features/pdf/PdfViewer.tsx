@@ -141,7 +141,30 @@ function PdfViewerContent({
     setRightSidebarOpen(false);
   };
 
-  const { provides: searchApi } = useSearch(docId)
+  const { provides: searchApi } = useSearch(docId);
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    if (!searchApi) return;
+
+    const api = searchApi as unknown as Record<string, unknown>;
+    const trimmed = query.trim();
+
+    if (trimmed) {
+      if (typeof api.setShowAllResults === 'function') {
+        api.setShowAllResults(true);
+      }
+      if (typeof api.searchAllPages === 'function') {
+        api.searchAllPages(trimmed);
+      } else if (typeof api.startSearch === 'function') {
+        api.startSearch(trimmed);
+      }
+    } else {
+      if (typeof api.stopSearch === 'function') {
+        api.stopSearch();
+      }
+    }
+  };
 
   return (
     <DocumentContent documentId={docId}>
@@ -155,7 +178,7 @@ function PdfViewerContent({
               settings={settings}
               setSettings={setSettings}
               searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
+              onSearch={handleSearch}
               zoom={zoom}
               setZoom={setZoom}
               darkMode={darkMode}
@@ -185,7 +208,7 @@ function PdfViewerContent({
                 <div
                   className={cn(
                     "border-r border-border bg-background flex flex-col",
-                    isMobile ? "absolute left-0 top-0 bottom-[48px] z-20 w-64 shadow-xl h-[calc(100%-48px)]" : "w-48 h-full"
+                    isMobile ? "absolute left-0 top-0 bottom-[53px] z-20 w-64 shadow-xl h-[calc(100%-53px)]" : "w-48 h-full"
                   )}
                 >
                   <LeftSidebar
@@ -258,7 +281,7 @@ function PdfViewerContent({
                 <div
                   className={cn(
                     "border-l border-border bg-background flex flex-col",
-                    isMobile ? "absolute right-0 top-0 bottom-[48px] z-20 w-72 shadow-xl h-[calc(100%-48px)]" : "w-64 h-full"
+                    isMobile ? "absolute right-0 top-0 bottom-[53px] z-20 w-72 shadow-xl h-[calc(100%-53px)]" : "w-64 h-full"
                   )}
                 >
                   <Tabs value={rightSidebarTab} onValueChange={(v) => setRightSidebarTab(v as "comments" | "search")} className="flex flex-col h-full">
@@ -292,7 +315,7 @@ function PdfViewerContent({
                           searchApi?.stopSearch()
                         }}
                         showIntegratedSearch={searchBarHidden}
-                        onSearch={setSearchQuery}
+                        onSearch={handleSearch}
                       />
                     </TabsContent>
                   </Tabs>
