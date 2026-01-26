@@ -84,7 +84,7 @@ export function CounterCard({ counter }: Props) {
               variant="ghost"
               size="icon"
               className={cn(
-                'h-8 w-8',
+                'hidden h-8 w-8 sm:inline-flex',
                 counter.is_linked ? 'text-primary' : 'text-muted-foreground',
               )}
               onClick={handleToggleLink}
@@ -102,7 +102,7 @@ export function CounterCard({ counter }: Props) {
           <Button
             variant="ghost"
             size="icon"
-            className="text-muted-foreground hover:text-foreground h-8 w-8"
+            className="text-muted-foreground hover:text-foreground hidden h-8 w-8 sm:inline-flex"
             onClick={handleReset}
             title="Reset"
             data-testid={`counter-reset-${counter.id}`}
