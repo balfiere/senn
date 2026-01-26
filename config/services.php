@@ -35,4 +35,32 @@ return [
         ],
     ],
 
+    // Public OAuth providers
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI', env('APP_URL').'/auth/google/callback'),
+        'enabled' => env('GOOGLE_AUTH_ENABLED', false),
+    ],
+
+    'github' => [
+        'client_id' => env('GITHUB_CLIENT_ID'),
+        'client_secret' => env('GITHUB_CLIENT_SECRET'),
+        'redirect' => env('GITHUB_REDIRECT_URI', env('APP_URL').'/auth/github/callback'),
+        'enabled' => env('GITHUB_AUTH_ENABLED', false),
+    ],
+
+    // Generic OIDC provider (for Authentik, Authelia, Keycloak, etc.)
+    'oidc' => [
+        'client_id' => env('OIDC_CLIENT_ID'),
+        'client_secret' => env('OIDC_CLIENT_SECRET'),
+        'redirect' => env('OIDC_REDIRECT_URI', env('APP_URL').'/auth/oidc/callback'),
+        'base_url' => env('OIDC_BASE_URL'), // e.g., https://auth.yourdomain.com
+        'authorize_url' => env('OIDC_AUTHORIZE_URL'), // optional, for custom endpoints
+        'token_url' => env('OIDC_TOKEN_URL'), // optional
+        'userinfo_url' => env('OIDC_USERINFO_URL'), // optional
+        'enabled' => env('OIDC_ENABLED', false),
+        'name' => env('OIDC_PROVIDER_NAME', 'SSO'), // Display name for the button
+    ],
+
 ];

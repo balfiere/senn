@@ -30,6 +30,8 @@ import {
 import type React from 'react';
 import { useEffect } from 'react';
 import { type AnnotationSettings, type AnnotationToolType } from './utils';
+import { useToolbarBreakpoint } from '@/hooks/useToolbarBreakpoint';
+import { AnnotationToolsMenu } from './AnnotationToolsMenu';
 
 interface AnnotationToolbarProps {
   documentId: string;
@@ -52,6 +54,7 @@ interface AnnotationToolbarProps {
   isMobile: boolean;
   setRightSidebarTab: (tab: 'comments' | 'search') => void;
   rightSidebarTab: 'comments' | 'search';
+  onSearchBarVisibilityChange?: (hidden: boolean) => void;
 }
 
 export function AnnotationToolbar({
@@ -75,6 +78,7 @@ export function AnnotationToolbar({
   isMobile,
   setRightSidebarTab,
   rightSidebarTab,
+  onSearchBarVisibilityChange,
 }: AnnotationToolbarProps) {
   const { provides: annotationApi, state: annotationState } =
     useAnnotation(documentId);
@@ -82,6 +86,18 @@ export function AnnotationToolbar({
   const { provides: searchApi, state: searchState } = useSearch(documentId);
   const { provides: scrollApi } = useScroll(documentId);
   const { provides: panApi, isPanning } = usePan(documentId);
+
+  const {
+    showAnnotationTools,
+    showResetZoom,
+    showSearchBar,
+    showZoomControls,
+  } = useToolbarBreakpoint();
+
+  // Notify parent when search bar visibility changes
+  useEffect(() => {
+    onSearchBarVisibilityChange?.(!showSearchBar);
+  }, [showSearchBar, onSearchBarVisibilityChange]);
 
   useEffect(() => {
     if (!zoomState || zoomState.currentZoomLevel == null) return;
@@ -174,30 +190,30 @@ export function AnnotationToolbar({
     icon: React.ReactNode;
     label: string;
   }[] = [
-    {
-      id: 'select',
-      icon: <MousePointer2 className="h-4 w-4" />,
-      label: 'Select',
-    },
-    {
-      id: 'highlight',
-      icon: <Highlighter className="h-4 w-4" />,
-      label: 'Highlight',
-    },
-    {
-      id: 'underline',
-      icon: <Underline className="h-4 w-4" />,
-      label: 'Underline',
-    },
-    { id: 'freeText', icon: <Type className="h-4 w-4" />, label: 'Text' },
-    { id: 'square', icon: <Square className="h-4 w-4" />, label: 'Rectangle' },
-    { id: 'line', icon: <Minus className="h-4 w-4" />, label: 'Line' },
-    {
-      id: 'lineArrow',
-      icon: <ArrowRight className="h-4 w-4" />,
-      label: 'Arrow',
-    },
-  ];
+      {
+        id: 'select',
+        icon: <MousePointer2 className="h-4 w-4" />,
+        label: 'Select',
+      },
+      {
+        id: 'highlight',
+        icon: <Highlighter className="h-4 w-4" />,
+        label: 'Highlight',
+      },
+      {
+        id: 'underline',
+        icon: <Underline className="h-4 w-4" />,
+        label: 'Underline',
+      },
+      { id: 'freeText', icon: <Type className="h-4 w-4" />, label: 'Text' },
+      { id: 'square', icon: <Square className="h-4 w-4" />, label: 'Rectangle' },
+      { id: 'line', icon: <Minus className="h-4 w-4" />, label: 'Line' },
+      {
+        id: 'lineArrow',
+        icon: <ArrowRight className="h-4 w-4" />,
+        label: 'Arrow',
+      },
+    ];
 
   const handleToolSelect = (toolId: AnnotationToolType) => {
     setActiveTool(toolId);
@@ -215,7 +231,7 @@ export function AnnotationToolbar({
   };
 
   return (
-    <div className="border-border bg-background flex flex-wrap items-center gap-1 border-b p-2 h-14">
+    <div className="border-border bg-background flex h-14 items-center gap-1 border-b p-2">
       {/* Left sidebar toggle */}
       <Button
         variant="ghost"
@@ -246,20 +262,29 @@ export function AnnotationToolbar({
       <Separator orientation="vertical" className="mx-1 h-6" />
 
       {/* Annotation tools */}
-      <div className="flex items-center gap-0.5">
-        {tools.map((tool) => (
-          <Button
-            key={tool.id}
-            variant={getHighlightedTool(tool.id) ? 'secondary' : 'ghost'}
-            size="icon"
-            onClick={() => handleToolSelect(tool.id)}
-            className="h-8 w-8"
-            title={tool.label}
-          >
-            {tool.icon}
-          </Button>
-        ))}
-      </div>
+      {showAnnotationTools ? (
+        <div className="flex items-center gap-0.5">
+          {tools.map((tool) => (
+            <Button
+              key={tool.id}
+              variant={getHighlightedTool(tool.id) ? 'secondary' : 'ghost'}
+              size="icon"
+              onClick={() => handleToolSelect(tool.id)}
+              className="h-8 w-8"
+              title={tool.label}
+            >
+              {tool.icon}
+            </Button>
+          ))}
+        </div>
+      ) : (
+        <AnnotationToolsMenu
+          documentId={documentId}
+          activeTool={activeTool}
+          onToolSelect={handleToolSelect}
+          isPanning={isPanning}
+        />
+      )}
 
       <Separator orientation="vertical" className="mx-1 h-6" />
 
@@ -281,102 +306,115 @@ export function AnnotationToolbar({
         <Palette className="h-4 w-4" />
       </Button>
 
-      <Separator orientation="vertical" className="mx-1 hidden h-6 sm:block" />
+      {showSearchBar && (
+        <>
+          <Separator
+            orientation="vertical"
+            className="mx-1 h-6"
+          />
 
-      {/* Search */}
-      {!isMobile && (
-        <div className="hidden items-center gap-1 sm:flex">
-          <div className="relative">
-            <Search className="text-muted-foreground absolute top-1/2 left-2 h-3 w-3 -translate-y-1/2" />
-            <Input
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  if (rightSidebarOpen && rightSidebarTab === 'search') {
-                    // If search sidebar is already open, go to next result
-                    if (
-                      searchApi &&
-                      scrollApi &&
-                      searchState.results.length > 0
-                    ) {
-                      // Calculate the next index
-                      const currentIndex =
-                        searchState.activeResultIndex >= 0
-                          ? searchState.activeResultIndex
-                          : -1;
-                      const nextIndex =
-                        currentIndex >= searchState.results.length - 1
-                          ? 0
-                          : currentIndex + 1;
-                      const nextResult = searchState.results[nextIndex];
+          {/* Search */}
+          {!isMobile && (
+            <div className="flex items-center gap-1">
+              <div className="relative">
+                <Search className="text-muted-foreground absolute top-1/2 left-2 h-3 w-3 -translate-y-1/2" />
+                <Input
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      if (rightSidebarOpen && rightSidebarTab === 'search') {
+                        // If search sidebar is already open, go to next result
+                        if (
+                          searchApi &&
+                          scrollApi &&
+                          searchState.results.length > 0
+                        ) {
+                          // Calculate the next index
+                          const currentIndex =
+                            searchState.activeResultIndex >= 0
+                              ? searchState.activeResultIndex
+                              : -1;
+                          const nextIndex =
+                            currentIndex >= searchState.results.length - 1
+                              ? 0
+                              : currentIndex + 1;
+                          const nextResult = searchState.results[nextIndex];
 
-                      // Scroll to the next result
-                      const minCoordinates = nextResult.rects.reduce(
-                        (min, rect) => ({
-                          x: Math.min(min.x, rect.origin.x),
-                          y: Math.min(min.y, rect.origin.y),
-                        }),
-                        { x: Infinity, y: Infinity },
-                      );
+                          // Scroll to the next result
+                          const minCoordinates = nextResult.rects.reduce(
+                            (min, rect) => ({
+                              x: Math.min(min.x, rect.origin.x),
+                              y: Math.min(min.y, rect.origin.y),
+                            }),
+                            { x: Infinity, y: Infinity },
+                          );
 
-                      scrollApi.scrollToPage({
-                        pageNumber: nextResult.pageIndex + 1,
-                        pageCoordinates: minCoordinates,
-                        alignX: 50,
-                        alignY: 50,
-                      });
+                          scrollApi.scrollToPage({
+                            pageNumber: nextResult.pageIndex + 1,
+                            pageCoordinates: minCoordinates,
+                            alignX: 50,
+                            alignY: 50,
+                          });
 
-                      // Update the active result
-                      searchApi.goToResult(nextIndex);
+                          // Update the active result
+                          searchApi.goToResult(nextIndex);
+                        }
+                      } else {
+                        // Open the search sidebar
+                        setRightSidebarOpen(true);
+                        setRightSidebarTab('search');
+                      }
                     }
-                  } else {
-                    // Open the search sidebar
-                    setRightSidebarOpen(true);
-                    setRightSidebarTab('search');
-                  }
-                }
-              }}
-              className="h-8 w-32 pl-7 text-xs"
-            />
-          </div>
-        </div>
+                  }}
+                  className="h-8 w-32 pl-7 text-xs"
+                />
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       <div className="flex-1" />
 
       {/* Zoom controls */}
-      <div className="flex items-center gap-1">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleZoomOut}
-          className="h-8 w-8"
-        >
-          <ZoomOut className="h-4 w-4" />
-        </Button>
-        <span className="w-12 text-center text-xs">{zoom}%</span>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleZoomIn}
-          className="h-8 w-8"
-        >
-          <ZoomIn className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleResetZoom}
-          className="h-8 w-8"
-          title="Reset zoom"
-        >
-          <RotateCcw className="h-4 w-4" />
-        </Button>
-      </div>
+      {showZoomControls ? (
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleZoomOut}
+            className="h-8 w-8"
+          >
+            <ZoomOut className="h-4 w-4" />
+          </Button>
+          <span className="w-12 text-center text-xs">{zoom}%</span>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleZoomIn}
+            className="h-8 w-8"
+          >
+            <ZoomIn className="h-4 w-4" />
+          </Button>
+          {showResetZoom && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleResetZoom}
+              className="h-8 w-8"
+              title="Reset zoom"
+            >
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      ) : null}
 
-      <Separator orientation="vertical" className="mx-1 h-6" />
+      {showZoomControls && (
+        <Separator orientation="vertical" className="mx-1 h-6" />
+      )}
 
       {/* Dark mode toggle */}
       <Button

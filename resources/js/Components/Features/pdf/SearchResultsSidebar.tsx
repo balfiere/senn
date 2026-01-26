@@ -6,7 +6,8 @@ import { Button } from '@/Components/ui/button';
 import { Checkbox } from '@/Components/ui/checkbox';
 import { ScrollArea } from '@/Components/ui/scroll-area';
 import { Label } from '@/Components/ui/label';
-import { X, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Loader2, Search } from 'lucide-react';
+import { Input } from '@/Components/ui/input';
 import { cn } from '@/lib/utils';
 
 // Search result type from embedpdf
@@ -29,9 +30,17 @@ interface SearchResultsSidebarProps {
   documentId: string;
   searchQuery: string;
   onClose: () => void;
+  showIntegratedSearch?: boolean;
+  onSearch?: (query: string) => void;
 }
 
-export function SearchResultsSidebar({ documentId, searchQuery, onClose }: SearchResultsSidebarProps) {
+export function SearchResultsSidebar({
+  documentId,
+  searchQuery,
+  onClose,
+  showIntegratedSearch = false,
+  onSearch,
+}: SearchResultsSidebarProps) {
   const { state, provides } = useSearch(documentId);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { provides: scrollApi } = useScroll(documentId);
@@ -110,6 +119,19 @@ export function SearchResultsSidebar({ documentId, searchQuery, onClose }: Searc
             <X className="h-3 w-3" />
           </Button>
         </div>
+
+        {/* Integrated search input when toolbar search is hidden */}
+        {showIntegratedSearch && (
+          <div className="relative mb-3">
+            <Search className="text-muted-foreground absolute top-1/2 left-2 h-3 w-3 -translate-y-1/2" />
+            <Input
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => onSearch?.(e.target.value)}
+              className="h-8 pl-7 text-xs"
+            />
+          </div>
+        )}
 
         {/* Search options */}
         <div className="space-y-1">

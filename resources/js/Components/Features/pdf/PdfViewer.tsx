@@ -82,6 +82,8 @@ interface PdfViewerContentProps {
   setRightSidebarOpen: Dispatch<SetStateAction<boolean>>;
   rightSidebarTab: 'comments' | 'search';
   setRightSidebarTab: Dispatch<SetStateAction<'comments' | 'search'>>;
+  searchBarHidden: boolean;
+  setSearchBarHidden: (hidden: boolean) => void;
 }
 
 function PdfViewerContent({
@@ -99,6 +101,8 @@ function PdfViewerContent({
   setRightSidebarOpen,
   rightSidebarTab,
   setRightSidebarTab,
+  searchBarHidden,
+  setSearchBarHidden,
 }: PdfViewerContentProps) {
   useEffect(() => {
     onDocumentIdChange(docId)
@@ -146,6 +150,7 @@ function PdfViewerContent({
               isMobile={isMobile}
               setRightSidebarTab={setRightSidebarTab}
               rightSidebarTab={rightSidebarTab}
+              onSearchBarVisibilityChange={setSearchBarHidden}
             />
 
             <div className="flex flex-1 overflow-hidden">
@@ -247,6 +252,8 @@ function PdfViewerContent({
                           setSearchQuery("")
                           searchApi?.stopSearch()
                         }}
+                        showIntegratedSearch={searchBarHidden}
+                        onSearch={setSearchQuery}
                       />
                     </TabsContent>
                   </Tabs>
@@ -282,6 +289,7 @@ export function PdfViewer({
   const [rightSidebarTab, setRightSidebarTab] = useState<'comments' | 'search'>(
     'comments',
   );
+  const [searchBarHidden, setSearchBarHidden] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   // Refs to store API and state for use in event handlers
@@ -324,7 +332,7 @@ export function PdfViewer({
 
       for (const dbAnnotation of currentAnnotations) {
         const annotationId = dbAnnotation.embedpdf_annotation_id;
-        
+
         // Skip annotations that are already loaded in the engine
         // This prevents duplicate imports and the resulting duplicate create events
         if (loadedAnnotationIdsRef.current.has(annotationId)) {
@@ -396,9 +404,9 @@ export function PdfViewer({
       createPluginRegistration(HistoryPluginPackage),
       createPluginRegistration(ZoomPluginPackage),
       createPluginRegistration(ThumbnailPluginPackage, {
-    width: 120,
-    paddingY: 10,
-  }),
+        width: 120,
+        paddingY: 10,
+      }),
       createPluginRegistration(SearchPluginPackage),
       createPluginRegistration(PanPluginPackage, {
         defaultMode: 'mobile',
@@ -470,7 +478,7 @@ export function PdfViewer({
             // Use Axios for delete operations to ensure CSRF token is included
             try {
               await window.axios.delete(route('annotations.destroy', annotationId));
-              
+
               // Update local state on success
               setAnnotations((prev) =>
                 prev.filter(
@@ -701,10 +709,10 @@ export function PdfViewer({
               const deleteAnnotationId = annotation.id || annotation.object?.id;
               if (deleteAnnotationId) {
                 saveAnnotation('delete', {}, deleteAnnotationId);
-                
+
                 // Remove from tracking ref so it can be re-created if needed
                 loadedAnnotationIdsRef.current.delete(deleteAnnotationId);
-                
+
                 // Remove from local state immediately
                 setAnnotations((prev) =>
                   prev.filter(
@@ -748,6 +756,8 @@ export function PdfViewer({
             rightSidebarTab={rightSidebarTab}
             setRightSidebarTab={setRightSidebarTab}
             isMobile={isMobile}
+            searchBarHidden={searchBarHidden}
+            setSearchBarHidden={setSearchBarHidden}
           />
         );
       }}

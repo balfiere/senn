@@ -2,6 +2,7 @@ export { PdfViewer } from './PdfViewer';
 export { AnnotationToolbar } from './AnnotationToolbar';
 export { AnnotationStyleSidebar } from './AnnotationStyleSidebar';
 export { AnnotationSelectionMenu } from './AnnotationSelectionMenu';
+export { AnnotationToolsMenu } from './AnnotationToolsMenu';
 export { TextSelectionMenu } from './TextSelectionMenu';
 export { LeftSidebar } from './LeftSidebar';
 export { ThumbnailPane } from './ThumbnailPane';
