@@ -14,7 +14,7 @@ interface LeftSidebarProps {
 
 export function LeftSidebar({ documentId, activeTab, setActiveTab, activeTool }: LeftSidebarProps) {
   return (
-    <div className="flex h-full w-48 flex-col border-r border-border bg-background">
+    <div className="flex h-full flex-col border-r border-border bg-background">
       <Tabs
         value={activeTab}
         onValueChange={(v) => setActiveTab(v as 'thumbnails' | 'bookmarks' | 'styles')}

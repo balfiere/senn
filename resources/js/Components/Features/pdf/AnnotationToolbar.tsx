@@ -55,6 +55,7 @@ interface AnnotationToolbarProps {
   setRightSidebarTab: (tab: 'comments' | 'search') => void;
   rightSidebarTab: 'comments' | 'search';
   onSearchBarVisibilityChange?: (hidden: boolean) => void;
+  closeSidebars?: () => void;
 }
 
 export function AnnotationToolbar({
@@ -79,6 +80,7 @@ export function AnnotationToolbar({
   setRightSidebarTab,
   rightSidebarTab,
   onSearchBarVisibilityChange,
+  closeSidebars,
 }: AnnotationToolbarProps) {
   const { provides: annotationApi, state: annotationState } =
     useAnnotation(documentId);
@@ -228,6 +230,10 @@ export function AnnotationToolbar({
     } else {
       annotationApi?.setActiveTool(null);
     }
+
+    if (isMobile) {
+      closeSidebars?.();
+    }
   };
 
   return (
@@ -252,7 +258,10 @@ export function AnnotationToolbar({
       <Button
         variant={isPanning ? 'secondary' : 'ghost'}
         size="icon"
-        onClick={() => panApi?.togglePan()}
+        onClick={() => {
+          panApi?.togglePan();
+          if (isMobile) closeSidebars?.();
+        }}
         className="h-8 w-8"
         title="Pan tool"
       >
@@ -420,7 +429,10 @@ export function AnnotationToolbar({
       <Button
         variant="ghost"
         size="icon"
-        onClick={() => setDarkMode(!darkMode)}
+        onClick={() => {
+          setDarkMode(!darkMode)
+          if (isMobile) closeSidebars?.();
+        }}
         className="h-8 w-8"
         title={darkMode ? 'Light mode' : 'Dark mode (invert PDF)'}
       >
@@ -431,7 +443,9 @@ export function AnnotationToolbar({
       <Button
         variant="ghost"
         size="icon"
-        onClick={() => setRightSidebarOpen(!rightSidebarOpen)}
+        onClick={() => {
+          setRightSidebarOpen(!rightSidebarOpen);
+        }}
         className="h-8 w-8"
       >
         <MessageSquare className="h-4 w-4" />

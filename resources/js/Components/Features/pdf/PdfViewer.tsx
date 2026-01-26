@@ -122,6 +122,25 @@ function PdfViewerContent({
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(false)
   const [leftSidebarTab, setLeftSidebarTab] = useState<"thumbnails" | "bookmarks" | "styles">("thumbnails")
 
+  const handleSetLeftSidebarOpen = (open: boolean) => {
+    if (isMobile && open) {
+      setRightSidebarOpen(false);
+    }
+    setLeftSidebarOpen(open);
+  };
+
+  const handleSetRightSidebarOpen = (open: boolean) => {
+    if (isMobile && open) {
+      setLeftSidebarOpen(false);
+    }
+    setRightSidebarOpen(open);
+  };
+
+  const closeSidebars = () => {
+    setLeftSidebarOpen(false);
+    setRightSidebarOpen(false);
+  };
+
   const { provides: searchApi } = useSearch(docId)
 
   return (
@@ -142,25 +161,40 @@ function PdfViewerContent({
               darkMode={darkMode}
               setDarkMode={setDarkMode}
               leftSidebarOpen={leftSidebarOpen}
-              setLeftSidebarOpen={setLeftSidebarOpen}
+              setLeftSidebarOpen={handleSetLeftSidebarOpen}
               leftSidebarTab={leftSidebarTab}
               setLeftSidebarTab={setLeftSidebarTab}
               rightSidebarOpen={rightSidebarOpen}
-              setRightSidebarOpen={setRightSidebarOpen}
+              setRightSidebarOpen={handleSetRightSidebarOpen}
               isMobile={isMobile}
               setRightSidebarTab={setRightSidebarTab}
               rightSidebarTab={rightSidebarTab}
               onSearchBarVisibilityChange={setSearchBarHidden}
+              closeSidebars={isMobile ? closeSidebars : undefined}
             />
 
-            <div className="flex flex-1 overflow-hidden">
-              {leftSidebarOpen && !isMobile && (
-                <LeftSidebar
-                  documentId={docId}
-                  activeTab={leftSidebarTab}
-                  setActiveTab={setLeftSidebarTab}
-                  activeTool={activeTool}
+            <div className="flex flex-1 overflow-hidden relative">
+              {isMobile && (leftSidebarOpen || rightSidebarOpen) && (
+                <div
+                  className="absolute inset-0 z-10 bg-black/5"
+                  onClick={closeSidebars}
                 />
+              )}
+
+              {leftSidebarOpen && (
+                <div
+                  className={cn(
+                    "border-r border-border bg-background flex flex-col",
+                    isMobile ? "absolute left-0 top-0 bottom-[48px] z-20 w-64 shadow-xl h-[calc(100%-48px)]" : "w-48 h-full"
+                  )}
+                >
+                  <LeftSidebar
+                    documentId={docId}
+                    activeTab={leftSidebarTab}
+                    setActiveTab={setLeftSidebarTab}
+                    activeTool={activeTool}
+                  />
+                </div>
               )}
 
               <div className="flex-1 relative overflow-hidden">
@@ -220,8 +254,13 @@ function PdfViewerContent({
                 </GlobalPointerProvider>
               </div>
 
-              {rightSidebarOpen && !isMobile && (
-                <div className="w-64 border-l border-border bg-background flex flex-col h-full">
+              {rightSidebarOpen && (
+                <div
+                  className={cn(
+                    "border-l border-border bg-background flex flex-col",
+                    isMobile ? "absolute right-0 top-0 bottom-[48px] z-20 w-72 shadow-xl h-[calc(100%-48px)]" : "w-64 h-full"
+                  )}
+                >
                   <Tabs value={rightSidebarTab} onValueChange={(v) => setRightSidebarTab(v as "comments" | "search")} className="flex flex-col h-full">
                     <TabsList className="w-full rounded-none border-b shrink-0">
                       <TabsTrigger value="comments" className="flex-1 text-xs">
