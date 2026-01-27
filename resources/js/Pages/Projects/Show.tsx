@@ -137,7 +137,9 @@ export default function Show({
               }
             >
               {currentPart.counters.map((counter) => (
-                <CounterCard key={counter.id} counter={counter} />
+                <div key={counter.id} className="@container">
+                  <CounterCard counter={counter} />
+                </div>
               ))}
             </div>
           ) : (
