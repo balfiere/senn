@@ -208,6 +208,7 @@ export function EditCounterDialog({
                                     type="button"
                                     variant="outline"
                                     size="sm"
+                                    className="flex-1"
                                     onClick={onClose}
                                     data-testid="edit-counter-cancel"
                                     disabled={processing}
@@ -217,6 +218,7 @@ export function EditCounterDialog({
                                 <Button
                                     type="submit"
                                     size="sm"
+                                    className="flex-1"
                                     disabled={processing}
                                     data-testid="edit-counter-save"
                                 >
