@@ -254,7 +254,7 @@ export function CommentsSidebar({
                           <div className="group/content relative">
                             {root.comment ? (
                               <p
-                                className="wrap-break-word text-sm leading-relaxed text-foreground/90"
+                                className="wrap-break-word whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground/90"
                                 style={{ overflowWrap: 'anywhere' }}
                               >
                                 {root.comment}
