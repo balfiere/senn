@@ -247,22 +247,24 @@ export function AnnotationToolbar({
         <Hand className="h-4 w-4" />
       </Button>
 
-      <Separator orientation="vertical" className="mx-1 h-6" />
-
       {/* Annotation tools */}
       {showAnnotationTools ? (
         <div className="flex items-center gap-0.5">
           {tools.map((tool) => (
-            <Button
-              key={tool.id}
-              variant={getHighlightedTool(tool.id) ? 'secondary' : 'ghost'}
-              size="icon"
-              onClick={() => handleToolSelect(tool.id)}
-              className="h-8 w-8"
-              title={tool.label}
-            >
-              {tool.icon}
-            </Button>
+            <div key={tool.id} className="flex items-center gap-0.5">
+              <Button
+                variant={getHighlightedTool(tool.id) ? 'secondary' : 'ghost'}
+                size="icon"
+                onClick={() => handleToolSelect(tool.id)}
+                className="h-8 w-8"
+                title={tool.label}
+              >
+                {tool.icon}
+              </Button>
+              {tool.id === 'select' && (
+                <Separator orientation="vertical" className="mx-2 h-6" />
+              )}
+            </div>
           ))}
         </div>
       ) : (
