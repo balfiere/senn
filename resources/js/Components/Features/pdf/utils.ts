@@ -160,6 +160,8 @@ export interface StoredAnnotation {
   line_ending: string | null;
   line_start_ending: string | null;
   line_end_ending: string | null;
+  text_align: number;
+  vertical_align: number;
   contents: string | null;
   comment: string | null;
   in_reply_to_id: string | null;
@@ -194,6 +196,8 @@ export interface DbAnnotation {
   line_ending: string | null;
   line_start_ending: string | null;
   line_end_ending: string | null;
+  text_align: number;
+  vertical_align: number;
   contents: string | null;
   comment: string | null;
   in_reply_to_id: string | null;
@@ -228,9 +232,9 @@ export function annotationToDbFormat(
 
   const rect = obj.rect as
     | {
-        origin?: { x: number; y: number };
-        size?: { width: number; height: number };
-      }
+      origin?: { x: number; y: number };
+      size?: { width: number; height: number };
+    }
     | undefined;
   const position = obj.position as { x: number; y: number } | undefined;
   const dimensions = obj.dimensions as
@@ -266,13 +270,15 @@ export function annotationToDbFormat(
       lineEndings?.start ?? obj.lineStartEnding ?? obj.lineEndStarting,
     )),
     line_end_ending: String(lineEndingToString(lineEndings?.end ?? obj.lineEndEnding)),
+    text_align: Number(obj.textAlign ?? 0),
+    vertical_align: Number(obj.verticalAlign ?? 0),
     contents: obj.contents != null ? String(obj.contents) : null,
     comment: obj.comment != null ? String(obj.comment) : null,
     in_reply_to_id: obj.inReplyToId != null ? String(obj.inReplyToId) : null,
     segment_rects: (obj.segmentRects as unknown[]) || null,
   };
 
- // Set colors based on annotation type
+  // Set colors based on annotation type
   if (
     ['highlight', 'underline', 'strikeout', 'squiggly'].includes(
       annotationTypeStr,
@@ -394,6 +400,8 @@ export function dbAnnotationToEmbedpdf(
       if (dbAnnotation.contents !== null) {
         annotationObj.contents = dbAnnotation.contents;
       }
+      annotationObj.textAlign = dbAnnotation.text_align ?? 0;
+      annotationObj.verticalAlign = dbAnnotation.vertical_align ?? 0;
     }
 
     // Line/arrow specific

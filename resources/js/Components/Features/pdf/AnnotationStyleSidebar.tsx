@@ -19,6 +19,14 @@ import {
 import { useEffect, useState } from 'react';
 import { ANNOTATION_COLORS, type AnnotationToolType } from './utils';
 import { Button } from '@/Components/ui/button';
+import {
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignVerticalJustifyStart,
+  AlignVerticalJustifyCenter,
+  AlignVerticalJustifyEnd,
+} from 'lucide-react';
 
 // Utility component for color swatches
 function ColorSwatch({
@@ -325,16 +333,22 @@ function FreeTextPanel({
   const baseOpacity = editing ? Number(annotation.object.opacity || 1) : Number(defaults?.opacity || 1);
   const baseFontSize = editing ? Number(annotation.object.fontSize || 14) : Number(defaults?.fontSize || 14);
   const baseFontFamily = editing ? String(annotation.object.fontFamily || 'Helvetica') : String(defaults?.fontFamily || 'Helvetica');
+  const baseTextAlign = editing ? Number(annotation.object.textAlign ?? 0) : Number(defaults?.textAlign ?? 0);
+  const baseVerticalAlign = editing ? Number(annotation.object.verticalAlign ?? 0) : Number(defaults?.verticalAlign ?? 0);
 
   const [fontColor, setFontColor] = useState(baseFontColor);
   const [opacity, setOpacity] = useState(baseOpacity);
   const [fontSize, setFontSize] = useState(baseFontSize);
   const [fontFamily, setFontFamily] = useState(baseFontFamily);
+  const [textAlign, setTextAlign] = useState(baseTextAlign);
+  const [verticalAlign, setVerticalAlign] = useState(baseVerticalAlign);
 
   useEffect(() => setFontColor(baseFontColor), [baseFontColor]);
   useEffect(() => setOpacity(baseOpacity), [baseOpacity]);
   useEffect(() => setFontSize(baseFontSize), [baseFontSize]);
   useEffect(() => setFontFamily(baseFontFamily), [baseFontFamily]);
+  useEffect(() => setTextAlign(baseTextAlign), [baseTextAlign]);
+  useEffect(() => setVerticalAlign(baseVerticalAlign), [baseVerticalAlign]);
 
   const changeFontColor = (c: string) => {
     setFontColor(c);
@@ -354,6 +368,16 @@ function FreeTextPanel({
   const changeFontFamily = (family: string) => {
     setFontFamily(family);
     applyPatch({ fontFamily: String(family) });
+  };
+
+  const changeTextAlign = (align: number) => {
+    setTextAlign(align);
+    applyPatch({ textAlign: align });
+  };
+
+  const changeVerticalAlign = (align: number) => {
+    setVerticalAlign(align);
+    applyPatch({ verticalAlign: align });
   };
 
   function applyPatch(patch: Partial<any>) {
@@ -413,6 +437,66 @@ function FreeTextPanel({
           <option value="ZapfDingbats">ZapfDingbats</option>
         </Select>
       </FormField>
+
+      <div className="space-y-3">
+        <Label className="text-xs font-medium">Text Alignment</Label>
+        <div className="flex gap-1.5">
+          <Button
+            variant={textAlign === 0 ? 'default' : 'outline'}
+            size="icon-xs"
+            onClick={() => changeTextAlign(0)}
+            title="Left"
+          >
+            <AlignLeft size={16} />
+          </Button>
+          <Button
+            variant={textAlign === 1 ? 'default' : 'outline'}
+            size="icon-xs"
+            onClick={() => changeTextAlign(1)}
+            title="Center"
+          >
+            <AlignCenter size={16} />
+          </Button>
+          <Button
+            variant={textAlign === 2 ? 'default' : 'outline'}
+            size="icon-xs"
+            onClick={() => changeTextAlign(2)}
+            title="Right"
+          >
+            <AlignRight size={16} />
+          </Button>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <Label className="text-xs font-medium">Vertical Alignment</Label>
+        <div className="flex gap-1.5">
+          <Button
+            variant={verticalAlign === 0 ? 'default' : 'outline'}
+            size="icon-xs"
+            onClick={() => changeVerticalAlign(0)}
+            title="Top"
+          >
+            <AlignVerticalJustifyStart size={16} />
+          </Button>
+          <Button
+            variant={verticalAlign === 1 ? 'default' : 'outline'}
+            size="icon-xs"
+            onClick={() => changeVerticalAlign(1)}
+            title="Middle"
+          >
+            <AlignVerticalJustifyCenter size={16} />
+          </Button>
+          <Button
+            variant={verticalAlign === 2 ? 'default' : 'outline'}
+            size="icon-xs"
+            onClick={() => changeVerticalAlign(2)}
+            title="Bottom"
+          >
+            <AlignVerticalJustifyEnd size={16} />
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

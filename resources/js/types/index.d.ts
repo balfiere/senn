@@ -82,6 +82,8 @@ export interface PdfAnnotation {
   blend_mode: number;
   line_start_ending: string | null;
   line_end_ending: string | null;
+  text_align: number;
+  vertical_align: number;
   in_reply_to_id: string | null;
   created_at: string;
   updated_at: string;

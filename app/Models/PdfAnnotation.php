@@ -43,6 +43,8 @@ class PdfAnnotation extends Model
         'blend_mode',
         'line_start_ending',
         'line_end_ending',
+        'text_align',
+        'vertical_align',
         'in_reply_to_id',
     ];
 
@@ -68,6 +70,8 @@ class PdfAnnotation extends Model
             'line_end_y' => 'float',
             'segment_rects' => 'array',
             'blend_mode' => 'integer',
+            'text_align' => 'integer',
+            'vertical_align' => 'integer',
         ];
     }
 

@@ -342,6 +342,8 @@ export function PdfViewer({
       initialAnnotations.map((dbAnn) => ({
         ...dbAnn,
         localId: dbAnn.embedpdf_annotation_id,
+        text_align: dbAnn.text_align ?? 0,
+        vertical_align: dbAnn.vertical_align ?? 0,
       })) as StoredAnnotation[],
   );
   const [selectedAnnotation, setSelectedAnnotation] =

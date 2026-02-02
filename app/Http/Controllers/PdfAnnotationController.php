@@ -59,6 +59,8 @@ class PdfAnnotationController extends Controller
             'comment' => 'string|nullable',
             'in_reply_to_id' => 'string|nullable',
             'segment_rects' => 'string|nullable', // Received as JSON string from frontend
+            'text_align' => 'integer|nullable',
+            'vertical_align' => 'integer|nullable',
         ]);
 
         // Decode segment_rects if it's a JSON string
@@ -106,6 +108,8 @@ class PdfAnnotationController extends Controller
             'comment' => 'string|nullable',
             'in_reply_to_id' => 'string|nullable',
             'segment_rects' => 'string|nullable', // Received as JSON string from frontend
+            'text_align' => 'integer|nullable',
+            'vertical_align' => 'integer|nullable',
         ]);
 
         // Decode segment_rects if it's a JSON string
