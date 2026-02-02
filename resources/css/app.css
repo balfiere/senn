@@ -109,3 +109,7 @@
     width: auto;
     opacity: 1;
 }
+
+[data-no-interaction="true"] span {
+    white-space: pre-wrap !important;
+}
