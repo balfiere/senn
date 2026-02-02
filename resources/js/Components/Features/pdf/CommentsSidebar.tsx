@@ -117,13 +117,13 @@ export function CommentsSidebar({
       selectedAnnotation.embedpdf_annotation_id,
       {
         comment: editingComment,
-        contents: editingComment,
         modified: new Date(),
       }
     );
 
     setIsEditing(false);
   };
+
 
   const handleDeleteAnnotation = (id: string, pageIndex: number) => {
     if (!annotationApi) return;
