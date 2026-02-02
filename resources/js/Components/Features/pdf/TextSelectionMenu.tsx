@@ -1,5 +1,5 @@
 import { Separator } from '@/Components/ui/separator';
-import { PdfAnnotationSubtype } from '@embedpdf/models';
+import { PdfAnnotationSubtype, PdfBlendMode } from '@embedpdf/models';
 import { useAnnotationCapability } from '@embedpdf/plugin-annotation/react';
 import { useSelectionCapability } from '@embedpdf/plugin-selection/react';
 import { Highlighter, Underline } from 'lucide-react';
@@ -49,13 +49,24 @@ export function TextSelectionMenu({
         // Create highlight annotations for each selection range
         for (const selection of formattedSelection) {
           if (selection.segmentRects && selection.segmentRects.length > 0) {
-            // Use the first rect as the main annotation rect
-            const firstRect = selection.segmentRects[0];
+            // Calculate the bounding box for all segments
+            let minX = Infinity;
+            let minY = Infinity;
+            let maxX = -Infinity;
+            let maxY = -Infinity;
+
+            for (const rect of selection.segmentRects) {
+              minX = Math.min(minX, rect.origin.x);
+              minY = Math.min(minY, rect.origin.y);
+              maxX = Math.max(maxX, rect.origin.x + rect.size.width);
+              maxY = Math.max(maxY, rect.origin.y + rect.size.height);
+            }
+
             const annotationRect = {
-              origin: { x: firstRect.origin.x, y: firstRect.origin.y },
+              origin: { x: minX, y: minY },
               size: {
-                width: firstRect.size.width,
-                height: firstRect.size.height,
+                width: maxX - minX,
+                height: maxY - minY,
               },
             };
 
@@ -68,7 +79,8 @@ export function TextSelectionMenu({
               segmentRects: selection.segmentRects,
               color: ANNOTATION_COLORS.find((color) => color.name === 'Yellow')
                 ?.value,
-              opacity: 0.5,
+              opacity: 1,
+              blendMode: PdfBlendMode.Multiply,
             };
 
             await annotationScope.importAnnotations([
@@ -105,13 +117,24 @@ export function TextSelectionMenu({
         // Create underline annotations for each selection range
         for (const selection of formattedSelection) {
           if (selection.segmentRects && selection.segmentRects.length > 0) {
-            // Use the first rect as the main annotation rect
-            const firstRect = selection.segmentRects[0];
+            // Calculate the bounding box for all segments
+            let minX = Infinity;
+            let minY = Infinity;
+            let maxX = -Infinity;
+            let maxY = -Infinity;
+
+            for (const rect of selection.segmentRects) {
+              minX = Math.min(minX, rect.origin.x);
+              minY = Math.min(minY, rect.origin.y);
+              maxX = Math.max(maxX, rect.origin.x + rect.size.width);
+              maxY = Math.max(maxY, rect.origin.y + rect.size.height);
+            }
+
             const annotationRect = {
-              origin: { x: firstRect.origin.x, y: firstRect.origin.y },
+              origin: { x: minX, y: minY },
               size: {
-                width: firstRect.size.width,
-                height: firstRect.size.height,
+                width: maxX - minX,
+                height: maxY - minY,
               },
             };
 
@@ -124,7 +147,7 @@ export function TextSelectionMenu({
               segmentRects: selection.segmentRects,
               color: ANNOTATION_COLORS.find((color) => color.name === 'Sky')
                 ?.value,
-              opacity: 0.8,
+              opacity: 1,
             };
 
             await annotationScope.importAnnotations([
