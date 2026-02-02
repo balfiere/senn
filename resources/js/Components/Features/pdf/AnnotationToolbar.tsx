@@ -93,6 +93,7 @@ export function AnnotationToolbar({
     showAnnotationTools,
     showResetZoom,
     showSearchBar,
+    showZoomLabel,
     showZoomControls,
   } = useToolbarBreakpoint();
 
@@ -296,7 +297,7 @@ export function AnnotationToolbar({
         <Palette className="h-4 w-4" />
       </Button>
 
-      {showSearchBar && !isMobile && (
+      {showSearchBar && (
         <>
           <Separator
             orientation="vertical"
@@ -377,7 +378,9 @@ export function AnnotationToolbar({
           >
             <ZoomOut className="h-4 w-4" />
           </Button>
-          <span className="w-12 text-center text-xs">{zoom}%</span>
+          {showZoomLabel && (
+            <span className="w-12 text-center text-xs">{zoom}%</span>
+          )}
           <Button
             variant="ghost"
             size="icon"

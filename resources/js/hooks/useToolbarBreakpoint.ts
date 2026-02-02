@@ -4,16 +4,17 @@ export interface ToolbarVisibility {
     showAnnotationTools: boolean;      // Stage 1: annotation tools visible
     showResetZoom: boolean;            // Stage 2: reset zoom button visible
     showSearchBar: boolean;            // Stage 3: search bar visible
-    showZoomControls: boolean;         // Stage 4: zoom controls visible
+    showZoomLabel: boolean;            // Stage 4: zoom percentage visible
+    showZoomControls: boolean;         // Stage 5: zoom buttons visible
 }
 
 // Breakpoints in pixels (viewport width)
-// These are based on typical responsive design breakpoints
 const BREAKPOINTS = {
-    ANNOTATION_TOOLS: 768,   // Hide annotation tools below tablet width
-    RESET_ZOOM: 640,         // Hide reset zoom on small tablets
-    SEARCH_BAR: 550,         // Hide search bar on large phones
-    ZOOM_CONTROLS: 480,      // Hide zoom controls on smaller phones
+    ANNOTATION_TOOLS: 1060,  // Collapse tools earlier to avoid sidebar collisions
+    SEARCH_BAR: 600,         // Keep search bar visible longer
+    RESET_ZOOM: 500,         // Keep reset zoom visible longer
+    ZOOM_LABEL: 400,         // Hide zoom label at 400px
+    ZOOM_CONTROLS: 350,      // Keep zoom buttons visible until 350px
 } as const;
 
 /**
@@ -26,36 +27,36 @@ const BREAKPOINTS = {
  */
 export function useToolbarBreakpoint(): ToolbarVisibility {
     const [visibility, setVisibility] = useState<ToolbarVisibility>(() => {
-        // Initialize with current window width if available (SSR safe)
         const width = typeof window !== 'undefined' ? window.innerWidth : 1024;
-        return {
-            showAnnotationTools: width >= BREAKPOINTS.ANNOTATION_TOOLS,
-            showResetZoom: width >= BREAKPOINTS.RESET_ZOOM,
-            showSearchBar: width >= BREAKPOINTS.SEARCH_BAR,
-            showZoomControls: width >= BREAKPOINTS.ZOOM_CONTROLS,
-        };
+        return calculateVisibility(width);
     });
 
     useEffect(() => {
         const updateVisibility = () => {
-            const width = window.innerWidth;
-
-            setVisibility({
-                showAnnotationTools: width >= BREAKPOINTS.ANNOTATION_TOOLS,
-                showResetZoom: width >= BREAKPOINTS.RESET_ZOOM,
-                showSearchBar: width >= BREAKPOINTS.SEARCH_BAR,
-                showZoomControls: width >= BREAKPOINTS.ZOOM_CONTROLS,
-            });
+            setVisibility(calculateVisibility(window.innerWidth));
         };
 
-        // Initial measurement
         updateVisibility();
-
-        // Listen for window resize
         window.addEventListener('resize', updateVisibility);
-
         return () => window.removeEventListener('resize', updateVisibility);
     }, []);
 
     return visibility;
+}
+
+function calculateVisibility(width: number): ToolbarVisibility {
+    // Annotation tools:
+    // - Collapsed if < 800 (mobile/tablet narrow)
+    // - Collapsed if between 880 and 1060 (desktop with sidebar crunch)
+    // - Visible otherwise
+    const isCrunched = width >= 880 && width < 1060;
+    const isMobileSize = width < 800;
+
+    return {
+        showAnnotationTools: !isCrunched && !isMobileSize,
+        showSearchBar: width >= BREAKPOINTS.SEARCH_BAR,
+        showResetZoom: width >= BREAKPOINTS.RESET_ZOOM,
+        showZoomLabel: width >= BREAKPOINTS.ZOOM_LABEL,
+        showZoomControls: width >= BREAKPOINTS.ZOOM_CONTROLS,
+    };
 }
