@@ -404,17 +404,16 @@ export function PdfViewer({
         }
 
         const converted = dbAnnotationToEmbedpdf(dbAnnotation);
-
-        if (
-          converted &&
-          converted.annotation &&
-          converted.annotation.id != null &&
-          converted.annotation.pageIndex != null
-        ) {
-          annotationsToImport.push(converted);
-          // Mark as loaded BEFORE importing to prevent race conditions
-          loadedAnnotationIdsRef.current.add(annotationId);
+        if (!converted) {
+          continue;
         }
+
+        // Mark as loaded BEFORE importing to prevent race conditions
+        loadedAnnotationIdsRef.current.add(annotationId);
+
+        annotationsToImport.push({
+          annotation: converted,
+        });
       }
 
       if (annotationsToImport.length > 0) {
@@ -448,7 +447,7 @@ export function PdfViewer({
 
   // Check for mobile viewport
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    const checkMobile = () => setIsMobile(window.innerWidth <= 880);
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
