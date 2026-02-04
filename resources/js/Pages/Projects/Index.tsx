@@ -186,7 +186,7 @@ function ProjectCard({ project, handleDelete, deletingId }: { project: Project, 
       {project.thumbnail_path && (
         <div className="relative aspect-4/3 w-full border-b border-border bg-muted">
           <img
-            src={route('projects.thumbnail', project.id)}
+            src={`${route('projects.thumbnail', project.id)}?v=${new Date(project.updated_at).getTime()}`}
             alt={project.name}
             className="h-full w-full object-cover grayscale-20 group-hover:grayscale-0 transition-all duration-500"
           />

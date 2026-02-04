@@ -51,6 +51,11 @@ export function ProjectSidebar(props: ProjectSidebarProps) {
         }, {
             forceFormData: true,
             preserveScroll: true,
+            onSuccess: () => {
+                setIsUploading(false)
+                // props.onPdfUpload(null)
+                router.reload({ only: ['project'] })
+            },
             onFinish: () => setIsUploading(false),
         })
     }

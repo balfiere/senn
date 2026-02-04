@@ -34,6 +34,9 @@ export default function Show({
 
   const currentPart = parts.find((p) => p.id === currentPartId);
 
+  // Refresh trigger for PDF viewer
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
   // Auto-select logic
   useEffect(() => {
     // If no part is selected but we have parts, select the first one
@@ -110,13 +113,14 @@ export default function Show({
     );
   };
 
-  const handlePdfUpload = (url: string | null) => {
-    console.log('PDF Upload', url);
+  const handlePdfUpload = (_url: string | null) => {
+    // Force a complete refresh of the PDF viewer
+    setRefreshTrigger(prev => prev + 1);
   };
 
-  // Generate PDF URL
+  // Generate PDF URL with cache-busting parameter
   const pdfUrl = project.pdf_path
-    ? route('projects.pattern', project.id)
+    ? `${route('projects.pattern', project.id)}?v=${new Date(project.updated_at).getTime()}&t=${refreshTrigger}`
     : null;
 
   // Render counters content
@@ -170,6 +174,7 @@ export default function Show({
 
     return (
       <PdfViewer
+        key={`pdf-viewer-${project.id}-${project.updated_at}`}
         pdfUrl={pdfUrl}
         projectId={project.id}
         initialAnnotations={pdfAnnotations}

@@ -83,6 +83,7 @@ class ProjectController extends Controller
 
         if ($request->hasFile('pdf_file')) {
             $disk = \Illuminate\Support\Facades\Storage::disk('patterns');
+            $cacheDisk = \Illuminate\Support\Facades\Storage::disk('local');
             \Illuminate\Support\Facades\Log::info('File detected', ['original_name' => $request->file('pdf_file')->getClientOriginalName()]);
 
             // Delete old PDF
@@ -93,6 +94,12 @@ class ProjectController extends Controller
             // Delete old Thumbnail
             if ($project->thumbnail_path && $disk->exists($project->thumbnail_path)) {
                 $disk->delete($project->thumbnail_path);
+            }
+
+            // Clear the cached PDF file to force regeneration
+            $cachedPdfPath = "pdf-cache/projects/{$project->id}.pdf";
+            if ($cacheDisk->exists($cachedPdfPath)) {
+                $cacheDisk->delete($cachedPdfPath);
             }
 
             $path = $request->file('pdf_file')->store('projects/'.$request->user()->id, 'patterns');
