@@ -8,6 +8,7 @@ use App\Http\Controllers\PatternController;
 use App\Http\Controllers\PdfAnnotationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\SyncTokenController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Fortify;
@@ -58,6 +59,10 @@ Route::get('/dashboard', function () {
     return redirect()->route('projects.index');
 })->middleware($authMiddleware)->name('dashboard');
 
+Route::post('/sync/token', [SyncTokenController::class, 'store'])
+    ->middleware($authMiddleware)
+    ->name('sync.token');
+
 // Project routes
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
@@ -104,7 +109,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/account', [ProfileController::class, 'account'])->name('account');
-    
+
     // Add password update route for simple auth mode
     if (config('auth.mode') === 'simple') {
         Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');

@@ -7,11 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -64,7 +65,7 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         // In production mode, respect the actual email verification status
-        return !is_null($this->email_verified_at);
+        return ! is_null($this->email_verified_at);
     }
 
     /**
@@ -76,7 +77,7 @@ class User extends Authenticatable implements MustVerifyEmail
             return true; // No-op in simple mode
         }
 
-        if (!$this->email_verified_at) {
+        if (! $this->email_verified_at) {
             $this->forceFill([
                 'email_verified_at' => $this->freshTimestamp(),
             ])->save();
@@ -116,7 +117,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Get the password for the user.
-     * 
+     *
      * @return string
      */
     public function getAuthPassword()
@@ -126,10 +127,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Get the identifier for the user.
-     * 
-     * This override ensures we don't crash when transitioning from 
+     *
+     * This override ensures we don't crash when transitioning from
      * email-based to ID-based sessions.
-     * 
+     *
      * @return mixed
      */
     public function getAuthIdentifier()
@@ -141,7 +142,7 @@ class User extends Authenticatable implements MustVerifyEmail
         if (
             config('auth.mode') === 'production' &&
             $this->getAuthIdentifierName() === 'id' &&
-            !is_numeric($identifier) &&
+            ! is_numeric($identifier) &&
             is_string($identifier)
         ) {
             return null;

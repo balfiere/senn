@@ -5,7 +5,9 @@ export function registerServiceWorker(): void {
 
     window.addEventListener('load', async () => {
         try {
-            await navigator.serviceWorker.register('/sw.js', {
+            const swUrl = import.meta.env.PROD ? '/build/sw.js' : '/sw.js';
+
+            await navigator.serviceWorker.register(swUrl, {
                 scope: '/',
             });
         } catch {

@@ -85,7 +85,7 @@ function CreateProjectDialog() {
           action={route('projects.store')}
           method="post"
           resetOnSuccess
-          className="grid gap-5 py-6"
+          className="grid gap-5"
           onSuccess={() => setOpen(false)}
         >
           {({ processing, errors }) => (
