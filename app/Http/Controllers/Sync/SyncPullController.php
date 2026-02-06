@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\Sync;
 
 use App\Models\Counter;
+use App\Models\CounterComment;
 use App\Models\Part;
 use App\Models\PdfAnnotation;
 use App\Models\Project;
-use Illuminate\Support\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 final class SyncPullController
 {
@@ -34,6 +35,7 @@ final class SyncPullController
         $projects = $this->changedProjects($user->id, $since, $limit);
         $parts = $this->changedParts($user->id, $since, $limit);
         $counters = $this->changedCounters($user->id, $since, $limit);
+        $counterComments = $this->changedCounterComments($user->id, $since, $limit);
         $pdfAnnotations = $this->changedPdfAnnotations($user->id, $since, $limit);
 
         return response()->json([
@@ -41,6 +43,7 @@ final class SyncPullController
             'projects' => $projects,
             'parts' => $parts,
             'counters' => $counters,
+            'counter_comments' => $counterComments,
             'pdf_annotations' => $pdfAnnotations,
         ]);
     }
@@ -125,6 +128,31 @@ final class SyncPullController
             'is_global' => $c->is_global,
             'is_linked' => $c->is_linked,
             'position' => $c->position,
+            'updated_at' => $c->updated_at?->toISOString(),
+            'deleted_at' => optional($c->deleted_at)?->toISOString(),
+        ])->all();
+    }
+
+    /** @return array<int, array<string, mixed>> */
+    private function changedCounterComments(int $userId, $since, int $limit): array
+    {
+        $query = CounterComment::query()
+            ->withTrashed()
+            ->whereHas('counter.part.project', fn ($q) => $q->where('user_id', $userId))
+            ->orderBy('updated_at');
+
+        if ($since) {
+            $query->where(function ($q) use ($since) {
+                $q->where('updated_at', '>', $since)
+                    ->orWhere('deleted_at', '>', $since);
+            });
+        }
+
+        return $query->limit($limit)->get()->map(fn (CounterComment $c) => [
+            'id' => $c->id,
+            'counter_id' => $c->counter_id,
+            'row_pattern' => $c->row_pattern,
+            'comment_text' => $c->comment_text,
             'updated_at' => $c->updated_at?->toISOString(),
             'deleted_at' => optional($c->deleted_at)?->toISOString(),
         ])->all();

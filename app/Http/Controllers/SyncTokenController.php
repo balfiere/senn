@@ -15,7 +15,7 @@ final class SyncTokenController
 
         $deviceName = $validated['device_name'] ?? 'Rowcounter Device';
 
-        $token = $request->user()->createToken($deviceName, ['sync']);
+        $token = $request->user()->createToken($deviceName, ['sync'], now()->addDays(30));
 
         return response()->json([
             'token' => $token->plainTextToken,
