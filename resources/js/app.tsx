@@ -13,6 +13,8 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 registerServiceWorker();
 initSyncEngine();
 
+import { HydrationWrapper } from './Components/HydrationWrapper';
+
 // For developer console testing
 if (import.meta.env.DEV) {
     (window as any).db = (await import('./lib/offline')).db;
@@ -22,11 +24,21 @@ if (import.meta.env.DEV) {
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
-    resolve: (name) =>
-        resolvePageComponent(
+    resolve: (name) => {
+        const page = resolvePageComponent(
             `./Pages/${name}.tsx`,
             import.meta.glob('./Pages/**/*.tsx'),
-        ),
+        );
+        page.then((module: any) => {
+            const page = module.default;
+            const oldLayout = page.layout;
+            page.layout = (children: React.ReactNode) => {
+                const content = oldLayout ? oldLayout(children) : children;
+                return <HydrationWrapper>{content}</HydrationWrapper>;
+            };
+        });
+        return page;
+    },
     setup({ el, App, props }) {
         const root = createRoot(el);
 
