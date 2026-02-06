@@ -6,10 +6,19 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 
 import { registerServiceWorker } from './pwa/register-service-worker';
+import { initSyncEngine } from './lib/offline';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 registerServiceWorker();
+initSyncEngine();
+
+// For developer console testing
+if (import.meta.env.DEV) {
+    (window as any).db = (await import('./lib/offline')).db;
+    (window as any).syncNow = (await import('./lib/offline')).syncNow;
+    (window as any).offline = await import('./lib/offline');
+}
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,

@@ -1,27 +1,35 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="theme-color" content="#A6A09B">
 
-        <link rel="manifest" href="/manifest.webmanifest">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#A6A09B">
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+    <link rel="manifest" href="/manifest.webmanifest">
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600|instrument-serif:400,400i|space-mono:400&display=swap" rel="stylesheet" />
-        {{-- <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600&family=instrument-serif:400,400i&family=space-mono:400&display=swap" rel="stylesheet" /> --}}
+    <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
-        <!-- Scripts -->
-        @routes
-        @viteReactRefresh
-        @vite(['resources/js/app.tsx'])
-        @inertiaHead
-    </head>
-    <body class="font-sans antialiased">
-        @inertia
-    </body>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link
+        href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600|instrument-serif:400,400i|space-mono:400&display=swap"
+        rel="stylesheet" />
+    {{--
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link
+        href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600&family=instrument-serif:400,400i&family=space-mono:400&display=swap"
+        rel="stylesheet" /> --}}
+
+    <!-- Scripts -->
+    @routes
+    @viteReactRefresh
+    @vite(['resources/js/app.tsx'])
+    @inertiaHead
+</head>
+
+<body class="font-sans antialiased">
+    @inertia
+</body>
+
 </html>
