@@ -8,7 +8,7 @@ class StopStopwatchAction
 {
     public function execute(Project $project): void
     {
-        if (!$project->stopwatch_running) {
+        if (! $project->stopwatch_running) {
             return;
         }
 

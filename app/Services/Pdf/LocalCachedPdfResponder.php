@@ -17,7 +17,7 @@ final class LocalCachedPdfResponder
         $cacheDisk = Storage::disk('local');
         $sourceDisk = Storage::disk('patterns');
 
-        if (!$cacheDisk->exists($cachePath)) {
+        if (! $cacheDisk->exists($cachePath)) {
             // Ensure source exists before trying to cache it
             abort_unless($sourceDisk->exists($sourcePath), 404);
 
@@ -31,7 +31,7 @@ final class LocalCachedPdfResponder
             $cacheDisk->path($cachePath),
             [
                 'Content-Type' => 'application/pdf',
-                'Cache-Control' => 'private, max-age=' . config('pdf.cache_ttl'),
+                'Cache-Control' => 'private, max-age='.config('pdf.cache_ttl'),
             ]
         );
     }

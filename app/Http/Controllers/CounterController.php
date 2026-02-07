@@ -60,6 +60,7 @@ class CounterController extends Controller
     {
         Gate::authorize('update', $counter->part->project);
         $action->execute($counter);
+
         return back();
     }
 
@@ -67,6 +68,7 @@ class CounterController extends Controller
     {
         Gate::authorize('update', $counter->part->project);
         $action->execute($counter);
+
         return back();
     }
 
@@ -74,6 +76,7 @@ class CounterController extends Controller
     {
         Gate::authorize('update', $counter->part->project);
         $action->execute($counter);
+
         return back();
     }
 }

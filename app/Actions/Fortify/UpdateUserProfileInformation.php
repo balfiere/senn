@@ -26,7 +26,7 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
 
             $oldUsername = $user->username;
             $newUsername = $input['username'];
-            
+
             $user->forceFill([
                 'name' => $input['name'],
                 'username' => $newUsername,

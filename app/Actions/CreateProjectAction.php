@@ -13,8 +13,7 @@ class CreateProjectAction
 {
     public function __construct(
         private PdfThumbnailGenerator $thumbnailGenerator
-    ) {
-    }
+    ) {}
 
     /**
      * Create a new project with a default part and global counter.
@@ -25,7 +24,7 @@ class CreateProjectAction
             $pdfPath = null;
 
             if ($pdfFile) {
-                $pdfPath = $pdfFile->store('projects/' . $user->id, 'patterns');
+                $pdfPath = $pdfFile->store('projects/'.$user->id, 'patterns');
             }
 
             // Create the project

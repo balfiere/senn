@@ -56,7 +56,7 @@ class ProfileController extends Controller
     {
         try {
             $data = ['name', 'password'];
-            
+
             if (config('auth.mode') === 'simple') {
                 $data[] = 'username';
             } else {
@@ -156,7 +156,7 @@ class ProfileController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
-        $request->user()->notify(new PasswordChanged());
+        $request->user()->notify(new PasswordChanged);
 
         return back()->with('status', 'password-updated');
     }

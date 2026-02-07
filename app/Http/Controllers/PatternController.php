@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Services\Pdf\PdfResponseFactory;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 final class PatternController extends Controller
 {
@@ -19,7 +19,7 @@ final class PatternController extends Controller
     {
         $this->authorize('view', $project);
 
-        if (!$project->pdf_path) {
+        if (! $project->pdf_path) {
             abort(404);
         }
 
@@ -34,13 +34,13 @@ final class PatternController extends Controller
     {
         $this->authorize('view', $project);
 
-        if (!$project->thumbnail_path) {
+        if (! $project->thumbnail_path) {
             abort(404);
         }
 
         $disk = \Illuminate\Support\Facades\Storage::disk('patterns');
 
-        if (!$disk->exists($project->thumbnail_path)) {
+        if (! $disk->exists($project->thumbnail_path)) {
             abort(404);
         }
 
@@ -55,7 +55,7 @@ final class PatternController extends Controller
     public function cdnSignature(Project $project, Request $request)
     {
         // This is used by the CdnPdfResponder
-        if (!$request->hasValidSignature()) {
+        if (! $request->hasValidSignature()) {
             abort(401);
         }
 

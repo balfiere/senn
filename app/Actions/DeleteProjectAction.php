@@ -50,13 +50,13 @@ class DeleteProjectAction
 
         if ($project->thumbnail_path) {
             $thumbnailDir = dirname($project->thumbnail_path);
-            if ($thumbnailDir !== '.' && !in_array($thumbnailDir, $directories)) {
+            if ($thumbnailDir !== '.' && ! in_array($thumbnailDir, $directories)) {
                 $directories[] = $thumbnailDir;
             }
         }
 
         // Sort directories by depth (deepest first) to ensure proper cleanup
-        usort($directories, function($a, $b) {
+        usort($directories, function ($a, $b) {
             return substr_count($b, '/') - substr_count($a, '/');
         });
 

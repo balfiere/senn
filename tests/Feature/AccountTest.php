@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\User;
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
@@ -161,8 +161,8 @@ test('account deletion works', function () {
     // Create a project with files for the user
     $project = Project::factory()->create([
         'user_id' => $this->user->id,
-        'pdf_path' => 'projects/' . $this->user->id . '/test.pdf',
-        'thumbnail_path' => 'projects/' . $this->user->id . '/thumbnails/test_thumb.png',
+        'pdf_path' => 'projects/'.$this->user->id.'/test.pdf',
+        'thumbnail_path' => 'projects/'.$this->user->id.'/thumbnails/test_thumb.png',
     ]);
 
     // Create mock files in storage
@@ -185,8 +185,8 @@ test('account deletion works', function () {
 
     // Verify directories are also cleaned up (skip for S3 storage as directory cleanup may not work the same way)
     if (config('filesystems.disks.patterns.driver') !== 's3') {
-        $this->assertFalse(Storage::disk('patterns')->exists('projects/' . $this->user->id . '/thumbnails'));
-        $this->assertFalse(Storage::disk('patterns')->exists('projects/' . $this->user->id));
+        $this->assertFalse(Storage::disk('patterns')->exists('projects/'.$this->user->id.'/thumbnails'));
+        $this->assertFalse(Storage::disk('patterns')->exists('projects/'.$this->user->id));
     }
 
     // Verify user is deleted from database
