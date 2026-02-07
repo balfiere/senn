@@ -8,6 +8,17 @@ import { ResponsiveToaster } from '@/Components/Features/ResponsiveToaster';
 import { useProjectViewState } from '@/hooks/useProjectViewState';
 import { useStopwatch } from '@/hooks/useStopwatch';
 import { Part, PdfAnnotation, Project } from '@/types';
+import { useProjectData } from '@/hooks/use-project-data';
+import {
+  createPartLocally,
+  updatePartLocally,
+  deletePartLocally
+} from '@/lib/offline/repositories/parts';
+import { createCounterLocally } from '@/lib/offline/repositories/counters';
+import {
+  toggleStopwatchLocally,
+  resetStopwatchLocally
+} from '@/lib/offline/repositories/projects';
 
 interface Props {
   project: Project;
@@ -16,10 +27,17 @@ interface Props {
 }
 
 export default function Show({
-  project,
-  parts = [],
-  pdfAnnotations = [],
+  project: initialProject,
+  parts: initialParts = [],
+  pdfAnnotations: initialAnnotations = [],
 }: Props) {
+  // Use offline data hook to subscribe to Dexie changes
+  const { project, parts, annotations: pdfAnnotations } = useProjectData(
+    initialProject as any,
+    initialParts as any,
+    initialAnnotations as any
+  ) as { project: Project, parts: Part[], annotations: PdfAnnotation[] };
+
   const { view, setView, isMobile, effectiveView } = useProjectViewState({
     hasPdf: !!project.pdf_path,
   });
@@ -52,65 +70,88 @@ export default function Show({
     prevPartsLength.current = parts.length;
   }, [parts, currentPartId]);
 
-  const handleCreatePart = () => {
-    router.post(route('parts.store', project.id), {
-      name: `Part ${parts.length + 1}`,
-    });
-  };
+  const handleCreatePart = async () => {
+    try {
+      const newPartId = crypto.randomUUID();
+      const newPart = {
+        id: newPartId,
+        project_id: project.id,
+        name: `Part ${parts.length + 1}`,
+        position: parts.length,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        deleted_at: null
+      };
+      await createPartLocally(newPart);
 
-  const handleUpdatePart = (partId: string, updates: Partial<Part>) => {
-    const { name, position } = updates;
-    router.patch(route('parts.update', partId), { name, position });
-  };
+      // Every part must have exactly one global counter
+      await createCounterLocally({
+        id: crypto.randomUUID(),
+        part_id: newPartId,
+        name: 'Global Counter',
+        current_value: 1, // Start at 1 as per backend logic
+        reset_at: null,
+        reset_count: 0,
+        show_reset_count: false,
+        is_global: true,
+        is_linked: false,
+        position: 0,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        deleted_at: null
+      });
 
-  const handleDeletePart = (partId: string) => {
-    if (parts.length <= 1 && parts[0].id === partId) return;
-
-    router.delete(route('parts.destroy', partId), {
-      onSuccess: () => {
-        if (currentPartId === partId) {
-          setCurrentPartId('');
-        }
-      },
-    });
-  };
-
-  const handleCreateCounter = () => {
-    if (!currentPartId) return;
-    router.post(route('counters.store', currentPartId), {
-      name: 'New Counter',
-      current_value: 0,
-    });
-  };
-
-  const handleToggleStopwatch = () => {
-    if (project.stopwatch_running) {
-      router.patch(
-        route('projects.stopwatch.stop', project.id),
-        {},
-        {
-          preserveScroll: true,
-        },
-      );
-    } else {
-      router.patch(
-        route('projects.stopwatch.start', project.id),
-        {},
-        {
-          preserveScroll: true,
-        },
-      );
+      setCurrentPartId(newPartId);
+    } catch (e) {
+      console.error(e);
     }
   };
 
-  const handleResetStopwatch = () => {
-    router.patch(
-      route('projects.stopwatch.reset', project.id),
-      {},
-      {
-        preserveScroll: true,
-      },
-    );
+  const handleUpdatePart = async (partId: string, updates: Partial<Part>) => {
+    await updatePartLocally(partId, updates);
+  };
+
+  const handleDeletePart = async (partId: string) => {
+    if (parts.length <= 1 && parts[0].id === partId) return;
+    if (confirm('Are you sure you want to delete this part?')) {
+      await deletePartLocally(partId);
+      if (currentPartId === partId) {
+        setCurrentPartId(parts.find(p => p.id !== partId)?.id || '');
+      }
+    }
+  };
+
+  const handleCreateCounter = async () => {
+    if (!currentPartId) return;
+    try {
+      await createCounterLocally({
+        id: crypto.randomUUID(),
+        part_id: currentPartId,
+        name: 'New Counter',
+        current_value: 1,
+        reset_at: null,
+        reset_count: 0,
+        show_reset_count: false,
+        is_global: false,
+        is_linked: true, // New counters default to being linked to global
+        position: (currentPart?.counters?.length || 0),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        deleted_at: null
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleToggleStopwatch = async () => {
+    await toggleStopwatchLocally(project.id);
+  };
+
+  const handleResetStopwatch = async () => {
+    if (confirm('Reset stopwatch?')) {
+      await resetStopwatchLocally(project.id);
+    }
   };
 
   const handlePdfUpload = (_url: string | null) => {

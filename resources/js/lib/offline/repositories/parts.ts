@@ -12,7 +12,15 @@ export async function getPartsForProject(projectId: string): Promise<LocalPart[]
  * Upsert parts to local DB (from server data).
  */
 export async function upsertParts(parts: LocalPart[]): Promise<void> {
-    await db.parts.bulkPut(parts.map((p) => ({ ...p, _local_status: 'synced' })));
+    for (const p of parts) {
+        const existing = await db.parts.get(p.id);
+        if (existing && existing._local_status === 'pending') {
+            if (new Date(p.updated_at) <= new Date(existing.updated_at)) {
+                continue;
+            }
+        }
+        await db.parts.put({ ...p, _local_status: 'synced' });
+    }
 }
 
 /**

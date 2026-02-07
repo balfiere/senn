@@ -1,4 +1,4 @@
-import { Head, Link, router, Form } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import {
   Clock,
   FileText,
@@ -8,6 +8,7 @@ import {
   User,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
 
 import { Button } from '@/Components/ui/button';
 import { cn } from '@/lib/utils';
@@ -36,19 +37,12 @@ import {
 import { Input } from '@/Components/ui/input';
 import { FormField } from '@/Components/ui/form-field';
 import { ResponsiveToaster } from '@/Components/Features/ResponsiveToaster';
+import { db, type LocalProject } from '@/lib/offline/db';
+import { createProjectLocally, deleteProjectLocally } from '@/lib/offline/repositories/projects';
+import { router } from '@inertiajs/react';
 
-interface Project {
-  id: string;
-  user_id: number;
-  name: string;
-  pdf_path: string | null;
-  thumbnail_path: string | null;
-  stopwatch_seconds: number;
-  stopwatch_running: boolean;
-  stopwatch_started_at: string | null;
-  created_at: string;
-  updated_at: string;
-}
+// Use LocalProject type which matches our DB schema
+type Project = LocalProject;
 
 interface Props {
   projects: Project[];
@@ -65,6 +59,38 @@ function formatTime(seconds: number): string {
 
 function CreateProjectDialog() {
   const [open, setOpen] = useState(false);
+  const [name, setName] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+
+    setIsSubmitting(true);
+    try {
+      // Use offline-first creation
+      const newProject: Omit<LocalProject, '_local_status'> = {
+        id: crypto.randomUUID(),
+        user_id: 0, // Placeholder, server will override or we assume auth user
+        name,
+        pdf_path: null,
+        thumbnail_path: null,
+        stopwatch_seconds: 0,
+        stopwatch_running: false,
+        stopwatch_started_at: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        deleted_at: null,
+      };
+      await createProjectLocally(newProject);
+      setOpen(false);
+      setName('');
+    } catch (error) {
+      console.error('Failed to create project:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -81,60 +107,42 @@ function CreateProjectDialog() {
             Start tracking a new knitting or crochet project.
           </DialogDescription>
         </DialogHeader>
-        <Form
-          action={route('projects.store')}
-          method="post"
-          resetOnSuccess
-          className="grid gap-5"
-          onSuccess={() => setOpen(false)}
-        >
-          {({ processing, errors }) => (
-            <>
-              <FormField
-                label="Project Name"
-                error={errors.name}
-                required
-                description="Give your project a descriptive name"
-              >
-                <Input
-                  name="name"
-                  placeholder="My Sweater"
-                  required
-                />
-              </FormField>
-              <FormField
-                label="Pattern PDF (Optional)"
-                error={errors.pdf_file}
-                description="Upload a PDF pattern for your project"
-              >
-                <Input
-                  type="file"
-                  name="pdf_file"
-                  accept=".pdf"
-                />
-              </FormField>
+        <form onSubmit={handleSubmit} className="grid gap-5">
+          <FormField
+            label="Project Name"
+            description="Give your project a descriptive name"
+          >
+            <Input
+              name="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="My Sweater"
+              required
+            />
+          </FormField>
 
-              <DialogFooter className="mt-6">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setOpen(false)}
-                  className="rounded-none"
-                  disabled={processing}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={processing}
-                  className="rounded-none"
-                >
-                  {processing ? 'Creating...' : 'Create Project'}
-                </Button>
-              </DialogFooter>
-            </>
-          )}
-        </Form>
+          {/* PDF Upload is temporarily disabled in offline mode creation - simplified for now */}
+          {/* If we want to support PDF upload offline, we need to store the Blob in IndexedDB */}
+
+          <DialogFooter className="mt-6">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+              className="rounded-none"
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="rounded-none"
+            >
+              {isSubmitting ? 'Creating...' : 'Create Project'}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );
@@ -255,13 +263,17 @@ function ProjectCard({ project, handleDelete, deletingId }: { project: Project, 
 function ProjectsList({ projects }: { projects: Project[] }) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this project?')) return;
 
     setDeletingId(id);
-    router.delete(route('projects.destroy', id), {
-      onFinish: () => setDeletingId(null),
-    });
+    try {
+      await deleteProjectLocally(id);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   if (projects.length === 0) {
@@ -294,7 +306,17 @@ function ProjectsList({ projects }: { projects: Project[] }) {
   );
 }
 
-export default function Index({ projects }: Props) {
+export default function Index({ projects: initialProjects }: Props) {
+  // Use Dexie live query for reactivity
+  const projects = useLiveQuery(
+    () => db.projects
+      .orderBy('updated_at')
+      .reverse()
+      .filter((p) => !p.deleted_at)
+      .toArray(),
+    []
+  ) ?? initialProjects;
+
   return (
     <>
       <Head title="Projects" />

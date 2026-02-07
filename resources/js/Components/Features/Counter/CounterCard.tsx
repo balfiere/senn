@@ -3,9 +3,14 @@ import { Dialog, DialogTrigger } from '@/Components/ui/dialog';
 import { rowMatchesPattern } from '@/lib/patterns';
 import { cn } from '@/lib/utils';
 import { Counter } from '@/types';
-import { router } from '@inertiajs/react';
 import { Link2, Link2Off, Minus, Plus, RotateCcw, Settings } from 'lucide-react';
 import { useState } from 'react';
+import {
+  decrementCounterLocally,
+  incrementCounterLocally,
+  resetCounterLocally,
+  updateCounterLocally,
+} from '@/lib/offline/repositories/counters';
 import { EditCounterDialog } from './EditCounterDialog';
 import { ProgressRing } from './ProgressRing';
 
@@ -17,39 +22,23 @@ export function CounterCard({ counter }: Props) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleIncrement = () => {
-    router.post(
-      route('counters.increment', counter.id),
-      {},
-      { preserveScroll: true },
-    );
+    incrementCounterLocally(counter.id);
   };
 
   const handleDecrement = () => {
-    router.post(
-      route('counters.decrement', counter.id),
-      {},
-      { preserveScroll: true },
-    );
+    decrementCounterLocally(counter.id);
   };
 
   const handleReset = () => {
     if (confirm('Are you sure you want to reset this counter?')) {
-      router.post(
-        route('counters.reset', counter.id),
-        {},
-        { preserveScroll: true },
-      );
+      resetCounterLocally(counter.id);
     }
   };
 
   const handleToggleLink = () => {
-    router.patch(
-      route('counters.update', counter.id),
-      {
-        is_linked: !counter.is_linked,
-      },
-      { preserveScroll: true },
-    );
+    updateCounterLocally(counter.id, {
+      is_linked: !counter.is_linked,
+    });
   };
 
   // Applicable notes
@@ -119,10 +108,12 @@ export function CounterCard({ counter }: Props) {
                 <Settings className="h-4 w-4" />
               </Button>
             </DialogTrigger>
-            <EditCounterDialog
-              counter={counter}
-              onClose={() => setIsMenuOpen(false)}
-            />
+            {isMenuOpen && (
+              <EditCounterDialog
+                counter={counter}
+                onClose={() => setIsMenuOpen(false)}
+              />
+            )}
           </Dialog>
         </div>
       </div>

@@ -16,7 +16,15 @@ export async function getAnnotationsForProject(projectId: string): Promise<Local
  * Upsert annotations to local DB (from server data).
  */
 export async function upsertAnnotations(annotations: LocalPdfAnnotation[]): Promise<void> {
-    await db.pdfAnnotations.bulkPut(annotations.map((a) => ({ ...a, _local_status: 'synced' })));
+    for (const a of annotations) {
+        const existing = await db.pdfAnnotations.get(a.id);
+        if (existing && existing._local_status === 'pending') {
+            if (new Date(a.updated_at) <= new Date(existing.updated_at)) {
+                continue;
+            }
+        }
+        await db.pdfAnnotations.put({ ...a, _local_status: 'synced' });
+    }
 }
 
 /**

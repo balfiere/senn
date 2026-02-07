@@ -10,6 +10,7 @@ export interface LocalProject {
     stopwatch_seconds: number;
     stopwatch_running: boolean;
     stopwatch_started_at: string | null;
+    created_at: string;
     updated_at: string;
     deleted_at: string | null;
     // Local-only fields
@@ -22,6 +23,7 @@ export interface LocalPart {
     project_id: string;
     name: string;
     position: number;
+    created_at: string;
     updated_at: string;
     deleted_at: string | null;
     _local_status?: 'synced' | 'pending' | 'conflict';
@@ -38,6 +40,7 @@ export interface LocalCounter {
     is_global: boolean;
     is_linked: boolean;
     position: number;
+    created_at: string;
     updated_at: string;
     deleted_at: string | null;
     _local_status?: 'synced' | 'pending' | 'conflict';
@@ -48,6 +51,7 @@ export interface LocalCounterComment {
     counter_id: string;
     row_pattern: string;
     comment_text: string;
+    created_at: string;
     updated_at: string;
     deleted_at: string | null;
     _local_status?: 'synced' | 'pending' | 'conflict';
@@ -84,6 +88,7 @@ export interface LocalPdfAnnotation {
     segment_rects: unknown | null;
     text_align: number | null;
     vertical_align: number | null;
+    created_at: string;
     updated_at: string;
     deleted_at: string | null;
     _local_status?: 'synced' | 'pending' | 'conflict';
