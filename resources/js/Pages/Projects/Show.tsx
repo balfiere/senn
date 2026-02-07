@@ -57,13 +57,18 @@ export default function Show({
 
   // Auto-select logic
   useEffect(() => {
-    // If no part is selected but we have parts, select the first one
-    if (!currentPartId && parts.length > 0) {
-      setCurrentPartId(parts[0].id);
+    // If we have parts, and (nothing is selected OR the selection is invalid for this project)
+    if (parts.length > 0) {
+      const isCurrentIdValid = parts.some((p) => p.id === currentPartId);
+      if (!currentPartId || !isCurrentIdValid) {
+        setCurrentPartId(parts[0].id);
+      }
     }
 
-    // If a new part was added, select it
-    if (parts.length > prevPartsLength.current) {
+    // If a new part was added manually (count increased), select it
+    // We only do this if it's not the first load (prevPartsLength > 0)
+    // to avoid auto-selecting the last part if they load in a different order
+    if (prevPartsLength.current > 0 && parts.length > prevPartsLength.current) {
       setCurrentPartId(parts[parts.length - 1].id);
     }
 
