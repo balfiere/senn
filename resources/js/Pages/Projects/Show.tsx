@@ -21,28 +21,31 @@ import {
 } from '@/lib/offline/repositories/projects';
 
 interface Props {
-  project: Project;
+  project: Project | null;
+  id: string;
   parts?: Part[];
   pdfAnnotations?: PdfAnnotation[];
 }
 
 export default function Show({
   project: initialProject,
+  id,
   parts: initialParts = [],
   pdfAnnotations: initialAnnotations = [],
 }: Props) {
   // Use offline data hook to subscribe to Dexie changes
   const { project, parts, annotations: pdfAnnotations } = useProjectData(
     initialProject as any,
+    id,
     initialParts as any,
     initialAnnotations as any
   ) as { project: Project, parts: Part[], annotations: PdfAnnotation[] };
 
   const { view, setView, isMobile, effectiveView } = useProjectViewState({
-    hasPdf: !!project.pdf_path,
+    hasPdf: !!project?.pdf_path,
   });
 
-  const displaySeconds = useStopwatch(project);
+  const displaySeconds = useStopwatch(project as any);
 
   const [currentPartId, setCurrentPartId] = useState<string>(
     parts[0]?.id || '',
@@ -74,6 +77,17 @@ export default function Show({
 
     prevPartsLength.current = parts.length;
   }, [parts, currentPartId]);
+
+  if (!project) {
+    return (
+      <div className="flex h-svh items-center justify-center bg-background">
+        <div className="text-center">
+          <h2 className="text-xl font-light tracking-tight">Loading project...</h2>
+          <p className="mt-2 text-sm text-muted-foreground">This may take a moment if syncing for the first time.</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleCreatePart = async () => {
     try {

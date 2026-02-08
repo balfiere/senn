@@ -5,10 +5,15 @@ import { useEffect, useState } from 'react';
  * Hook to manage stopwatch display logic.
  * The server is the source of truth for the accumulated seconds and start timestamp.
  */
-export function useStopwatch(project: Project) {
-    const [displaySeconds, setDisplaySeconds] = useState(project.stopwatch_seconds);
+export function useStopwatch(project: Project | null) {
+    const [displaySeconds, setDisplaySeconds] = useState(project?.stopwatch_seconds ?? 0);
 
     useEffect(() => {
+        if (!project) {
+            setDisplaySeconds(0);
+            return;
+        }
+
         let interval: NodeJS.Timeout | null = null;
 
         const updateDisplay = () => {
@@ -32,9 +37,9 @@ export function useStopwatch(project: Project) {
             if (interval) clearInterval(interval);
         };
     }, [
-        project.stopwatch_running,
-        project.stopwatch_seconds,
-        project.stopwatch_started_at,
+        project?.stopwatch_running,
+        project?.stopwatch_seconds,
+        project?.stopwatch_started_at,
     ]);
 
     return displaySeconds;

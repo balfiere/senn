@@ -17,7 +17,8 @@ class ProjectController extends Controller
 {
     public function __construct(
         private PdfThumbnailGenerator $thumbnailGenerator
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of the user's projects.
@@ -52,21 +53,27 @@ class ProjectController extends Controller
     /**
      * Display the specified project.
      */
-    public function show(Project $project): Response
+    public function show(string $id): Response
     {
-        Gate::authorize('view', $project);
+        // Guard against non-UUID strings (like .map files or other assets)
+        $project = \Illuminate\Support\Str::isUuid($id) ? Project::find($id) : null;
 
-        $project->load([
-            'parts' => fn ($query) => $query->orderBy('position'),
-            'parts.counters' => fn ($query) => $query->orderBy('position'),
-            'parts.counters.comments',
-            'pdfAnnotations' => fn ($query) => $query->orderBy('page_number')->orderBy('created_at'),
-        ]);
+        if ($project) {
+            Gate::authorize('view', $project);
+
+            $project->load([
+                'parts' => fn($query) => $query->withTrashed()->orderBy('position'),
+                'parts.counters' => fn($query) => $query->withTrashed()->orderBy('position'),
+                'parts.counters.comments' => fn($query) => $query->withTrashed(),
+                'pdfAnnotations' => fn($query) => $query->withTrashed()->orderBy('page_number')->orderBy('created_at'),
+            ]);
+        }
 
         return Inertia::render('Projects/Show', [
             'project' => $project,
-            'parts' => $project->parts,
-            'pdfAnnotations' => $project->pdfAnnotations,
+            'id' => $id,
+            'parts' => $project?->parts ?? [],
+            'pdfAnnotations' => $project?->pdfAnnotations ?? [],
         ]);
     }
 
@@ -102,7 +109,7 @@ class ProjectController extends Controller
                 $cacheDisk->delete($cachedPdfPath);
             }
 
-            $path = $request->file('pdf_file')->store('projects/'.$request->user()->id, 'patterns');
+            $path = $request->file('pdf_file')->store('projects/' . $request->user()->id, 'patterns');
             $data['pdf_path'] = $path;
 
             // Generate thumbnail

@@ -39,6 +39,8 @@ import { FormField } from '@/Components/ui/form-field';
 import { ResponsiveToaster } from '@/Components/Features/ResponsiveToaster';
 import { db, type LocalProject } from '@/lib/offline/db';
 import { createProjectLocally, deleteProjectLocally } from '@/lib/offline/repositories/projects';
+import { createPartLocally } from '@/lib/offline/repositories/parts';
+import { createCounterLocally } from '@/lib/offline/repositories/counters';
 import { router } from '@inertiajs/react';
 
 // Use LocalProject type which matches our DB schema
@@ -60,18 +62,46 @@ function formatTime(seconds: number): string {
 function CreateProjectDialog() {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
 
     setIsSubmitting(true);
+    setErrors({});
+
     try {
-      // Use offline-first creation
+      if (pdfFile) {
+        // HYBRID: Use server-side creation for projects with PDFs
+        router.post(
+          route('projects.store'),
+          {
+            name,
+            pdf_file: pdfFile,
+          },
+          {
+            onSuccess: () => {
+              setOpen(false);
+              setName('');
+              setPdfFile(null);
+            },
+            onError: (err) => {
+              setErrors(err);
+            },
+            onFinish: () => setIsSubmitting(false),
+          }
+        );
+        return;
+      }
+
+      // OFFLINE-FIRST: Use local creation for projects without files
+      const projectId = crypto.randomUUID();
       const newProject: Omit<LocalProject, '_local_status'> = {
-        id: crypto.randomUUID(),
-        user_id: 0, // Placeholder, server will override or we assume auth user
+        id: projectId,
+        user_id: 0, // Server will override on sync
         name,
         pdf_path: null,
         thumbnail_path: null,
@@ -82,13 +112,48 @@ function CreateProjectDialog() {
         updated_at: new Date().toISOString(),
         deleted_at: null,
       };
+
       await createProjectLocally(newProject);
+
+      // Replicate backend CreateProjectAction: Create default part
+      const partId = crypto.randomUUID();
+      await createPartLocally({
+        id: partId,
+        project_id: projectId,
+        name: 'Part 1',
+        position: 0,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        deleted_at: null,
+      });
+
+      // Create global counter for the part
+      await createCounterLocally({
+        id: crypto.randomUUID(),
+        part_id: partId,
+        name: 'Row Counter',
+        current_value: 1,
+        reset_at: null,
+        reset_count: 0,
+        show_reset_count: false,
+        is_global: true,
+        is_linked: false,
+        position: 0,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        deleted_at: null,
+      });
+
       setOpen(false);
       setName('');
+      // Navigate manually for local projects
+      router.visit(route('projects.show', projectId));
     } catch (error) {
       console.error('Failed to create project:', error);
     } finally {
-      setIsSubmitting(false);
+      if (!pdfFile) {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -111,6 +176,8 @@ function CreateProjectDialog() {
           <FormField
             label="Project Name"
             description="Give your project a descriptive name"
+            error={errors.name}
+            required
           >
             <Input
               name="name"
@@ -121,8 +188,18 @@ function CreateProjectDialog() {
             />
           </FormField>
 
-          {/* PDF Upload is temporarily disabled in offline mode creation - simplified for now */}
-          {/* If we want to support PDF upload offline, we need to store the Blob in IndexedDB */}
+          <FormField
+            label="Pattern PDF (Optional)"
+            description="Upload a PDF pattern for your project"
+            error={errors.pdf_file}
+          >
+            <Input
+              type="file"
+              name="pdf_file"
+              accept=".pdf"
+              onChange={(e) => setPdfFile(e.target.files?.[0] || null)}
+            />
+          </FormField>
 
           <DialogFooter className="mt-6">
             <Button
