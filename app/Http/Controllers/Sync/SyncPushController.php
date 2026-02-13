@@ -46,6 +46,7 @@ final class SyncPushController
                 ]);
             } catch (QueryException $e) {
                 $duplicate++;
+
                 continue;
             }
 

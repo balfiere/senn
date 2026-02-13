@@ -2,14 +2,12 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db, LocalProject, LocalPart, LocalPdfAnnotation } from '@/lib/offline/db';
 
 export function useProjectData(
-    initialProject: LocalProject | null,
-    projectId: string, // Standardize on explicitly passed ID
+    initialProject: LocalProject,
     initialParts: any[] = [],
     initialAnnotations: LocalPdfAnnotation[] = []
 ) {
     return useLiveQuery(async () => {
-        const id = initialProject?.id || projectId;
-        const project = await db.projects.get(id);
+        const project = await db.projects.get(initialProject.id);
 
         // If project not found locally, and we have a server version, use it
         if (!project) return {
@@ -67,7 +65,7 @@ export function useProjectData(
             parts: partsWithCounters,
             annotations
         };
-    }, [initialProject?.id, projectId], {
+    }, [initialProject?.id], {
         project: initialProject,
         parts: initialParts,
         annotations: initialAnnotations

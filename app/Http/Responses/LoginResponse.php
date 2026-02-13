@@ -2,7 +2,6 @@
 
 namespace App\Http\Responses;
 
-use Illuminate\Auth\Events\Verified;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
@@ -20,7 +19,7 @@ class LoginResponse implements LoginResponseContract
                 return redirect()->route('verification.notice');
             }
         }
-        
+
         return redirect()->intended(route('projects.index', absolute: false));
     }
 }

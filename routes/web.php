@@ -67,7 +67,7 @@ Route::post('/sync/token', [SyncTokenController::class, 'store'])
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
-    Route::get('/projects/{id}', [ProjectController::class, 'show'])->name('projects.show');
+    Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
     Route::patch('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
     Route::get('/projects/{project}/pattern', [PatternController::class, 'show'])->name('projects.pattern');
@@ -118,5 +118,5 @@ Route::middleware('auth')->group(function () {
 
 // CONDITIONALLY INCLUDE auth.php based on auth mode
 if (config('auth.mode') === 'production') {
-    require __DIR__ . '/auth.php';
+    require __DIR__.'/auth.php';
 }

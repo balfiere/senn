@@ -27,7 +27,26 @@ class DeleteProjectAction
         // Clean up empty directories after file deletion
         $this->cleanEmptyDirectories($project);
 
-        // Delete the project (cascade will handle related records like parts, counters)
+        // Load related data and soft delete them
+        $project->load(['parts.counters', 'parts.counters.comments', 'pdfAnnotations']);
+
+        // Soft delete PDF annotations
+        foreach ($project->pdfAnnotations as $annotation) {
+            $annotation->delete();
+        }
+
+        // Soft delete counters and their comments
+        foreach ($project->parts as $part) {
+            foreach ($part->counters as $counter) {
+                foreach ($counter->comments as $comment) {
+                    $comment->delete();
+                }
+                $counter->delete();
+            }
+            $part->delete();
+        }
+
+        // Soft delete the project
         return $project->delete();
     }
 

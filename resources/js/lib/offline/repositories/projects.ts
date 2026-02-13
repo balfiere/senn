@@ -79,11 +79,6 @@ export async function deleteProjectLocally(id: string): Promise<void> {
         updated_at: deletedAt,
         _local_status: 'pending',
     });
-    await db.projects.update(id, {
-        deleted_at: deletedAt,
-        updated_at: deletedAt,
-        _local_status: 'pending',
-    });
     await enqueueEvent('project.delete', { id, deleted_at: deletedAt });
 }
 
