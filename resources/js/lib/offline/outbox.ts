@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { db, type OutboxEvent } from './db';
+import { scheduleSyncSoon } from './sync-engine';
 
 /**
  * Enqueue a new sync event to the outbox.
@@ -20,6 +21,8 @@ export async function enqueueEvent(
         last_attempt_at: null,
         error_message: null,
     });
+    // Trigger sync soon so events are pushed to server while online
+    scheduleSyncSoon();
     return eventId;
 }
 

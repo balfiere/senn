@@ -14,5 +14,5 @@ export { enqueueEvent, getPendingEvents, getPendingCount, markCompleted, markFai
 
 export { getSyncToken, setSyncToken, clearSyncToken, fetchNewToken, ensureSyncToken } from './sync-token';
 
-export { getSyncState, subscribeSyncState, syncNow, initSyncEngine } from './sync-engine';
+export { getSyncState, subscribeSyncState, syncNow, initSyncEngine, scheduleSyncSoon } from './sync-engine';
 export type { SyncState } from './sync-engine';

@@ -2,6 +2,9 @@ import { db } from './db';
 import { getPendingEvents, markCompleted, markFailed, markProcessing, resetProcessing, getPendingCount } from './outbox';
 import { getSyncToken, fetchNewToken } from './sync-token';
 
+const SYNC_DEBOUNCE_MS = 1_000;
+const SYNC_INTERVAL_MS = 30_000;
+
 export interface SyncState {
     status: 'idle' | 'syncing' | 'error';
     lastSyncAt: string | null;
@@ -196,8 +199,26 @@ async function upsertWithConflictResolution<T extends { id: string; updated_at: 
 }
 
 /**
- * Initialize sync engine - auto-sync when coming back online.
+ * Debounced trigger to sync soon after an event is enqueued.
+ * Multiple rapid calls will collapse into a single syncNow() after the debounce window.
  */
+let syncDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+export function scheduleSyncSoon(): void {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return;
+    if (syncDebounceTimer) clearTimeout(syncDebounceTimer);
+    syncDebounceTimer = setTimeout(() => {
+        syncDebounceTimer = null;
+        syncNow();
+    }, SYNC_DEBOUNCE_MS);
+}
+
+/**
+ * Initialize sync engine - auto-sync when coming back online,
+ * periodically, and on startup.
+ */
+let syncIntervalId: ReturnType<typeof setInterval> | null = null;
+
 export function initSyncEngine(): void {
     if (typeof window === 'undefined') return;
 
@@ -205,6 +226,15 @@ export function initSyncEngine(): void {
         syncNow();
     });
 
-    // Initial pending count
+    // Periodic sync as a fallback safety net
+    if (syncIntervalId) clearInterval(syncIntervalId);
+    syncIntervalId = setInterval(() => {
+        if (navigator.onLine) syncNow();
+    }, SYNC_INTERVAL_MS);
+
+    // Initial pending count + flush any events from previous sessions
     refreshPendingCount();
+    if (navigator.onLine) {
+        syncNow();
+    }
 }
