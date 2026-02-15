@@ -43,6 +43,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { Loader2, MessageSquare, Search } from 'lucide-react';
 
+import { usePdfLoader } from '@/hooks/use-pdf-loader';
 import { AnnotationSelectionMenu } from './AnnotationSelectionMenu';
 import { AnnotationToolbar } from './AnnotationToolbar';
 import { LeftSidebar } from './LeftSidebar';
@@ -64,6 +65,7 @@ interface PdfViewerProps {
   pdfUrl: string;
   projectId: string;
   initialAnnotations?: DbAnnotation[];
+  projectUpdatedAt: string;
 }
 
 interface PdfViewerContentProps {
@@ -333,7 +335,9 @@ export function PdfViewer({
   pdfUrl,
   projectId,
   initialAnnotations = [],
+  projectUpdatedAt,
 }: PdfViewerProps) {
+  const { pdfBlobUrl, isLoading: isPdfLoading, error: pdfError } = usePdfLoader(projectId, pdfUrl, projectUpdatedAt);
   const { engine, isLoading } = usePdfiumEngine();
   const [activeDocumentId, setActiveDocumentId] = useState<string | null>(null);
 
@@ -453,34 +457,40 @@ export function PdfViewer({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+
+
   // Create plugins configuration with the PDF URL
   const plugins = useMemo(
-    () => [
-      createPluginRegistration(DocumentManagerPluginPackage, {
-        initialDocuments: [{ url: pdfUrl }],
-      }),
-      createPluginRegistration(ViewportPluginPackage),
-      createPluginRegistration(ScrollPluginPackage),
-      createPluginRegistration(RenderPluginPackage),
-      createPluginRegistration(InteractionManagerPluginPackage),
-      createPluginRegistration(SelectionPluginPackage),
-      createPluginRegistration(HistoryPluginPackage),
-      createPluginRegistration(ZoomPluginPackage),
-      createPluginRegistration(ThumbnailPluginPackage, {
-        width: 120,
-        paddingY: 10,
-      }),
-      createPluginRegistration(SearchPluginPackage),
-      createPluginRegistration(PanPluginPackage, {
-        defaultMode: 'mobile',
-      }),
-      createPluginRegistration(AnnotationPluginPackage, {
-        annotationAuthor: 'User',
-        deactivateToolAfterCreate: true,
-        selectAfterCreate: true,
-      }),
-    ],
-    [pdfUrl],
+    () => {
+      if (!pdfBlobUrl) return [];
+
+      return [
+        createPluginRegistration(DocumentManagerPluginPackage, {
+          initialDocuments: [{ url: pdfBlobUrl }],
+        }),
+        createPluginRegistration(ViewportPluginPackage),
+        createPluginRegistration(ScrollPluginPackage),
+        createPluginRegistration(RenderPluginPackage),
+        createPluginRegistration(InteractionManagerPluginPackage),
+        createPluginRegistration(SelectionPluginPackage),
+        createPluginRegistration(HistoryPluginPackage),
+        createPluginRegistration(ZoomPluginPackage),
+        createPluginRegistration(ThumbnailPluginPackage, {
+          width: 120,
+          paddingY: 10,
+        }),
+        createPluginRegistration(SearchPluginPackage),
+        createPluginRegistration(PanPluginPackage, {
+          defaultMode: 'mobile',
+        }),
+        createPluginRegistration(AnnotationPluginPackage, {
+          annotationAuthor: 'User',
+          deactivateToolAfterCreate: true,
+          selectAfterCreate: true,
+        }),
+      ];
+    },
+    [pdfBlobUrl],
   );
 
   // Helper to prepare annotation data for Inertia (serialize segment_rects and ensure type safety)
@@ -566,6 +576,27 @@ export function PdfViewer({
         <div className="text-muted-foreground flex items-center gap-2">
           <Loader2 size={20} className="animate-spin" />
           <span className="text-sm">Loading PDF Engine...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (isPdfLoading) {
+    return (
+      <div className="bg-muted/30 flex h-full w-full items-center justify-center">
+        <div className="text-muted-foreground flex items-center gap-2">
+          <Loader2 size={20} className="animate-spin" />
+          <span className="text-sm">Loading PDF...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (pdfError) {
+    return (
+      <div className="bg-muted/30 flex h-full w-full items-center justify-center">
+        <div className="text-destructive flex items-center gap-2">
+          <span className="text-sm">Error loading PDF: {pdfError.message}</span>
         </div>
       </div>
     );
@@ -796,7 +827,8 @@ export function PdfViewer({
             documentId={docId}
             onDocumentIdChange={setActiveDocumentId}
             projectId={projectId}
-            pdfUrl={pdfUrl}
+
+            pdfUrl={pdfBlobUrl!}
             annotations={annotations}
             selectedAnnotation={selectedAnnotation}
             setSelectedAnnotation={(ann) => {

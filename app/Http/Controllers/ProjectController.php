@@ -17,7 +17,8 @@ class ProjectController extends Controller
 {
     public function __construct(
         private PdfThumbnailGenerator $thumbnailGenerator
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of the user's projects.
@@ -58,10 +59,10 @@ class ProjectController extends Controller
         Gate::authorize('view', $project);
 
         $project->load([
-            'parts' => fn ($query) => $query->orderBy('position'),
-            'parts.counters' => fn ($query) => $query->orderBy('position'),
+            'parts' => fn($query) => $query->orderBy('position'),
+            'parts.counters' => fn($query) => $query->orderBy('position'),
             'parts.counters.comments',
-            'pdfAnnotations' => fn ($query) => $query->orderBy('page_number')->orderBy('created_at'),
+            'pdfAnnotations' => fn($query) => $query->orderBy('page_number')->orderBy('created_at'),
         ]);
 
         return Inertia::render('Projects/Show', [
@@ -84,7 +85,6 @@ class ProjectController extends Controller
 
         if ($request->hasFile('pdf_file')) {
             $disk = \Illuminate\Support\Facades\Storage::disk('patterns');
-            $cacheDisk = \Illuminate\Support\Facades\Storage::disk('local');
             \Illuminate\Support\Facades\Log::info('File detected', ['original_name' => $request->file('pdf_file')->getClientOriginalName()]);
 
             // Delete old PDF
@@ -97,13 +97,7 @@ class ProjectController extends Controller
                 $disk->delete($project->thumbnail_path);
             }
 
-            // Clear the cached PDF file to force regeneration
-            $cachedPdfPath = "pdf-cache/projects/{$project->id}.pdf";
-            if ($cacheDisk->exists($cachedPdfPath)) {
-                $cacheDisk->delete($cachedPdfPath);
-            }
-
-            $path = $request->file('pdf_file')->store('projects/'.$request->user()->id, 'patterns');
+            $path = $request->file('pdf_file')->store('projects/' . $request->user()->id, 'patterns');
             $data['pdf_path'] = $path;
 
             // Generate thumbnail

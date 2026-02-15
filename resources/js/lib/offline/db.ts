@@ -16,6 +16,7 @@ export interface LocalProject {
     // Local-only fields
     _local_status?: 'synced' | 'pending' | 'conflict';
     _local_pdf_blob?: Blob; // For offline PDF storage (Phase 8)
+    _local_pdf_updated_at?: string; // Timestamp of the stored blob
 }
 
 export interface LocalPart {

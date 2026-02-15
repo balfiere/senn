@@ -224,6 +224,7 @@ export default function Show({
         pdfUrl={pdfUrl}
         projectId={project.id}
         initialAnnotations={pdfAnnotations}
+        projectUpdatedAt={project.updated_at}
       />
     );
   };
