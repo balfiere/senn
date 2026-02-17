@@ -44,6 +44,11 @@ import { cn } from '@/lib/utils';
 import { Loader2, MessageSquare, Search } from 'lucide-react';
 
 import { usePdfLoader } from '@/hooks/use-pdf-loader';
+import type { LocalPdfAnnotation } from '@/lib/offline/db';
+import {
+  deleteAnnotationLocally,
+  upsertAnnotationLocally,
+} from '@/lib/offline/repositories/pdf-annotations';
 import { AnnotationSelectionMenu } from './AnnotationSelectionMenu';
 import { AnnotationToolbar } from './AnnotationToolbar';
 import { LeftSidebar } from './LeftSidebar';
@@ -493,75 +498,142 @@ export function PdfViewer({
     [pdfBlobUrl],
   );
 
-  // Helper to prepare annotation data for Inertia (serialize segment_rects and ensure type safety)
-  const prepareAnnotationPayload = (data: Partial<DbAnnotation>) => {
-    const payload: Record<string, string | number | null | undefined> = {};
-    for (const [key, value] of Object.entries(data)) {
-      if (key === 'segment_rects' && value != null) {
-        payload[key] = JSON.stringify(value);
-      } else if (key === 'font_family' && value != null) {
-        // Ensure font_family is always a string
-        payload[key] = String(value);
-      } else {
-        payload[key] = value as string | number | null | undefined;
-      }
-    }
-    return payload;
-  };
-
-  // Helper to save annotation to backend
+  /**
+   * Persist an annotation change to the local IndexedDB and queue a sync event.
+   * The sync engine will push it to the server when online.
+   *
+   * @param eventType - 'create' | 'update' | 'delete'
+   * @param annotationData - Partial annotation fields from the EmbedPDF engine event
+   * @param annotationId - The EmbedPDF engine annotation ID (embedpdf_annotation_id)
+   * @param dbId - Pre-generated DB row UUID (only used for 'create')
+   */
   const saveAnnotation = useCallback(
     async (
       eventType: 'create' | 'update' | 'delete',
       annotationData: Partial<DbAnnotation>,
       annotationId: string,
+      dbId?: string,
     ) => {
       try {
-        const payload = prepareAnnotationPayload(annotationData);
+        const now = new Date().toISOString();
 
         switch (eventType) {
-          case 'create':
-            // Use axios for API calls to avoid Inertia response conflicts
-            try {
-              await window.axios.post(route('annotations.store', projectId), payload);
-              // Success - the optimistic update already handled the UI
-            } catch (error) {
-              console.error('Failed to save annotation:', error);
-              // Optionally revert the optimistic update
-            }
-            break;
+          case 'create': {
+            const resolvedDbId = dbId ?? crypto.randomUUID();
+            const localAnnotation: LocalPdfAnnotation = {
+              id: resolvedDbId,
+              project_id: annotationData.project_id ?? projectId,
+              embedpdf_annotation_id: annotationData.embedpdf_annotation_id ?? annotationId,
+              page_number: annotationData.page_number ?? 1,
+              annotation_type: annotationData.annotation_type ?? 'unknown',
+              position_x: annotationData.position_x ?? 0,
+              position_y: annotationData.position_y ?? 0,
+              width: annotationData.width ?? 0,
+              height: annotationData.height ?? 0,
+              color: annotationData.color ?? null,
+              fill_color: annotationData.fill_color ?? null,
+              stroke_color: annotationData.stroke_color ?? null,
+              opacity: annotationData.opacity ?? 1,
+              blend_mode: annotationData.blend_mode ?? 0,
+              stroke_width: annotationData.stroke_width ?? 1,
+              font_size: annotationData.font_size ?? 14,
+              font_family: annotationData.font_family ?? null,
+              line_start_x: annotationData.line_start_x ?? null,
+              line_start_y: annotationData.line_start_y ?? null,
+              line_end_x: annotationData.line_end_x ?? null,
+              line_end_y: annotationData.line_end_y ?? null,
+              line_ending: annotationData.line_ending ?? null,
+              line_start_ending: annotationData.line_start_ending ?? null,
+              line_end_ending: annotationData.line_end_ending ?? null,
+              contents: annotationData.contents ?? null,
+              comment: annotationData.comment ?? null,
+              in_reply_to_id: annotationData.in_reply_to_id ?? null,
+              segment_rects: annotationData.segment_rects ?? null,
+              text_align: annotationData.text_align ?? 0,
+              vertical_align: annotationData.vertical_align ?? 0,
+              created_at: now,
+              updated_at: now,
+              deleted_at: null,
+            };
+            await upsertAnnotationLocally(localAnnotation);
 
-          case 'update':
-            try {
-              const response = await window.axios.patch(route('annotations.update', annotationId), payload);
-              // Update local state on success
-              setAnnotations((prev) =>
-                prev.map((ann) =>
-                  ann.embedpdf_annotation_id === annotationId
-                    ? ({ ...ann, ...response.data } as StoredAnnotation)
-                    : ann,
-                ),
-              );
-            } catch (error) {
-              console.error('Failed to update annotation:', error);
-            }
+            // Update state: replace the temp embedpdf id used as id with the real DB UUID
+            setAnnotations((prev) =>
+              prev.map((ann) =>
+                ann.embedpdf_annotation_id === annotationId
+                  ? { ...ann, id: resolvedDbId }
+                  : ann,
+              ),
+            );
             break;
+          }
 
-          case 'delete':
-            // Use Axios for delete operations to ensure CSRF token is included
-            try {
-              await window.axios.delete(route('annotations.destroy', annotationId));
-
-              // Update local state on success
-              setAnnotations((prev) =>
-                prev.filter(
-                  (ann) => ann.embedpdf_annotation_id !== annotationId,
-                ),
-              );
-            } catch (error) {
-              console.error('Failed to delete annotation:', error);
+          case 'update': {
+            const existing = annotationsRef.current.find(
+              (ann) => ann.embedpdf_annotation_id === annotationId,
+            );
+            if (!existing) {
+              console.warn('[PDF Annotation] Cannot update: not found in state', annotationId);
+              return;
             }
+            const localAnnotation: LocalPdfAnnotation = {
+              id: existing.id,
+              project_id: annotationData.project_id ?? projectId,
+              embedpdf_annotation_id: annotationId,
+              page_number: annotationData.page_number ?? existing.page_number,
+              annotation_type: annotationData.annotation_type ?? existing.annotation_type,
+              position_x: annotationData.position_x ?? existing.position_x,
+              position_y: annotationData.position_y ?? existing.position_y,
+              width: annotationData.width ?? existing.width,
+              height: annotationData.height ?? existing.height,
+              color: annotationData.color !== undefined ? annotationData.color : existing.color,
+              fill_color: annotationData.fill_color !== undefined ? annotationData.fill_color : existing.fill_color,
+              stroke_color: annotationData.stroke_color !== undefined ? annotationData.stroke_color : existing.stroke_color,
+              opacity: annotationData.opacity ?? existing.opacity,
+              blend_mode: annotationData.blend_mode ?? existing.blend_mode,
+              stroke_width: annotationData.stroke_width ?? existing.stroke_width,
+              font_size: annotationData.font_size ?? existing.font_size,
+              font_family: annotationData.font_family !== undefined ? annotationData.font_family : existing.font_family,
+              line_start_x: annotationData.line_start_x !== undefined ? annotationData.line_start_x : existing.line_start_x,
+              line_start_y: annotationData.line_start_y !== undefined ? annotationData.line_start_y : existing.line_start_y,
+              line_end_x: annotationData.line_end_x !== undefined ? annotationData.line_end_x : existing.line_end_x,
+              line_end_y: annotationData.line_end_y !== undefined ? annotationData.line_end_y : existing.line_end_y,
+              line_ending: annotationData.line_ending !== undefined ? annotationData.line_ending : existing.line_ending,
+              line_start_ending: annotationData.line_start_ending !== undefined ? annotationData.line_start_ending : existing.line_start_ending,
+              line_end_ending: annotationData.line_end_ending !== undefined ? annotationData.line_end_ending : existing.line_end_ending,
+              contents: annotationData.contents !== undefined ? annotationData.contents : existing.contents,
+              comment: annotationData.comment !== undefined ? annotationData.comment : existing.comment,
+              in_reply_to_id: annotationData.in_reply_to_id !== undefined ? annotationData.in_reply_to_id : existing.in_reply_to_id,
+              segment_rects: annotationData.segment_rects !== undefined ? annotationData.segment_rects : existing.segment_rects,
+              text_align: annotationData.text_align ?? existing.text_align,
+              vertical_align: annotationData.vertical_align ?? existing.vertical_align,
+              created_at: existing.created_at,
+              updated_at: now,
+              deleted_at: null,
+            };
+            await upsertAnnotationLocally(localAnnotation);
+
+            // Update React state to reflect the change
+            setAnnotations((prev) =>
+              prev.map((ann) =>
+                ann.embedpdf_annotation_id === annotationId
+                  ? ({ ...ann, ...annotationData, updated_at: now } as StoredAnnotation)
+                  : ann,
+              ),
+            );
             break;
+          }
+
+          case 'delete': {
+            const existing = annotationsRef.current.find(
+              (ann) => ann.embedpdf_annotation_id === annotationId,
+            );
+            if (existing?.id) {
+              await deleteAnnotationLocally(existing.id);
+            }
+            // State filter is handled in the calling event handler
+            break;
+          }
         }
       } catch (error) {
         console.error('Annotation save error:', error);
@@ -741,10 +813,13 @@ export function PdfViewer({
                 annotationData,
               });
 
+              // Generate a stable DB UUID upfront so the state and IndexedDB share the same id
+              const dbId = crypto.randomUUID();
+
               // Optimistically add annotation to local state immediately
               const newStoredAnnotation = {
                 ...annotationData,
-                id: annotationId, // Use embedpdf ID as temporary ID
+                id: dbId, // DB row UUID (not the embedpdf engine id)
                 localId: annotationData.embedpdf_annotation_id,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
@@ -766,8 +841,8 @@ export function PdfViewer({
               // This prevents the annotation from being lost during view changes/re-initialization
               loadedAnnotationIdsRef.current.add(annotationId);
 
-              // Persist to server
-              saveAnnotation('create', annotationData, annotationId);
+              // Persist to IndexedDB and queue sync event
+              saveAnnotation('create', annotationData, annotationId, dbId);
 
               // If the sidebar is open to comments, auto-select the new annotation
               if (

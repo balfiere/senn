@@ -3,6 +3,7 @@
 use App\Models\Counter;
 use App\Models\CounterComment;
 use App\Models\Part;
+use App\Models\PdfAnnotation;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Support\Str;
@@ -116,7 +117,7 @@ test('sync push applies counter.decrement events', function () {
                 'event_id' => fake()->uuid(),
                 'type' => 'counter.decrement',
                 'payload' => ['counter_id' => $counter->id],
-            ]
+            ],
         ],
     ]);
 
@@ -148,7 +149,7 @@ test('sync push applies counter.reset events', function () {
                 'event_id' => fake()->uuid(),
                 'type' => 'counter.reset',
                 'payload' => ['counter_id' => $counter->id],
-            ]
+            ],
         ],
     ]);
 
@@ -177,9 +178,9 @@ test('sync push applies part.upsert events for create and update', function () {
                         'project_id' => $project->id,
                         'name' => 'New Part',
                         'position' => 0,
-                    ]
+                    ],
                 ],
-            ]
+            ],
         ],
     ]);
 
@@ -200,9 +201,9 @@ test('sync push applies part.upsert events for create and update', function () {
                         'project_id' => $project->id,
                         'name' => 'Updated Part',
                         'position' => 1,
-                    ]
+                    ],
                 ],
-            ]
+            ],
         ],
     ]);
 
@@ -224,7 +225,7 @@ test('sync push applies part.delete events', function () {
                 'event_id' => fake()->uuid(),
                 'type' => 'part.delete',
                 'payload' => ['id' => $part->id],
-            ]
+            ],
         ],
     ]);
 
@@ -260,9 +261,9 @@ test('sync push applies counter.upsert events for create and update', function (
                         'is_global' => false,
                         'is_linked' => true,
                         'position' => 0,
-                    ]
+                    ],
                 ],
-            ]
+            ],
         ],
     ]);
 
@@ -289,9 +290,9 @@ test('sync push applies counter.upsert events for create and update', function (
                         'is_global' => false,
                         'is_linked' => true,
                         'position' => 0,
-                    ]
+                    ],
                 ],
-            ]
+            ],
         ],
     ]);
 
@@ -324,7 +325,7 @@ test('sync push applies counter.delete events', function () {
                 'event_id' => fake()->uuid(),
                 'type' => 'counter.delete',
                 'payload' => ['id' => $counter->id],
-            ]
+            ],
         ],
     ]);
 
@@ -364,9 +365,9 @@ test('sync push applies counter_comment.upsert events', function () {
                         'counter_id' => $counter->id,
                         'row_pattern' => '5',
                         'comment_text' => 'Increase stitch count here',
-                    ]
+                    ],
                 ],
-            ]
+            ],
         ],
     ]);
 
@@ -405,7 +406,7 @@ test('sync push applies counter_comment.delete events', function () {
                 'event_id' => fake()->uuid(),
                 'type' => 'counter_comment.delete',
                 'payload' => ['id' => $comment->id],
-            ]
+            ],
         ],
     ]);
 
@@ -437,9 +438,9 @@ test('sync push applies project.upsert events for stopwatch', function () {
                         'stopwatch_running' => true,
                         'stopwatch_started_at' => $startedAt,
                         'stopwatch_seconds' => 10,
-                    ]
+                    ],
                 ],
-            ]
+            ],
         ],
     ]);
 
@@ -460,9 +461,9 @@ test('sync push applies project.upsert events for stopwatch', function () {
                         'stopwatch_running' => false,
                         'stopwatch_started_at' => null,
                         'stopwatch_seconds' => 25,
-                    ]
+                    ],
                 ],
-            ]
+            ],
         ],
     ]);
 
@@ -471,6 +472,161 @@ test('sync push applies project.upsert events for stopwatch', function () {
     expect($project->stopwatch_running)->toBeFalse();
     expect($project->stopwatch_seconds)->toBe(25);
     expect($project->stopwatch_started_at)->toBeNull();
+});
+
+test('sync push applies pdf_annotation.upsert events for create and update', function () {
+    $user = User::factory()->create();
+    $project = Project::factory()->for($user)->create();
+
+    Sanctum::actingAs($user, ['sync']);
+
+    $annotationId = (string) Str::uuid();
+
+    // Create
+    $response = $this->postJson(route('api.sync.push'), [
+        'events' => [
+            [
+                'event_id' => fake()->uuid(),
+                'type' => 'pdf_annotation.upsert',
+                'payload' => [
+                    'record' => [
+                        'id' => $annotationId,
+                        'project_id' => $project->id,
+                        'embedpdf_annotation_id' => 'embed-abc-123',
+                        'page_number' => 1,
+                        'annotation_type' => 'highlight',
+                        'position_x' => 100.0,
+                        'position_y' => 200.0,
+                        'width' => 50.0,
+                        'height' => 20.0,
+                        'color' => '#cba6f7',
+                        'opacity' => 0.5,
+                        'blend_mode' => 4,
+                        'stroke_width' => 1,
+                        'font_size' => 14,
+                        'text_align' => 0,
+                        'vertical_align' => 0,
+                    ],
+                ],
+            ],
+        ],
+    ]);
+
+    $response->assertOk()->assertJson(['applied' => 1]);
+    $annotation = PdfAnnotation::find($annotationId);
+    expect($annotation)->not->toBeNull();
+    expect($annotation->annotation_type)->toBe('highlight');
+    expect($annotation->color)->toBe('#cba6f7');
+
+    // Update
+    $response = $this->postJson(route('api.sync.push'), [
+        'events' => [
+            [
+                'event_id' => fake()->uuid(),
+                'type' => 'pdf_annotation.upsert',
+                'payload' => [
+                    'record' => [
+                        'id' => $annotationId,
+                        'project_id' => $project->id,
+                        'embedpdf_annotation_id' => 'embed-abc-123',
+                        'page_number' => 1,
+                        'annotation_type' => 'highlight',
+                        'position_x' => 100.0,
+                        'position_y' => 200.0,
+                        'width' => 50.0,
+                        'height' => 20.0,
+                        'color' => '#f9e2af',
+                        'opacity' => 0.8,
+                        'blend_mode' => 4,
+                        'stroke_width' => 1,
+                        'font_size' => 14,
+                        'text_align' => 0,
+                        'vertical_align' => 0,
+                    ],
+                ],
+            ],
+        ],
+    ]);
+
+    $response->assertOk()->assertJson(['applied' => 1]);
+    expect($annotation->refresh()->color)->toBe('#f9e2af');
+    expect($annotation->opacity)->toBe(0.8);
+});
+
+test('sync push applies pdf_annotation.delete events', function () {
+    $user = User::factory()->create();
+    $project = Project::factory()->for($user)->create();
+    $annotation = PdfAnnotation::query()->create([
+        'project_id' => $project->id,
+        'embedpdf_annotation_id' => 'embed-del-456',
+        'page_number' => 2,
+        'annotation_type' => 'square',
+        'position_x' => 10.0,
+        'position_y' => 20.0,
+        'width' => 30.0,
+        'height' => 30.0,
+        'opacity' => 1.0,
+        'blend_mode' => 0,
+        'stroke_width' => 2,
+        'font_size' => 14,
+        'text_align' => 0,
+        'vertical_align' => 0,
+    ]);
+
+    Sanctum::actingAs($user, ['sync']);
+
+    $response = $this->postJson(route('api.sync.push'), [
+        'events' => [
+            [
+                'event_id' => fake()->uuid(),
+                'type' => 'pdf_annotation.delete',
+                'payload' => ['id' => $annotation->id],
+            ],
+        ],
+    ]);
+
+    $response->assertOk()->assertJson(['applied' => 1]);
+    expect(PdfAnnotation::find($annotation->id))->toBeNull();
+    expect(PdfAnnotation::withTrashed()->find($annotation->id))->not->toBeNull();
+});
+
+test('sync push rejects pdf_annotation.upsert for another user\'s project', function () {
+    $owner = User::factory()->create();
+    $attacker = User::factory()->create();
+    $project = Project::factory()->for($owner)->create();
+
+    Sanctum::actingAs($attacker, ['sync']);
+
+    $response = $this->postJson(route('api.sync.push'), [
+        'events' => [
+            [
+                'event_id' => fake()->uuid(),
+                'type' => 'pdf_annotation.upsert',
+                'payload' => [
+                    'record' => [
+                        'id' => (string) Str::uuid(),
+                        'project_id' => $project->id,
+                        'embedpdf_annotation_id' => 'embed-hack-789',
+                        'page_number' => 1,
+                        'annotation_type' => 'highlight',
+                        'position_x' => 0.0,
+                        'position_y' => 0.0,
+                        'width' => 10.0,
+                        'height' => 10.0,
+                        'opacity' => 1.0,
+                        'blend_mode' => 0,
+                        'stroke_width' => 1,
+                        'font_size' => 14,
+                        'text_align' => 0,
+                        'vertical_align' => 0,
+                    ],
+                ],
+            ],
+        ],
+    ]);
+
+    $response->assertOk()->assertJson(['applied' => 0]);
+    expect($response->json('errors'))->toHaveCount(1);
 });
 
 test('sync pull returns counters for the authenticated user', function () {

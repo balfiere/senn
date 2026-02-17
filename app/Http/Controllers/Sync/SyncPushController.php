@@ -8,6 +8,7 @@ use App\Actions\ResetCounterAction;
 use App\Models\Counter;
 use App\Models\CounterComment;
 use App\Models\Part;
+use App\Models\PdfAnnotation;
 use App\Models\Project;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
@@ -20,14 +21,13 @@ final class SyncPushController
         private readonly IncrementCounterAction $incrementCounterAction,
         private readonly DecrementCounterAction $decrementCounterAction,
         private readonly ResetCounterAction $resetCounterAction,
-    ) {
-    }
+    ) {}
 
     public function __invoke(Request $request): JsonResponse
     {
         $user = $request->user();
 
-        if (!$user || !$user->currentAccessToken() || !$user->tokenCan('sync')) {
+        if (! $user || ! $user->currentAccessToken() || ! $user->tokenCan('sync')) {
             return response()->json(['message' => 'Forbidden.'], 403);
         }
 
@@ -92,6 +92,8 @@ final class SyncPushController
             'counter_comment.upsert' => $this->applyCounterCommentUpsert($userId, $payload),
             'counter_comment.delete' => $this->applyCounterCommentDelete($userId, $payload),
             'project.upsert' => $this->applyProjectUpsert($userId, $payload),
+            'pdf_annotation.upsert' => $this->applyPdfAnnotationUpsert($userId, $payload),
+            'pdf_annotation.delete' => $this->applyPdfAnnotationDelete($userId, $payload),
             default => throw new \InvalidArgumentException("Unsupported event type: {$type}"),
         };
     }
@@ -102,7 +104,7 @@ final class SyncPushController
     {
         return Counter::query()
             ->whereKey($counterId)
-            ->whereHas('part.project', fn($q) => $q->where('user_id', $userId))
+            ->whereHas('part.project', fn ($q) => $q->where('user_id', $userId))
             ->firstOrFail();
     }
 
@@ -127,19 +129,19 @@ final class SyncPushController
     private function applyCounterUpsert(int $userId, array $payload): void
     {
         $record = $payload['record'] ?? null;
-        if (!is_array($record) || empty($record['id'])) {
+        if (! is_array($record) || empty($record['id'])) {
             throw new \InvalidArgumentException('Missing record or record.id.');
         }
 
         // Verify the part belongs to the user
         $partId = $record['part_id'] ?? null;
-        if (!$partId) {
+        if (! $partId) {
             throw new \InvalidArgumentException('Missing record.part_id.');
         }
 
         Part::query()
             ->whereKey($partId)
-            ->whereHas('project', fn($q) => $q->where('user_id', $userId))
+            ->whereHas('project', fn ($q) => $q->where('user_id', $userId))
             ->firstOrFail();
 
         $existing = Counter::withTrashed()->find($record['id']);
@@ -181,12 +183,12 @@ final class SyncPushController
     private function applyPartUpsert(int $userId, array $payload): void
     {
         $record = $payload['record'] ?? null;
-        if (!is_array($record) || empty($record['id'])) {
+        if (! is_array($record) || empty($record['id'])) {
             throw new \InvalidArgumentException('Missing record or record.id.');
         }
 
         $projectId = $record['project_id'] ?? null;
-        if (!$projectId) {
+        if (! $projectId) {
             throw new \InvalidArgumentException('Missing record.project_id.');
         }
 
@@ -218,7 +220,7 @@ final class SyncPushController
 
         $part = Part::query()
             ->whereKey($id)
-            ->whereHas('project', fn($q) => $q->where('user_id', $userId))
+            ->whereHas('project', fn ($q) => $q->where('user_id', $userId))
             ->firstOrFail();
 
         $part->delete();
@@ -229,19 +231,19 @@ final class SyncPushController
     private function applyCounterCommentUpsert(int $userId, array $payload): void
     {
         $record = $payload['record'] ?? null;
-        if (!is_array($record) || empty($record['id'])) {
+        if (! is_array($record) || empty($record['id'])) {
             throw new \InvalidArgumentException('Missing record or record.id.');
         }
 
         $counterId = $record['counter_id'] ?? null;
-        if (!$counterId) {
+        if (! $counterId) {
             throw new \InvalidArgumentException('Missing record.counter_id.');
         }
 
         // Verify ownership chain: counter -> part -> project -> user
         Counter::query()
             ->whereKey($counterId)
-            ->whereHas('part.project', fn($q) => $q->where('user_id', $userId))
+            ->whereHas('part.project', fn ($q) => $q->where('user_id', $userId))
             ->firstOrFail();
 
         $attributes = collect($record)->only(['counter_id', 'row_pattern', 'comment_text'])->toArray();
@@ -267,7 +269,7 @@ final class SyncPushController
 
         $comment = CounterComment::query()
             ->whereKey($id)
-            ->whereHas('counter.part.project', fn($q) => $q->where('user_id', $userId))
+            ->whereHas('counter.part.project', fn ($q) => $q->where('user_id', $userId))
             ->firstOrFail();
 
         $comment->delete();
@@ -276,7 +278,7 @@ final class SyncPushController
     private function applyProjectUpsert(int $userId, array $payload): void
     {
         $record = $payload['record'] ?? null;
-        if (!is_array($record) || empty($record['id'])) {
+        if (! is_array($record) || empty($record['id'])) {
             throw new \InvalidArgumentException('Missing record or record.id.');
         }
 
@@ -293,13 +295,91 @@ final class SyncPushController
         ])->toArray());
     }
 
+    // ─── PDF annotation operations ────────────────────────────────────
+
+    private function applyPdfAnnotationUpsert(int $userId, array $payload): void
+    {
+        $record = $payload['record'] ?? null;
+        if (! is_array($record) || empty($record['id'])) {
+            throw new \InvalidArgumentException('Missing record or record.id.');
+        }
+
+        $projectId = $record['project_id'] ?? null;
+        if (! $projectId) {
+            throw new \InvalidArgumentException('Missing record.project_id.');
+        }
+
+        Project::query()
+            ->whereKey($projectId)
+            ->where('user_id', $userId)
+            ->firstOrFail();
+
+        $attributes = collect($record)->only([
+            'project_id',
+            'embedpdf_annotation_id',
+            'page_number',
+            'annotation_type',
+            'position_x',
+            'position_y',
+            'width',
+            'height',
+            'color',
+            'fill_color',
+            'stroke_color',
+            'opacity',
+            'blend_mode',
+            'stroke_width',
+            'font_size',
+            'font_family',
+            'line_start_x',
+            'line_start_y',
+            'line_end_x',
+            'line_end_y',
+            'line_ending',
+            'line_start_ending',
+            'line_end_ending',
+            'contents',
+            'comment',
+            'in_reply_to_id',
+            'segment_rects',
+            'text_align',
+            'vertical_align',
+        ])->toArray();
+
+        $existing = PdfAnnotation::withTrashed()->find($record['id']);
+
+        if ($existing) {
+            $existing->fill($attributes);
+            if ($existing->trashed()) {
+                $existing->restore();
+            }
+            $existing->save();
+        } else {
+            $annotation = new PdfAnnotation($attributes);
+            $annotation->id = $record['id'];
+            $annotation->save();
+        }
+    }
+
+    private function applyPdfAnnotationDelete(int $userId, array $payload): void
+    {
+        $id = $this->requireString($payload, 'id');
+
+        $annotation = PdfAnnotation::query()
+            ->whereKey($id)
+            ->whereHas('project', fn ($q) => $q->where('user_id', $userId))
+            ->firstOrFail();
+
+        $annotation->delete();
+    }
+
     // ─── Helpers ──────────────────────────────────────────────────────
 
     private function requireString(array $payload, string $key): string
     {
         $value = $payload[$key] ?? null;
 
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             throw new \InvalidArgumentException("Missing {$key}.");
         }
 
