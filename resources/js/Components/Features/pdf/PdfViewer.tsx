@@ -357,6 +357,20 @@ export function PdfViewer({
   );
   const [selectedAnnotation, setSelectedAnnotation] =
     useState<StoredAnnotation | null>(null);
+
+  // Sync initialAnnotations changes to local state (e.g., after IndexedDB hydration)
+  useEffect(() => {
+    if (initialAnnotations.length > 0) {
+      setAnnotations(
+        initialAnnotations.map((dbAnn) => ({
+          ...dbAnn,
+          localId: dbAnn.embedpdf_annotation_id,
+          text_align: dbAnn.text_align ?? 0,
+          vertical_align: dbAnn.vertical_align ?? 0,
+        })) as StoredAnnotation[],
+      );
+    }
+  }, [initialAnnotations]);
   const [commentTrigger, setCommentTrigger] = useState(0);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
   const [rightSidebarTab, setRightSidebarTab] = useState<'comments' | 'search'>(
@@ -420,9 +434,9 @@ export function PdfViewer({
         // Mark as loaded BEFORE importing to prevent race conditions
         loadedAnnotationIdsRef.current.add(annotationId);
 
-        annotationsToImport.push({
-          annotation: converted,
-        });
+        if (converted) {
+          annotationsToImport.push(converted);
+        }
       }
 
       if (annotationsToImport.length > 0) {
@@ -452,6 +466,13 @@ export function PdfViewer({
       return () => clearTimeout(timer);
     }
   }, [activeDocumentId, syncAnnotationsToEngine]);
+
+  // Effect to sync annotations when they change after hydration
+  useEffect(() => {
+    if (annotationApiRef.current && annotations.length > 0) {
+      syncAnnotationsToEngine();
+    }
+  }, [annotations, syncAnnotationsToEngine]);
 
 
   // Check for mobile viewport
