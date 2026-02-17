@@ -41,6 +41,10 @@ export function AnnotationSelectionMenu({
   // Determine the relevant color property based on annotation type
   let currentColor = obj?.color as string | undefined;
   if (
+    type === PdfAnnotationSubtype.HIGHLIGHT ||
+    type === PdfAnnotationSubtype.UNDERLINE ||
+    type === PdfAnnotationSubtype.STRIKEOUT ||
+    type === PdfAnnotationSubtype.SQUIGGLY ||
     type === PdfAnnotationSubtype.LINE ||
     type === PdfAnnotationSubtype.POLYLINE ||
     type === PdfAnnotationSubtype.POLYGON ||
@@ -48,7 +52,10 @@ export function AnnotationSelectionMenu({
     type === PdfAnnotationSubtype.SQUARE ||
     type === PdfAnnotationSubtype.CIRCLE
   ) {
-    currentColor = (obj?.strokeColor as string) || (obj?.color as string);
+    currentColor =
+      (obj?.strokeColor as string) ||
+      (obj?.stroke_color as string) ||
+      (obj?.color as string);
   } else if (type === PdfAnnotationSubtype.FREETEXT) {
     currentColor = (obj?.fontColor as string) || (obj?.color as string);
   }
@@ -78,6 +85,10 @@ export function AnnotationSelectionMenu({
 
       // Update the relevant color property based on annotation type
       if (
+        annType === PdfAnnotationSubtype.HIGHLIGHT ||
+        annType === PdfAnnotationSubtype.UNDERLINE ||
+        annType === PdfAnnotationSubtype.STRIKEOUT ||
+        annType === PdfAnnotationSubtype.SQUIGGLY ||
         annType === PdfAnnotationSubtype.LINE ||
         annType === PdfAnnotationSubtype.POLYLINE ||
         annType === PdfAnnotationSubtype.POLYGON ||

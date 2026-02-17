@@ -131,7 +131,7 @@ function TextMarkupPanel({
 
   const changeColor = (c: string) => {
     setColor(c);
-    applyPatch({ color: c });
+    applyPatch({ color: c, strokeColor: c });
   };
 
   const changeOpacity = (o: number) => {

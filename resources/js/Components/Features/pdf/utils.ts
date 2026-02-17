@@ -216,7 +216,7 @@ export function annotationToDbFormat(
   // For merged annotations from update events, use the top-level properties first
   // Fall back to annotation.object for original structure
   const obj =
-    ann.object && !ann.strokeColor && !ann.color
+    ann.object && !ann.strokeColor && !ann.color && !ann.stroke_color
       ? (ann.object as Record<string, unknown>)
       : ann;
 
@@ -285,9 +285,14 @@ export function annotationToDbFormat(
     )
   ) {
     // Text markup annotations: use color for markup color
+    // @embedpdf v2.3.0+ uses strokeColor for these types
+    const markupColor = String(
+      obj.strokeColor || obj.stroke_color || obj.color || '#cba6f7',
+    );
     return {
       ...baseData,
-      color: String(obj.color || '#cba6f7'),
+      color: markupColor,
+      stroke_color: markupColor,
     };
   } else if (['square', 'circle'].includes(annotationTypeStr)) {
     // Shape annotations: separate fill and stroke colors
@@ -305,7 +310,10 @@ export function annotationToDbFormat(
     return {
       ...baseData,
       stroke_color: String(
-        (obj.strokeColor as string) || (obj.color as string) || '#000000'
+        obj.strokeColor ||
+        obj.stroke_color ||
+        obj.color ||
+        '#000000',
       ),
     };
   } else if (annotationTypeStr === 'freeText') {
@@ -370,7 +378,9 @@ export function dbAnnotationToEmbedpdf(
         dbAnnotation.annotation_type,
       )
     ) {
-      annotationObj.color = dbAnnotation.color || '#cba6f7';
+      const markupColor = dbAnnotation.stroke_color || dbAnnotation.color || '#cba6f7';
+      annotationObj.color = markupColor;
+      annotationObj.strokeColor = markupColor;
     } else if (['square', 'circle'].includes(dbAnnotation.annotation_type)) {
       annotationObj.color = dbAnnotation.fill_color || 'transparent';
       annotationObj.strokeColor =
@@ -378,12 +388,14 @@ export function dbAnnotationToEmbedpdf(
       annotationObj.strokeWidth = dbAnnotation.stroke_width ?? 1;
       annotationObj.strokeStyle = 1; // Solid stroke style
     } else if (
-      ['line', 'lineArrow', 'polyline', 'polygon'].includes(
+      ['line', 'lineArrow', 'polyline', 'polygon', 'ink'].includes(
         dbAnnotation.annotation_type,
       )
     ) {
-      annotationObj.strokeColor =
-        dbAnnotation.stroke_color || dbAnnotation.color || '#000000';
+      const strokeColor = dbAnnotation.stroke_color || dbAnnotation.color || '#000000';
+      annotationObj.strokeColor = strokeColor;
+      // Compatibility fallback
+      annotationObj.color = strokeColor;
       annotationObj.strokeWidth = dbAnnotation.stroke_width ?? 1;
       annotationObj.strokeStyle = 1;
     } else if (dbAnnotation.annotation_type === 'freeText') {

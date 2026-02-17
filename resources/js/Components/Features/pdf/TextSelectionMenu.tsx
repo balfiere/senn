@@ -79,6 +79,8 @@ export function TextSelectionMenu({
               segmentRects: selection.segmentRects,
               color: ANNOTATION_COLORS.find((color) => color.name === 'Yellow')
                 ?.value,
+              strokeColor: ANNOTATION_COLORS.find((color) => color.name === 'Yellow')
+                ?.value,
               opacity: 1,
               blendMode: PdfBlendMode.Multiply,
             };
@@ -146,6 +148,8 @@ export function TextSelectionMenu({
               rect: annotationRect,
               segmentRects: selection.segmentRects,
               color: ANNOTATION_COLORS.find((color) => color.name === 'Sky')
+                ?.value,
+              strokeColor: ANNOTATION_COLORS.find((color) => color.name === 'Sky')
                 ?.value,
               opacity: 1,
             };
