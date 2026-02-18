@@ -8,7 +8,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.tsx'],
+            input: ['resources/css/app.css', 'resources/js/app.tsx', 'resources/js/pwa/sw.ts'],
             ssr: 'resources/js/ssr.tsx',
             refresh: true,
         }),
@@ -16,48 +16,11 @@ export default defineConfig({
             registerType: 'autoUpdate',
             injectRegister: null,
             manifest: false,
-            workbox: {
+            strategies: 'injectManifest',
+            srcDir: 'resources/js/pwa',
+            filename: 'sw.ts',
+            injectManifest: {
                 maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
-                navigateFallbackDenylist: [/^\/build\//],
-                runtimeCaching: [
-                    {
-                        urlPattern: ({ request }) => request.destination === 'document',
-                        handler: 'NetworkFirst',
-                        options: {
-                            cacheName: 'documents',
-                            networkTimeoutSeconds: 3,
-                            expiration: {
-                                maxEntries: 25,
-                                maxAgeSeconds: 60 * 60 * 24,
-                            },
-                        },
-                    },
-                    {
-                        urlPattern: ({ request }) =>
-                            request.destination === 'script' ||
-                            request.destination === 'style' ||
-                            request.destination === 'font',
-                        handler: 'CacheFirst',
-                        options: {
-                            cacheName: 'assets',
-                            expiration: {
-                                maxEntries: 200,
-                                maxAgeSeconds: 60 * 60 * 24 * 30,
-                            },
-                        },
-                    },
-                    {
-                        urlPattern: ({ request }) => request.destination === 'image',
-                        handler: 'CacheFirst',
-                        options: {
-                            cacheName: 'images',
-                            expiration: {
-                                maxEntries: 200,
-                                maxAgeSeconds: 60 * 60 * 24 * 30,
-                            },
-                        },
-                    },
-                ],
             },
         }),
         react({

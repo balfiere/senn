@@ -1,7 +1,7 @@
 import '../css/app.css';
 import './bootstrap';
 
-import { createInertiaApp } from '@inertiajs/react';
+import { createInertiaApp, router } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 
@@ -12,6 +12,19 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 registerServiceWorker();
 initSyncEngine();
+
+/**
+ * When offline, Inertia may receive an HTML response (from the service worker's
+ * navigateFallback) instead of a JSON Inertia response. This triggers Inertia's
+ * "invalid" event, which would normally show a modal. We intercept it offline
+ * and redirect to /projects instead.
+ */
+router.on('invalid', (event) => {
+    if (!navigator.onLine) {
+        event.preventDefault();
+        router.visit(route('projects.index'), { replace: true });
+    }
+});
 
 import { HydrationWrapper } from './Components/HydrationWrapper';
 
