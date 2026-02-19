@@ -83,9 +83,8 @@ class ProjectController extends Controller
 
         $data = $request->validated();
 
-        if ($request->hasFile('pdf_file')) {
+        if ($request->hasFile('pdf_file') || $request->boolean('delete_pdf')) {
             $disk = \Illuminate\Support\Facades\Storage::disk('patterns');
-            \Illuminate\Support\Facades\Log::info('File detected', ['original_name' => $request->file('pdf_file')->getClientOriginalName()]);
 
             // Delete old PDF
             if ($project->pdf_path && $disk->exists($project->pdf_path)) {
@@ -97,14 +96,21 @@ class ProjectController extends Controller
                 $disk->delete($project->thumbnail_path);
             }
 
-            $path = $request->file('pdf_file')->store('projects/' . $request->user()->id, 'patterns');
-            $data['pdf_path'] = $path;
+            if ($request->hasFile('pdf_file')) {
+                \Illuminate\Support\Facades\Log::info('File detected', ['original_name' => $request->file('pdf_file')->getClientOriginalName()]);
+                $path = $request->file('pdf_file')->store('projects/' . $request->user()->id, 'patterns');
+                $data['pdf_path'] = $path;
 
-            // Generate thumbnail
-            $project->pdf_path = $path; // Temporarily set path for generator
-            $thumbnailPath = $this->thumbnailGenerator->generate($project);
-            if ($thumbnailPath) {
-                $data['thumbnail_path'] = $thumbnailPath;
+                // Generate thumbnail
+                $project->pdf_path = $path; // Temporarily set path for generator
+                $thumbnailPath = $this->thumbnailGenerator->generate($project);
+                if ($thumbnailPath) {
+                    $data['thumbnail_path'] = $thumbnailPath;
+                }
+            } else if ($request->boolean('delete_pdf')) {
+                \Illuminate\Support\Facades\Log::info('PDF deletion requested', ['project_id' => $project->id]);
+                $data['pdf_path'] = null;
+                $data['thumbnail_path'] = null;
             }
         }
 

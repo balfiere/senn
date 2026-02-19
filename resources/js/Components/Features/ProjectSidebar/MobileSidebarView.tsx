@@ -1,5 +1,5 @@
 import { Link } from "@inertiajs/react"
-import { Home, PanelLeftClose, X, Plus, Upload } from "lucide-react"
+import { Home, PanelLeftClose, X, Plus, Upload, Trash2 } from "lucide-react"
 import { Button } from "@/Components/ui/button"
 import { Input } from '@/Components/ui/input';
 import { Project, Part } from "@/types"
@@ -27,6 +27,7 @@ interface MobileSidebarViewProps {
     setIsMobileExpanded: (expanded: boolean) => void
     isUploading: boolean
     handleFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void
+    handlePdfDelete: () => void
 }
 
 export function MobileSidebarView({
@@ -48,6 +49,7 @@ export function MobileSidebarView({
     setIsMobileExpanded,
     isUploading,
     handleFileUpload,
+    handlePdfDelete,
 }: MobileSidebarViewProps) {
     return (
         <>
@@ -182,6 +184,17 @@ export function MobileSidebarView({
                                             <Upload className="mr-2 h-4 w-4" />
                                             {isUploading ? "Uploading..." : project.pdf_path ? "Change PDF" : "Upload PDF"}
                                         </Button>
+                                        {project.pdf_path && !isUploading && (
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 font-light mt-2"
+                                                onClick={handlePdfDelete}
+                                            >
+                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                Delete PDF
+                                            </Button>
+                                        )}
                                     </div>
                                 </div>
 

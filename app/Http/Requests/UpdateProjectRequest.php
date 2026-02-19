@@ -30,7 +30,7 @@ class UpdateProjectRequest extends FormRequest
                 'max:20480', // 20MB max for security
                 function ($attribute, $value, $fail) {
                     // Additional validation to ensure it's actually a valid PDF file
-                    if (! $value) {
+                    if (!$value) {
                         return; // Skip if no file is uploaded
                     }
 
@@ -58,6 +58,7 @@ class UpdateProjectRequest extends FormRequest
                     }
                 },
             ],
+            'delete_pdf' => ['nullable', 'boolean'],
         ];
     }
 }

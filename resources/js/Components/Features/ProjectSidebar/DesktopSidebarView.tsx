@@ -1,5 +1,5 @@
 import { Link } from "@inertiajs/react"
-import { Home, PanelLeftClose, Plus, Upload } from "lucide-react"
+import { Home, PanelLeftClose, Plus, Upload, Trash2 } from "lucide-react"
 import { Button } from "@/Components/ui/button"
 import { ScrollArea } from "@/Components/ui/scroll-area"
 import { Input } from '@/Components/ui/input';
@@ -27,6 +27,7 @@ interface DesktopSidebarViewProps {
     setIsCollapsed: (collapsed: boolean) => void
     isUploading: boolean
     handleFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void
+    handlePdfDelete: () => void
 }
 
 export function DesktopSidebarView({
@@ -48,6 +49,7 @@ export function DesktopSidebarView({
     setIsCollapsed,
     isUploading,
     handleFileUpload,
+    handlePdfDelete,
 }: DesktopSidebarViewProps) {
     if (isCollapsed) {
         return (
@@ -176,6 +178,17 @@ export function DesktopSidebarView({
                                 <Upload className="mr-2 h-4 w-4" />
                                 {isUploading ? "Uploading..." : project.pdf_path ? "Change PDF" : "Upload PDF"}
                             </Button>
+                            {project.pdf_path && !isUploading && (
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 font-light mt-2"
+                                    onClick={handlePdfDelete}
+                                >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete PDF
+                                </Button>
+                            )}
                         </div>
                     </div>
 

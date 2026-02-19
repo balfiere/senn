@@ -20,6 +20,7 @@ interface ProjectSidebarProps {
     onToggleStopwatch: () => void
     onResetStopwatch: () => void
     onPdfUpload: (url: string | null) => void
+    onPdfDelete: () => void
 }
 
 export function ProjectSidebar(props: ProjectSidebarProps) {
@@ -60,10 +61,25 @@ export function ProjectSidebar(props: ProjectSidebarProps) {
         })
     }
 
+    const handlePdfDelete = async () => {
+        if (!confirm("Are you sure you want to delete the pattern PDF? This will also remove all annotations.")) return
+
+        router.post(route('projects.update', props.project.id), {
+            _method: 'PATCH',
+            delete_pdf: true,
+        }, {
+            preserveScroll: true,
+            onSuccess: () => {
+                router.reload({ only: ['project'] })
+            },
+        })
+    }
+
     const commonProps = {
         ...props,
         isUploading,
         handleFileUpload,
+        handlePdfDelete,
     }
 
     if (isMobile) {
