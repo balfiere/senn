@@ -519,7 +519,7 @@ export default function Account(props: AccountPageProps) {
                         Back to Projects
                     </Link>
                     <h1 className="text-foreground text-sm uppercase tracking-[0.2em] font-medium">
-                        {user.email || user.username}
+                        {authMode === 'simple' ? (user.username || user.email) : (user.email || user.username)}
                     </h1>
                 </div>
             </header>
