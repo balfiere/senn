@@ -49,7 +49,6 @@ return [
                 'client_id' => $clientId,
                 'client_secret' => $clientSecret,
                 'redirect' => env("{$prefix}REDIRECT"),
-                'button_text' => env("{$prefix}BUTTON_TEXT", "Sign in with {$name}"),
                 'scopes' => env("{$prefix}SCOPES", 'openid email profile'),
                 'verify_jwt' => env("{$prefix}VERIFY_JWT", false),
             ];

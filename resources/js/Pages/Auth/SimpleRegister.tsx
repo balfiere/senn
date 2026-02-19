@@ -9,7 +9,6 @@ import { Head, Link, Form, usePage } from '@inertiajs/react';
 interface OidcProvider {
     slug: string;
     name: string;
-    button_text: string;
 }
 
 export default function SimpleRegister() {
@@ -75,7 +74,7 @@ export default function SimpleRegister() {
                         )}
                     </Form>
 
-                    {oidc.enabled && <OidcButtons providers={oidc.providers} className="mt-4" />}
+                    {oidc.enabled && <OidcButtons providers={oidc.providers} actionVerb="up" className="mt-4" />}
 
                     <div className="mt-4 text-center text-sm text-muted-foreground">
                         Already have an account?{' '}

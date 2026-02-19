@@ -35,7 +35,6 @@ class HandleInertiaRequests extends Middleware
                 $oidcProviders[] = [
                     'slug' => $slug,
                     'name' => $provider['name'],
-                    'button_text' => $provider['button_text'],
                 ];
             }
         }

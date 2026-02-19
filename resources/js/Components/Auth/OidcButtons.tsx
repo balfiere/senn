@@ -4,15 +4,16 @@ import { Divider } from '@/Components/Auth/Divider';
 interface OidcProvider {
     slug: string;
     name: string;
-    button_text: string;
 }
 
 interface OidcButtonsProps {
     providers: OidcProvider[];
     className?: string;
+    /** The action verb: "in" for sign in, "up" for sign up */
+    actionVerb?: 'in' | 'up';
 }
 
-export function OidcButtons({ providers, className = '' }: OidcButtonsProps) {
+export function OidcButtons({ providers, className = '', actionVerb = 'in' }: OidcButtonsProps) {
     if (!providers || providers.length === 0) {
         return null;
     }
@@ -20,6 +21,14 @@ export function OidcButtons({ providers, className = '' }: OidcButtonsProps) {
     const handleLogin = (slug: string) => {
         // Use full page navigation for OIDC redirect (required for external OAuth flow)
         window.location.href = route('oidc.redirect', { provider: slug });
+    };
+
+    /**
+     * Generate button text from provider name and action verb.
+     * Example: name="Pocket ID", actionVerb="up" → "Sign up with Pocket ID"
+     */
+    const getButtonText = (provider: OidcProvider): string => {
+        return `Sign ${actionVerb} with ${provider.name}`;
     };
 
     return (
@@ -46,7 +55,7 @@ export function OidcButtons({ providers, className = '' }: OidcButtonsProps) {
                             d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
                         />
                     </svg>
-                    {provider.button_text}
+                    {getButtonText(provider)}
                 </Button>
             ))}
         </div>

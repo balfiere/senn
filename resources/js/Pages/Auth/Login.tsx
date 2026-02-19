@@ -11,7 +11,6 @@ import { Head, Link, Form, usePage } from '@inertiajs/react';
 interface OidcProvider {
     slug: string;
     name: string;
-    button_text: string;
 }
 
 export default function Login({ status, canResetPassword }: { status?: string; canResetPassword: boolean }) {
