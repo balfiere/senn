@@ -16,6 +16,7 @@
 .env.production
 .env.local
 .env.sqlite
+.env.selfhosted
 .env.supabase
 .phpactor.json
 .phpunit.result.cache

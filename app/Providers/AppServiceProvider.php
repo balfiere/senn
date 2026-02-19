@@ -28,8 +28,6 @@ class AppServiceProvider extends ServiceProvider
         Vite::prefetch(concurrency: 3);
 
         // Register OIDC Socialite provider
-        Event::listen(function (SocialiteWasCalled $event) {
-            $event->extendSocialite('oidc', \SocialiteProviders\OIDC\Provider::class);
-        });
+        Event::listen(SocialiteWasCalled::class, \SocialiteProviders\OIDC\OIDCExtendSocialite::class);
     }
 }

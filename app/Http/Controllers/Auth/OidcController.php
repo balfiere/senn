@@ -41,17 +41,23 @@ class OidcController extends Controller
      */
     public function callback(Request $request, string $provider)
     {
+        \Log::info('OIDC Callback initiated', ['provider' => $provider, 'action' => $request->session()->get('oidc_action', 'login')]);
+
         $action = $request->session()->get('oidc_action', 'login');
 
         // Verify session provider matches URL provider
         $sessionProvider = $request->session()->get('oidc_provider');
         if ($sessionProvider && $sessionProvider !== $provider) {
+            \Log::warning('OIDC provider mismatch', ['session' => $sessionProvider, 'url' => $provider]);
+
             return redirect()->route('login')->withErrors(['oidc' => 'OIDC provider mismatch.']);
         }
 
         $providerConfig = $this->oidcService->getProvider($provider);
 
         if (! $providerConfig) {
+            \Log::error('OIDC provider not found', ['provider' => $provider]);
+
             return redirect()->route('login')->withErrors(['oidc' => 'OIDC provider not found.']);
         }
 
@@ -60,7 +66,14 @@ class OidcController extends Controller
 
         try {
             $oidcUser = Socialite::driver('oidc')->user();
+            \Log::info('OIDC user retrieved', [
+                'id' => $oidcUser->getId(),
+                'email' => $oidcUser->getEmail(),
+                'name' => $oidcUser->getName(),
+            ]);
         } catch (\Exception $e) {
+            \Log::error('OIDC authentication failed', ['error' => $e->getMessage()]);
+
             return redirect()->route('login')->withErrors(['oidc' => 'OIDC authentication failed: '.$e->getMessage()]);
         }
 
@@ -121,11 +134,21 @@ class OidcController extends Controller
     protected function handleLogin($oidcUser, string $provider)
     {
         try {
+            \Log::info('OIDC handleLogin: Starting', ['provider' => $provider]);
+
             $user = $this->oidcService->findOrCreateUser($oidcUser, $provider);
+            \Log::info('OIDC handleLogin: User found/created', ['user_id' => $user->id, 'email' => $user->email]);
+
             $this->oidcService->login($user);
+            \Log::info('OIDC handleLogin: Login called', ['auth_check' => Auth::check(), 'auth_id' => Auth::id()]);
+
+            $redirectUrl = redirect()->intended(route('projects.index'))->getTargetUrl();
+            \Log::info('OIDC handleLogin: Redirecting', ['url' => $redirectUrl]);
 
             return redirect()->intended(route('projects.index'));
         } catch (\Exception $e) {
+            \Log::error('OIDC handleLogin: Exception', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+
             return redirect()->route('login')->withErrors(['oidc' => $e->getMessage()]);
         }
     }

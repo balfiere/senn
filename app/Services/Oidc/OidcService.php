@@ -127,14 +127,24 @@ class OidcService
      */
     public function findOrCreateUser(SocialiteUser $oidcUser, string $providerSlug): User
     {
+        \Log::info('OidcService findOrCreateUser: Starting', ['provider' => $providerSlug]);
+
         return DB::transaction(function () use ($oidcUser, $providerSlug) {
             $providerId = $oidcUser->getId();
             $email = $oidcUser->getEmail();
             $name = $oidcUser->getName() ?? $oidcUser->getNickname() ?? 'Unknown';
 
+            \Log::info('OidcService findOrCreateUser: OIDC user data', [
+                'provider_id' => $providerId,
+                'email' => $email,
+                'name' => $name,
+            ]);
+
             // 1. Check if OIDC identity already exists (by provider + provider_id)
             $existingIdentity = OidcIdentity::findByProvider($providerSlug, $providerId);
             if ($existingIdentity) {
+                \Log::info('OidcService findOrCreateUser: Found existing identity', ['user_id' => $existingIdentity->user_id]);
+
                 // Update email if changed
                 if ($email && $existingIdentity->email !== $email) {
                     $existingIdentity->update(['email' => $email]);
@@ -147,6 +157,8 @@ class OidcService
             if ($email) {
                 $existingUser = User::where('email', $email)->first();
                 if ($existingUser) {
+                    \Log::info('OidcService findOrCreateUser: Found existing user by email, linking', ['user_id' => $existingUser->id]);
+
                     // Create OIDC identity for existing user
                     $existingUser->oidcIdentities()->create([
                         'provider' => $providerSlug,
@@ -159,19 +171,28 @@ class OidcService
             }
 
             // 3. Create new user with OIDC identity
+            \Log::info('OidcService findOrCreateUser: Creating new user');
+
+            $username = $this->generateUniqueUsername($email, $name);
+            \Log::info('OidcService findOrCreateUser: Generated username', ['username' => $username]);
+
             $user = User::create([
                 'name' => $name,
-                'username' => $this->generateUniqueUsername($email, $name),
+                'username' => $username,
                 'email' => $email,
                 'password' => null, // No password for OIDC-only users
                 'email_verified_at' => now(), // OIDC users are auto-verified
             ]);
+
+            \Log::info('OidcService findOrCreateUser: User created', ['user_id' => $user->id]);
 
             $user->oidcIdentities()->create([
                 'provider' => $providerSlug,
                 'provider_id' => $providerId,
                 'email' => $email,
             ]);
+
+            \Log::info('OidcService findOrCreateUser: OIDC identity created');
 
             return $user;
         });
