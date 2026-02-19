@@ -29,6 +29,17 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $oidcProviders = [];
+        if (config('oidc.enabled')) {
+            foreach (config('oidc.providers', []) as $slug => $provider) {
+                $oidcProviders[] = [
+                    'slug' => $slug,
+                    'name' => $provider['name'],
+                    'button_text' => $provider['button_text'],
+                ];
+            }
+        }
+
         return [
             ...parent::share($request),
             'auth' => [
@@ -37,6 +48,10 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),
+            ],
+            'oidc' => [
+                'enabled' => config('oidc.enabled', false),
+                'providers' => $oidcProviders,
             ],
         ];
     }

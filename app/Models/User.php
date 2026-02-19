@@ -24,6 +24,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'username',
         'email',
         'password',
+        'email_verified_at',
     ];
 
     /**
@@ -157,5 +158,37 @@ class User extends Authenticatable implements MustVerifyEmail
     public function projects(): HasMany
     {
         return $this->hasMany(Project::class);
+    }
+
+    /**
+     * Get the OIDC identities for the user.
+     */
+    public function oidcIdentities(): HasMany
+    {
+        return $this->hasMany(OidcIdentity::class);
+    }
+
+    /**
+     * Check if the user has a linked OIDC identity for a specific provider.
+     */
+    public function hasOidcIdentity(string $provider): bool
+    {
+        return $this->oidcIdentities()->where('provider', $provider)->exists();
+    }
+
+    /**
+     * Get a linked OIDC identity for a specific provider.
+     */
+    public function getOidcIdentity(string $provider): ?OidcIdentity
+    {
+        return $this->oidcIdentities()->where('provider', $provider)->first();
+    }
+
+    /**
+     * Check if the user has a password set.
+     */
+    public function hasPassword(): bool
+    {
+        return ! empty($this->password);
     }
 }

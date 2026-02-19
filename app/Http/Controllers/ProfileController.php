@@ -35,6 +35,21 @@ class ProfileController extends Controller
      */
     public function account(Request $request): Response
     {
+        // Get OIDC identities for the user
+        $oidcIdentities = $request->user()->oidcIdentities()->get(['provider', 'email'])->keyBy('provider');
+
+        // Build list of linked providers with their identity info
+        $linkedProviders = [];
+        foreach (config('oidc.providers', []) as $slug => $provider) {
+            $identity = $oidcIdentities->get($slug);
+            $linkedProviders[] = [
+                'slug' => $slug,
+                'name' => $provider['name'],
+                'linked' => $identity !== null,
+                'email' => $identity?->email,
+            ];
+        }
+
         return Inertia::render('Account', [
             'auth' => [
                 'user' => [
@@ -42,10 +57,15 @@ class ProfileController extends Controller
                     'name' => $request->user()->name,
                     'email' => $request->user()->email,
                     'username' => $request->user()->username,
+                    'has_password' => ! empty($request->user()->password),
                 ],
             ],
             'authMode' => config('auth.mode'),
             'status' => session('status'),
+            'oidc' => [
+                'enabled' => config('oidc.enabled', false),
+                'providers' => $linkedProviders,
+            ],
         ]);
     }
 

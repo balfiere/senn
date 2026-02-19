@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, router } from '@inertiajs/react';
 import { PageProps, User } from '@/types';
-import { AlertTriangle, ArrowLeft, ExternalLink, KeyRound, LogOut, Mail, RotateCcw, Trash2, User as UserIcon } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Check, ExternalLink, KeyRound, Link as LinkIcon, LogOut, Mail, Plus, RotateCcw, Trash2, User as UserIcon, X } from 'lucide-react';
 
 import { SettingAction } from '@/Components/ui/setting-action';
 import { SettingGroup } from '@/Components/ui/setting-group';
@@ -374,19 +374,104 @@ function DeleteAccountSection() {
     );
 }
 
+interface OidcProvider {
+    slug: string;
+    name: string;
+    linked: boolean;
+    email?: string;
+}
+
 interface AccountPageProps extends PageProps {
     auth: {
         user: User & {
             username: string | null;
+            has_password: boolean;
         };
     };
     authMode: 'simple' | 'production';
+    oidc: {
+        enabled: boolean;
+        providers: OidcProvider[];
+    };
     status?: string;
+}
+
+function LinkedAccountsSection({ providers, hasPassword }: { providers: OidcProvider[]; hasPassword: boolean }) {
+    const handleLink = (slug: string) => {
+        // Use full page navigation for OIDC redirect (required for external OAuth flow)
+        window.location.href = route('oidc.link', { provider: slug });
+    };
+
+    const handleUnlink = (slug: string) => {
+        if (!hasPassword) {
+            alert('Cannot unlink your only authentication method. Please set a password first.');
+            return;
+        }
+        if (confirm('Are you sure you want to unlink this provider?')) {
+            router.delete(route('oidc.unlink', { provider: slug }));
+        }
+    };
+
+    if (providers.length === 0) {
+        return null;
+    }
+
+    return (
+        <div className="border border-border">
+            <div className="px-4 py-3 bg-muted/30 border-b border-border">
+                <div className="flex items-center gap-2">
+                    <LinkIcon className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">Linked Accounts</span>
+                </div>
+            </div>
+            <div className="divide-y divide-border">
+                {providers.map((provider) => (
+                    <div key={provider.slug} className="px-4 py-3 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <span className="text-sm font-medium">{provider.name}</span>
+                            {provider.linked && provider.email && (
+                                <span className="text-xs text-muted-foreground">({provider.email})</span>
+                            )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {provider.linked ? (
+                                <>
+                                    <span className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                                        <Check className="h-3 w-3" />
+                                        Linked
+                                    </span>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-7 text-xs text-muted-foreground hover:text-destructive"
+                                        onClick={() => handleUnlink(provider.slug)}
+                                    >
+                                        <X className="h-3 w-3 mr-1" />
+                                        Unlink
+                                    </Button>
+                                </>
+                            ) : (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-7 text-xs"
+                                    onClick={() => handleLink(provider.slug)}
+                                >
+                                    <Plus className="h-3 w-3 mr-1" />
+                                    Link
+                                </Button>
+                            )}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
 }
 
 export default function Account(props: AccountPageProps) {
     const { user } = props.auth;
-    const { authMode } = props;
+    const { authMode, oidc } = props;
     const handleLogout = () => {
         router.post(route('logout'));
     };
@@ -430,6 +515,13 @@ export default function Account(props: AccountPageProps) {
                         {authMode === 'production' && <ResetPasswordSection />}
                     </div>
                 </FormGroup>
+
+                {/* Linked Accounts Section */}
+                {oidc.enabled && oidc.providers.length > 0 && (
+                    <FormGroup title="Linked Accounts" className="mb-12">
+                        <LinkedAccountsSection providers={oidc.providers} hasPassword={user.has_password} />
+                    </FormGroup>
+                )}
 
                 {/* Danger Zone */}
                 <FormGroup title="Danger Zone" className="mb-12">

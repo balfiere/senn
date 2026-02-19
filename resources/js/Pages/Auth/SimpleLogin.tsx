@@ -4,10 +4,19 @@ import { Checkbox } from '@/Components/ui/checkbox';
 import { FormField } from '@/Components/ui/form-field';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
+import { OidcButtons } from '@/Components/Auth/OidcButtons';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, Form } from '@inertiajs/react';
+import { Head, Link, Form, usePage } from '@inertiajs/react';
+
+interface OidcProvider {
+    slug: string;
+    name: string;
+    button_text: string;
+}
 
 export default function SimpleLogin() {
+    const { oidc } = usePage<{ oidc: { enabled: boolean; providers: OidcProvider[] } }>().props;
+
     return (
         <GuestLayout>
             <Head title="Sign In" />
@@ -55,6 +64,9 @@ export default function SimpleLogin() {
                             </>
                         )}
                     </Form>
+
+                    {oidc.enabled && <OidcButtons providers={oidc.providers} className="mt-4" />}
+
                     <div className="mt-4 text-center text-sm text-muted-foreground">
                         Don't have an account?{' '}
                         <Link href={route('register')} className="text-primary underline underline-offset-4 hover:text-primary/80">

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\OidcController;
 use App\Http\Controllers\Auth\SimpleAuthController;
 use App\Http\Controllers\CounterCommentController;
 use App\Http\Controllers\CounterController;
@@ -46,6 +47,17 @@ Route::post('/logout', function () {
 
     return redirect('/');
 })->name('logout');
+
+// OIDC Routes (available when OIDC is configured)
+Route::middleware('web')->group(function () {
+    Route::get('/auth/oidc/{provider}/redirect', [OidcController::class, 'redirect'])->name('oidc.redirect');
+    Route::get('/auth/oidc/{provider}/callback', [OidcController::class, 'callback'])->name('oidc.callback');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/auth/oidc/{provider}/link', [OidcController::class, 'link'])->name('oidc.link');
+    Route::delete('/auth/oidc/{provider}/unlink', [OidcController::class, 'unlink'])->name('oidc.unlink');
+});
 
 // Conditional middleware based on auth mode
 if (config('auth.mode') === 'simple') {
