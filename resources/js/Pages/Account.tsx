@@ -94,7 +94,7 @@ function ChangeEmailSection({ currentName }: { currentName: string }) {
     );
 }
 
-function ChangePasswordSection() {
+function ChangePasswordSection({ hasPassword }: { hasPassword: boolean }) {
     const [formData, setFormData] = useState({
         currentPassword: '',
         password: '',
@@ -102,21 +102,33 @@ function ChangePasswordSection() {
     });
     const [showSuccess, setShowSuccess] = useState(false);
 
+    const isFormValid = hasPassword
+        ? formData.currentPassword && formData.password && formData.password_confirmation
+        : formData.password && formData.password_confirmation;
+
     return (
         <SettingGroup
             icon={<KeyRound />}
-            title="Change Password"
+            title={hasPassword ? 'Change Password' : 'Set Password'}
             variant="default"
         >
             {({ setExpanded }) => (
                 <>
-                    <p className="text-sm text-amber-600 dark:text-amber-400 mb-4">
-                        <AlertTriangle className="inline h-4 w-4 mr-2" />
-                        Changing your password will log you out of all other devices.
-                    </p>
-                    <p className="text-sm text-muted-foreground mb-4">
-                        Enter your current password and choose a new one.
-                    </p>
+                    {hasPassword ? (
+                        <>
+                            <p className="text-sm text-amber-600 dark:text-amber-400 mb-4">
+                                <AlertTriangle className="inline h-4 w-4 mr-2" />
+                                Changing your password will log you out of all other devices.
+                            </p>
+                            <p className="text-sm text-muted-foreground mb-4">
+                                Enter your current password and choose a new one.
+                            </p>
+                        </>
+                    ) : (
+                        <p className="text-sm text-muted-foreground mb-4">
+                            You signed up with an external provider. Set a password to enable password-based login.
+                        </p>
+                    )}
                     <Form
                         action={route('password.update')}
                         method="put"
@@ -137,16 +149,18 @@ function ChangePasswordSection() {
                     >
                         {({ processing, errors }) => (
                             <>
-                                <FormField label="Current Password" error={errors.current_password} required>
-                                    <Input
-                                        type="password"
-                                        name="current_password"
-                                        value={formData.currentPassword}
-                                        onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
-                                        required
-                                    />
-                                </FormField>
-                                <FormField label="New Password" error={errors.password} required>
+                                {hasPassword && (
+                                    <FormField label="Current Password" error={errors.current_password} required>
+                                        <Input
+                                            type="password"
+                                            name="current_password"
+                                            value={formData.currentPassword}
+                                            onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
+                                            required
+                                        />
+                                    </FormField>
+                                )}
+                                <FormField label={hasPassword ? 'New Password' : 'Password'} error={errors.password} required>
                                     <Input
                                         type="password"
                                         name="password"
@@ -155,7 +169,7 @@ function ChangePasswordSection() {
                                         required
                                     />
                                 </FormField>
-                                <FormField label="Confirm New Password" error={errors.password_confirmation} required>
+                                <FormField label="Confirm Password" error={errors.password_confirmation} required>
                                     <Input
                                         type="password"
                                         name="password_confirmation"
@@ -167,9 +181,9 @@ function ChangePasswordSection() {
                                 <div className="flex gap-3">
                                     <Button
                                         type="submit"
-                                        disabled={processing || !formData.currentPassword || !formData.password || !formData.password_confirmation}
+                                        disabled={processing || !isFormValid}
                                     >
-                                        {processing ? 'Changing...' : 'Change Password'}
+                                        {processing ? (hasPassword ? 'Changing...' : 'Setting...') : (hasPassword ? 'Change Password' : 'Set Password')}
                                     </Button>
                                     <Button
                                         type="button"
@@ -184,7 +198,7 @@ function ChangePasswordSection() {
                                 </div>
                                 {showSuccess && (
                                     <div className="text-sm text-green-600 dark:text-green-400 mt-4">
-                                        Your password has been successfully updated!
+                                        Your password has been successfully {hasPassword ? 'updated' : 'set'}!
                                     </div>
                                 )}
                             </>
@@ -314,8 +328,11 @@ function ChangeUsernameSection({ currentName }: { currentName: string }) {
     );
 }
 
-function DeleteAccountSection() {
+function DeleteAccountSection({ hasPassword, username }: { hasPassword: boolean; username: string }) {
     const [password, setPassword] = useState('');
+    const [usernameConfirm, setUsernameConfirm] = useState('');
+
+    const isFormValid = hasPassword ? !!password : usernameConfirm === username;
 
     return (
         <SettingGroup
@@ -336,21 +353,34 @@ function DeleteAccountSection() {
                     >
                         {({ processing, errors }) => (
                             <>
-                                <FormField label="Enter your password to confirm" error={errors.password} required>
-                                    <Input
-                                        type="password"
-                                        name="password"
-                                        placeholder="Enter your password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        required
-                                    />
-                                </FormField>
+                                {hasPassword ? (
+                                    <FormField label="Enter your password to confirm" error={errors.password} required>
+                                        <Input
+                                            type="password"
+                                            name="password"
+                                            placeholder="Enter your password"
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            required
+                                        />
+                                    </FormField>
+                                ) : (
+                                    <FormField label={`Type "${username}" to confirm`} error={errors.username} required>
+                                        <Input
+                                            type="text"
+                                            name="username"
+                                            placeholder={username}
+                                            value={usernameConfirm}
+                                            onChange={(e) => setUsernameConfirm(e.target.value)}
+                                            required
+                                        />
+                                    </FormField>
+                                )}
                                 <div className="flex gap-3">
                                     <Button
                                         type="submit"
                                         variant="destructive"
-                                        disabled={processing || !password}
+                                        disabled={processing || !isFormValid}
                                     >
                                         {processing ? 'Deleting...' : 'Delete Account'}
                                     </Button>
@@ -360,6 +390,7 @@ function DeleteAccountSection() {
                                         onClick={() => {
                                             setExpanded(false);
                                             setPassword('');
+                                            setUsernameConfirm('');
                                         }}
                                     >
                                         Cancel
@@ -511,7 +542,7 @@ export default function Account(props: AccountPageProps) {
                         ) : (
                             <ChangeUsernameSection currentName={user.name} />
                         )}
-                        <ChangePasswordSection />
+                        <ChangePasswordSection hasPassword={user.has_password} />
                         {authMode === 'production' && <ResetPasswordSection />}
                     </div>
                 </FormGroup>
@@ -526,7 +557,7 @@ export default function Account(props: AccountPageProps) {
                 {/* Danger Zone */}
                 <FormGroup title="Danger Zone" className="mb-12">
                     <div>
-                        <DeleteAccountSection />
+                        <DeleteAccountSection hasPassword={user.has_password} username={user.username || ''} />
                     </div>
                 </FormGroup>
 

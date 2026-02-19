@@ -99,11 +99,23 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $request->validate([
-            'password' => ['required', 'current_password'],
-        ]);
-
         $user = $request->user();
+        $hasPassword = ! empty($user->password);
+
+        // Validate based on whether user has a password
+        if ($hasPassword) {
+            $request->validate([
+                'password' => ['required', 'current_password'],
+            ]);
+        } else {
+            // OIDC-only user: require username confirmation
+            $request->validate([
+                'username' => ['required', 'string', 'in:'.$user->username],
+            ], [
+                'username.in' => 'The username you entered does not match your account.',
+            ]);
+        }
+
         $userId = $user->id;
 
         $userProjects = $user->projects()->get();
@@ -159,24 +171,30 @@ class ProfileController extends Controller
      */
     public function updatePassword(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'current_password' => ['required', 'current_password'],
-            'password' => ['required', 'confirmed', Password::defaults()],
-        ]);
+        $user = $request->user();
+        $hasPassword = ! empty($user->password);
 
-        // For simple auth mode, logout other devices when password changes
-        if (config('auth.mode') === 'production') {
+        // If user has a password, require current_password validation
+        if ($hasPassword) {
+            $validated = $request->validate([
+                'current_password' => ['required', 'current_password'],
+                'password' => ['required', 'confirmed', Password::defaults()],
+            ]);
+
+            // Logout other devices when password changes
             Auth::logoutOtherDevices($validated['current_password']);
         } else {
-            // For simple auth mode, also logout other devices for security
-            Auth::logoutOtherDevices($validated['current_password']);
+            // OIDC-only user setting a password for the first time
+            $validated = $request->validate([
+                'password' => ['required', 'confirmed', Password::defaults()],
+            ]);
         }
 
-        $request->user()->update([
+        $user->update([
             'password' => Hash::make($validated['password']),
         ]);
 
-        $request->user()->notify(new PasswordChanged);
+        $user->notify(new PasswordChanged);
 
         return back()->with('status', 'password-updated');
     }
