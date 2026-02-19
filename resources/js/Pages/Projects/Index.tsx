@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { Masonry } from 'react-plock';
 
 import { Button } from '@/Components/ui/button';
 import { cn } from '@/lib/utils';
@@ -316,16 +317,23 @@ function ProjectsList({ projects }: { projects: Project[] }) {
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {projects.map((project) => (
+    <Masonry
+      items={projects}
+      config={{
+        columns: [1, 2, 3],
+        gap: [16, 16, 16],
+        media: [640, 1024, 1280],
+        useBalancedLayout: true,
+      }}
+      render={(project) => (
         <ProjectCard
           key={project.id}
           project={project}
           handleDelete={handleDelete}
           deletingId={deletingId}
         />
-      ))}
-    </div>
+      )}
+    />
   );
 }
 

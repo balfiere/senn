@@ -20,7 +20,6 @@ interface ProjectSidebarProps {
     onToggleStopwatch: () => void
     onResetStopwatch: () => void
     onPdfUpload: (url: string | null) => void
-    onPdfDelete: () => void
 }
 
 export function ProjectSidebar(props: ProjectSidebarProps) {
