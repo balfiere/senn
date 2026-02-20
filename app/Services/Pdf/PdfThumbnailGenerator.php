@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Services\Pdf;
 
 use App\Models\Project;
@@ -8,9 +7,6 @@ use Illuminate\Support\Facades\Storage;
 
 class PdfThumbnailGenerator
 {
-    /**
-     * Generate a thumbnail for the given project's PDF.
-     */
     public function generate(Project $project): ?string
     {
         if (! $project->pdf_path) {
@@ -28,60 +24,84 @@ class PdfThumbnailGenerator
             return null;
         }
 
-        // Create a temporary file for the PDF if it's not local
-        // Imagick needs a local file path to work reliably with Ghostscript
         $tempPdf = tempnam(sys_get_temp_dir(), 'pdf_');
-        file_put_contents($tempPdf, $disk->get($project->pdf_path));
-
-        $tempThumbnailPath = tempnam(sys_get_temp_dir(), 'thumb_').'.png';
+        $tempThumbnailPath = tempnam(sys_get_temp_dir(), 'thumb_') . '.png';
 
         try {
-            $imagick = new \Imagick;
+            file_put_contents($tempPdf, $disk->get($project->pdf_path));
 
-            // Set resolution before reading the PDF for better quality
-            $imagick->setResolution(150, 150);
+            $gsPath = $this->findGhostscript();
 
-            // Read ONLY the first page [0]
-            $imagick->readImage($tempPdf.'[0]');
+            // Build the Ghostscript command
+            // -dFirstPage=1 -dLastPage=1 ensures only the first page is rendered
+            $command = sprintf(
+                '%s -dBATCH -dNOPAUSE -dSAFER -sDEVICE=png16m -r150 ' .
+                '-dFirstPage=1 -dLastPage=1 ' .
+                '-dTextAlphaBits=4 -dGraphicsAlphaBits=4 ' .
+                '-sOutputFile=%s %s 2>&1',
+                escapeshellcmd($gsPath),
+                escapeshellarg($tempThumbnailPath),
+                escapeshellarg($tempPdf)
+            );
 
-            // Convert to PNG
-            $imagick->setImageFormat('png');
+            exec($command, $output, $exitCode);
 
-            // Flatten if there are alpha channels (common in PDFs)
-            $imagick = $imagick->mergeImageLayers(\Imagick::LAYERMETHOD_FLATTEN);
+            if ($exitCode !== 0) {
+                throw new \RuntimeException(
+                    'Ghostscript failed (exit ' . $exitCode . '): ' . implode("\n", $output)
+                );
+            }
 
-            // Write to temp file
-            $imagick->writeImage($tempThumbnailPath);
+            if (! file_exists($tempThumbnailPath) || filesize($tempThumbnailPath) === 0) {
+                throw new \RuntimeException('Ghostscript produced no output file.');
+            }
 
-            // Store the thumbnail
-            $thumbnailName = pathinfo($project->pdf_path, PATHINFO_FILENAME).'_thumb.png';
-            $thumbnailPath = 'projects/'.$project->user_id.'/thumbnails/'.$thumbnailName;
+            $thumbnailName = pathinfo($project->pdf_path, PATHINFO_FILENAME) . '_thumb.png';
+            $thumbnailPath = 'projects/' . $project->user_id . '/thumbnails/' . $thumbnailName;
 
             $disk->put($thumbnailPath, file_get_contents($tempThumbnailPath));
 
-            // Cleanup
-            @unlink($tempPdf);
-            @unlink($tempThumbnailPath);
-            $imagick->clear();
-            $imagick->destroy();
-
             return $thumbnailPath;
+
         } catch (\Exception $e) {
-            Log::error('Error generating thumbnail with Imagick', [
+            Log::error('Error generating thumbnail with Ghostscript', [
                 'message' => $e->getMessage(),
                 'project_id' => $project->id,
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            // Cleanup on failure
-            if (isset($tempPdf)) {
-                @unlink($tempPdf);
-            }
-            if (isset($tempThumbnailPath)) {
-                @unlink($tempThumbnailPath);
-            }
-
             return null;
+
+        } finally {
+            // Guaranteed cleanup whether success or failure,
+            // replacing the scattered @unlink calls
+            if (isset($tempPdf) && file_exists($tempPdf)) {
+                unlink($tempPdf);
+            }
+            if (isset($tempThumbnailPath) && file_exists($tempThumbnailPath)) {
+                unlink($tempThumbnailPath);
+            }
         }
+    }
+
+    private function findGhostscript(): string
+    {
+        // Alpine's ghostscript package installs as 'gs'
+        // This allows overriding via config/env if needed
+        $configured = config('services.ghostscript.path');
+        if ($configured && file_exists($configured)) {
+            return $configured;
+        }
+
+        foreach (['gs', '/usr/bin/gs', '/usr/local/bin/gs'] as $candidate) {
+            exec('command -v ' . escapeshellarg($candidate) . ' 2>/dev/null', $out, $code);
+            if ($code === 0 && ! empty($out[0])) {
+                return trim($out[0]);
+            }
+        }
+
+        throw new \RuntimeException(
+            'Ghostscript not found. Install it or set services.ghostscript.path.'
+        );
     }
 }
