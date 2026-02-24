@@ -12,12 +12,9 @@
 /storage/pail
 /vendor
 .env
-.env.backup
-.env.production
-.env.local
-.env.sqlite
-.env.selfhosted
-.env.supabase
+.env.*
+!.env.example
+!.env.docker
 .phpactor.json
 .phpunit.result.cache
 Homestead.json
