@@ -1,5 +1,9 @@
-import { usePage } from '@inertiajs/react';
-import { useEffect } from 'react';
+import type {
+    LocalCounter,
+    LocalPart,
+    LocalPdfAnnotation,
+    LocalProject,
+} from '@/lib/offline/db';
 import {
     upsertAnnotations,
     upsertCounters,
@@ -7,7 +11,8 @@ import {
     upsertProject,
     upsertProjects,
 } from '@/lib/offline/repositories';
-import type { LocalCounter, LocalPart, LocalProject, LocalPdfAnnotation } from '@/lib/offline/db';
+import { usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
 
 interface PageProps {
     projects?: LocalProject[];
@@ -40,7 +45,7 @@ export function useSyncHydration() {
 
                 props.parts.forEach((p) => {
                     // Extract part data
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
                     const { counters: partCounters, ...partData } = p;
                     parts.push(partData);
 

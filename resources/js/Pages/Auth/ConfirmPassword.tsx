@@ -1,5 +1,11 @@
 import { Button } from '@/Components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/Components/ui/card';
 import { FormField } from '@/Components/ui/form-field';
 import { Input } from '@/Components/ui/input';
 import GuestLayout from '@/Layouts/GuestLayout';
@@ -12,17 +18,27 @@ export default function ConfirmPassword() {
 
             <Card className="border-border">
                 <CardHeader className="text-center">
-                    <CardTitle className="text-2xl text-foreground">Confirm Password</CardTitle>
+                    <CardTitle className="text-foreground text-2xl">
+                        Confirm Password
+                    </CardTitle>
                     <CardDescription className="text-muted-foreground">
                         Please confirm your password before continuing.
                     </CardDescription>
                 </CardHeader>
 
                 <CardContent>
-                    <Form action="/confirm-password" method="post" className="flex flex-col gap-4">
+                    <Form
+                        action="/confirm-password"
+                        method="post"
+                        className="flex flex-col gap-4"
+                    >
                         {({ processing, errors }) => (
                             <>
-                                <FormField label="Password" error={errors.password} required>
+                                <FormField
+                                    label="Password"
+                                    error={errors.password}
+                                    required
+                                >
                                     <Input
                                         type="password"
                                         name="password"
@@ -32,7 +48,11 @@ export default function ConfirmPassword() {
                                     />
                                 </FormField>
 
-                                <Button type="submit" className="w-full" disabled={processing}>
+                                <Button
+                                    type="submit"
+                                    className="w-full"
+                                    disabled={processing}
+                                >
                                     {processing ? 'Confirming...' : 'Confirm'}
                                 </Button>
                             </>

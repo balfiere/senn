@@ -1,4 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/Components/ui/card';
 import { MailIcon } from '@/Components/ui/mail-icon';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link } from '@inertiajs/react';
@@ -11,13 +17,19 @@ export default function RegisterSuccess() {
             <Card className="border-border text-center">
                 <CardHeader>
                     <MailIcon />
-                    <CardTitle className="text-2xl text-foreground">Check Your Email</CardTitle>
+                    <CardTitle className="text-foreground text-2xl">
+                        Check Your Email
+                    </CardTitle>
                     <CardDescription className="text-muted-foreground">
-                        We&apos;ve sent you a confirmation link. Please check your email to verify your account.
+                        We&apos;ve sent you a confirmation link. Please check
+                        your email to verify your account.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Link href={route('login')} className="text-sm text-primary underline underline-offset-4 hover:text-primary/80">
+                    <Link
+                        href={route('login')}
+                        className="text-primary hover:text-primary/80 text-sm underline underline-offset-4"
+                    >
                         Back to login
                     </Link>
                 </CardContent>

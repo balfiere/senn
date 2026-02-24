@@ -1,6 +1,5 @@
-
-import { useState, useEffect } from 'react';
 import { db } from '@/lib/offline/db';
+import { useEffect, useState } from 'react';
 
 interface UsePdfLoaderResult {
     pdfBlobUrl: string | null;
@@ -11,7 +10,7 @@ interface UsePdfLoaderResult {
 export function usePdfLoader(
     projectId: string,
     serverPdfUrl: string | null,
-    projectUpdatedAt: string
+    projectUpdatedAt: string,
 ): UsePdfLoaderResult {
     const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -37,7 +36,9 @@ export function usePdfLoader(
                     project._local_pdf_updated_at === projectUpdatedAt
                 ) {
                     if (isMounted) {
-                        const url = URL.createObjectURL(project._local_pdf_blob);
+                        const url = URL.createObjectURL(
+                            project._local_pdf_blob,
+                        );
                         setPdfBlobUrl(url);
                         setIsLoading(false);
                     }
@@ -53,7 +54,7 @@ export function usePdfLoader(
                 // 3. Update local cache
                 await db.projects.update(projectId, {
                     _local_pdf_blob: blob,
-                    _local_pdf_updated_at: projectUpdatedAt
+                    _local_pdf_updated_at: projectUpdatedAt,
                 });
 
                 if (isMounted) {
@@ -64,7 +65,11 @@ export function usePdfLoader(
             } catch (err) {
                 console.error('Error loading PDF:', err);
                 if (isMounted) {
-                    setError(err instanceof Error ? err : new Error('Unknown error loading PDF'));
+                    setError(
+                        err instanceof Error
+                            ? err
+                            : new Error('Unknown error loading PDF'),
+                    );
                     setIsLoading(false);
                 }
             }
@@ -76,7 +81,7 @@ export function usePdfLoader(
             isMounted = false;
             // Cleanup object URL to prevent memory leaks?
             // Note: If we revoke it here, we might break the current view if the component unmounts/remounts quickly
-            // But strict mode might trigger this. 
+            // But strict mode might trigger this.
             // For now, rely on garbage collection or standard browser behavior for Blob URLs from IDB?
             // Actually, created Object URLs should be revoked.
             if (pdfBlobUrl) {

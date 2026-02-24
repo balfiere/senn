@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import * as React from 'react';
 
 export interface SettingGroupRenderProps {
     expanded: boolean;

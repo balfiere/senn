@@ -5,6 +5,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 import {
     ArrowRight,
     Highlighter,
@@ -16,9 +17,8 @@ import {
     Underline,
 } from 'lucide-react';
 import type React from 'react';
+
 import { type AnnotationToolType } from './utils';
-import { cn } from '@/lib/utils';
-import { useAnnotation } from '@embedpdf/plugin-annotation/react';
 
 interface AnnotationToolsMenuProps {
     documentId: string;
@@ -32,14 +32,30 @@ const tools: {
     icon: React.ReactNode;
     label: string;
 }[] = [
-        { id: 'select', icon: <MousePointer2 className="h-4 w-4" />, label: 'Select' },
-        { id: 'highlight', icon: <Highlighter className="h-4 w-4" />, label: 'Highlight' },
-        { id: 'underline', icon: <Underline className="h-4 w-4" />, label: 'Underline' },
-        { id: 'freeText', icon: <Type className="h-4 w-4" />, label: 'Text' },
-        { id: 'square', icon: <Square className="h-4 w-4" />, label: 'Rectangle' },
-        { id: 'line', icon: <Minus className="h-4 w-4" />, label: 'Line' },
-        { id: 'lineArrow', icon: <ArrowRight className="h-4 w-4" />, label: 'Arrow' },
-    ];
+    {
+        id: 'select',
+        icon: <MousePointer2 className="h-4 w-4" />,
+        label: 'Select',
+    },
+    {
+        id: 'highlight',
+        icon: <Highlighter className="h-4 w-4" />,
+        label: 'Highlight',
+    },
+    {
+        id: 'underline',
+        icon: <Underline className="h-4 w-4" />,
+        label: 'Underline',
+    },
+    { id: 'freeText', icon: <Type className="h-4 w-4" />, label: 'Text' },
+    { id: 'square', icon: <Square className="h-4 w-4" />, label: 'Rectangle' },
+    { id: 'line', icon: <Minus className="h-4 w-4" />, label: 'Line' },
+    {
+        id: 'lineArrow',
+        icon: <ArrowRight className="h-4 w-4" />,
+        label: 'Arrow',
+    },
+];
 
 export function AnnotationToolsMenu({
     documentId,
@@ -67,19 +83,23 @@ export function AnnotationToolsMenu({
             </DropdownMenuTrigger>
             <DropdownMenuContent
                 align="start"
-                className="min-w-[140px] rounded-none border-border bg-card shadow-lg"
+                className="border-border bg-card min-w-[140px] rounded-none shadow-lg"
             >
                 {tools.map((tool) => (
                     <DropdownMenuItem
                         key={tool.id}
                         onClick={() => onToolSelect(tool.id)}
                         className={cn(
-                            "flex items-center gap-2 px-2 py-1.5 cursor-pointer",
-                            getHighlightedTool(tool.id) ? 'bg-secondary' : 'hover:bg-accent'
+                            'flex cursor-pointer items-center gap-2 px-2 py-1.5',
+                            getHighlightedTool(tool.id)
+                                ? 'bg-secondary'
+                                : 'hover:bg-accent',
                         )}
                     >
                         <div className="flex-shrink-0">{tool.icon}</div>
-                        <span className="text-sm font-medium">{tool.label}</span>
+                        <span className="text-sm font-medium">
+                            {tool.label}
+                        </span>
                     </DropdownMenuItem>
                 ))}
             </DropdownMenuContent>

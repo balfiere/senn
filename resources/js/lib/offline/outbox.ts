@@ -1,4 +1,5 @@
 import { v4 as uuid } from 'uuid';
+
 import { db, type OutboxEvent } from './db';
 import { scheduleSyncSoon } from './sync-engine';
 
@@ -8,7 +9,7 @@ import { scheduleSyncSoon } from './sync-engine';
  */
 export async function enqueueEvent(
     type: string,
-    payload: Record<string, unknown>
+    payload: Record<string, unknown>,
 ): Promise<string> {
     const eventId = uuid();
     await db.outbox.add({
@@ -30,7 +31,11 @@ export async function enqueueEvent(
  * Get pending events ready for sync, ordered by creation time.
  */
 export async function getPendingEvents(limit = 50): Promise<OutboxEvent[]> {
-    return db.outbox.where('status').equals('pending').limit(limit).sortBy('created_at');
+    return db.outbox
+        .where('status')
+        .equals('pending')
+        .limit(limit)
+        .sortBy('created_at');
 }
 
 /**
@@ -57,25 +62,37 @@ export async function markCompleted(eventIds: string[]): Promise<void> {
 /**
  * Mark an event as failed with error message.
  */
-export async function markFailed(eventId: string, error: string): Promise<void> {
-    await db.outbox.where('event_id').equals(eventId).modify((event) => {
-        event.status = 'failed';
-        event.attempts += 1;
-        event.last_attempt_at = new Date().toISOString();
-        event.error_message = error;
-    });
+export async function markFailed(
+    eventId: string,
+    error: string,
+): Promise<void> {
+    await db.outbox
+        .where('event_id')
+        .equals(eventId)
+        .modify((event) => {
+            event.status = 'failed';
+            event.attempts += 1;
+            event.last_attempt_at = new Date().toISOString();
+            event.error_message = error;
+        });
 }
 
 /**
  * Retry all failed events by marking them as pending.
  */
 export async function retryFailed(): Promise<void> {
-    await db.outbox.where('status').equals('failed').modify({ status: 'pending' });
+    await db.outbox
+        .where('status')
+        .equals('failed')
+        .modify({ status: 'pending' });
 }
 
 /**
  * Reset processing events back to pending (for recovery after crash).
  */
 export async function resetProcessing(): Promise<void> {
-    await db.outbox.where('status').equals('processing').modify({ status: 'pending' });
+    await db.outbox
+        .where('status')
+        .equals('processing')
+        .modify({ status: 'pending' });
 }

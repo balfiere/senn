@@ -1,33 +1,34 @@
-import { Link } from "@inertiajs/react"
-import { Home, PanelLeftClose, X, Plus, Upload, Trash2 } from "lucide-react"
-import { Button } from "@/Components/ui/button"
+import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
-import { Project, Part } from "@/types"
-import { cn } from "@/lib/utils"
-import { SidebarPartItem } from "./SidebarPartItem"
-import { SidebarStopwatch } from "./SidebarStopwatch"
-import { SidebarViewState } from "./SidebarViewState"
+import { cn } from '@/lib/utils';
+import { Part, Project } from '@/types';
+import { Link } from '@inertiajs/react';
+import { Home, PanelLeftClose, Plus, Trash2, Upload, X } from 'lucide-react';
+
+import { SidebarPartItem } from './SidebarPartItem';
+import { SidebarStopwatch } from './SidebarStopwatch';
+import { SidebarViewState } from './SidebarViewState';
 
 interface MobileSidebarViewProps {
-    project: Project
-    parts: Part[]
-    currentPartId: string
-    onSelectPart: (id: string) => void
-    onCreatePart: () => void
-    onUpdatePart: (id: string, updates: Partial<Part>) => void
-    onDeletePart: (id: string) => void
-    onCreateCounter: () => void
-    view: "counters" | "pdf" | "split"
-    onViewChange: (view: "counters" | "pdf" | "split") => void
-    stopwatchSeconds: number
-    isStopwatchRunning: boolean
-    onToggleStopwatch: () => void
-    onResetStopwatch: () => void
-    isMobileExpanded: boolean
-    setIsMobileExpanded: (expanded: boolean) => void
-    isUploading: boolean
-    handleFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void
-    handlePdfDelete: () => void
+    project: Project;
+    parts: Part[];
+    currentPartId: string;
+    onSelectPart: (id: string) => void;
+    onCreatePart: () => void;
+    onUpdatePart: (id: string, updates: Partial<Part>) => void;
+    onDeletePart: (id: string) => void;
+    onCreateCounter: () => void;
+    view: 'counters' | 'pdf' | 'split';
+    onViewChange: (view: 'counters' | 'pdf' | 'split') => void;
+    stopwatchSeconds: number;
+    isStopwatchRunning: boolean;
+    onToggleStopwatch: () => void;
+    onResetStopwatch: () => void;
+    isMobileExpanded: boolean;
+    setIsMobileExpanded: (expanded: boolean) => void;
+    isUploading: boolean;
+    handleFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    handlePdfDelete: () => void;
 }
 
 export function MobileSidebarView({
@@ -54,15 +55,18 @@ export function MobileSidebarView({
     return (
         <>
             {/* Bottom Bar */}
-            <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border">
+            <div className="bg-background border-border fixed right-0 bottom-0 left-0 z-50 border-t">
                 <div className="flex items-center justify-around px-4 py-2">
                     <Button
                         asChild
                         variant="ghost"
                         size="sm"
-                        className="flex-1 text-popover-foreground"
+                        className="text-popover-foreground flex-1"
                     >
-                        <Link href={route('projects.index')} className="flex flex-col items-center gap-1">
+                        <Link
+                            href={route('projects.index')}
+                            className="flex flex-col items-center gap-1"
+                        >
                             <Home className="h-5 w-5" />
                             <span className="text-xs">Projects</span>
                         </Link>
@@ -71,11 +75,18 @@ export function MobileSidebarView({
                         variant="ghost"
                         size="sm"
                         onClick={() => setIsMobileExpanded(!isMobileExpanded)}
-                        className="flex-1 text-popover-foreground"
+                        className="text-popover-foreground flex-1"
                     >
                         <div className="flex flex-col items-center gap-1">
-                            <PanelLeftClose className={cn("h-5 w-5", isMobileExpanded ? "rotate-180" : "")} />
-                            <span className="text-xs">{isMobileExpanded ? "Close" : "Menu"}</span>
+                            <PanelLeftClose
+                                className={cn(
+                                    'h-5 w-5',
+                                    isMobileExpanded ? 'rotate-180' : '',
+                                )}
+                            />
+                            <span className="text-xs">
+                                {isMobileExpanded ? 'Close' : 'Menu'}
+                            </span>
                         </div>
                     </Button>
                 </div>
@@ -88,11 +99,13 @@ export function MobileSidebarView({
                     onClick={() => setIsMobileExpanded(false)}
                 >
                     <div
-                        className="fixed bottom-0 left-0 right-0 bg-background border-t border-border rounded-t-lg h-dvh flex flex-col"
+                        className="bg-background border-border fixed right-0 bottom-0 left-0 flex h-dvh flex-col rounded-t-lg border-t"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="flex items-center justify-between p-4 border-b border-border shrink-0">
-                            <h2 className="font-medium text-popover-foreground">{project.name}</h2>
+                        <div className="border-border flex shrink-0 items-center justify-between border-b p-4">
+                            <h2 className="text-popover-foreground font-medium">
+                                {project.name}
+                            </h2>
                             <Button
                                 variant="ghost"
                                 size="icon"
@@ -104,15 +117,22 @@ export function MobileSidebarView({
                         </div>
 
                         <div className="flex-1 overflow-y-auto overscroll-contain">
-                            <div className="p-4 space-y-6" style={{ paddingBottom: "calc(var(--spacing) * 17)" }}>
+                            <div
+                                className="space-y-6 p-4"
+                                style={{
+                                    paddingBottom: 'calc(var(--spacing) * 17)',
+                                }}
+                            >
                                 {/* Parts */}
                                 <div className="flex flex-col gap-1">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-xs font-medium uppercase text-popover-foreground/60">Parts</span>
+                                        <span className="text-popover-foreground/60 text-xs font-medium uppercase">
+                                            Parts
+                                        </span>
                                         <Button
                                             variant="ghost"
                                             size="icon"
-                                            className="h-6 w-6 text-popover-foreground"
+                                            className="text-popover-foreground h-6 w-6"
                                             onClick={onCreatePart}
                                             title="Add part"
                                         >
@@ -124,7 +144,9 @@ export function MobileSidebarView({
                                             <SidebarPartItem
                                                 key={part.id}
                                                 part={part}
-                                                isCurrent={currentPartId === part.id}
+                                                isCurrent={
+                                                    currentPartId === part.id
+                                                }
                                                 onSelect={onSelectPart}
                                                 onUpdate={onUpdatePart}
                                                 onDelete={onDeletePart}
@@ -137,11 +159,13 @@ export function MobileSidebarView({
                                 {/* Counters */}
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-sm font-medium uppercase text-popover-foreground/60">Counters</span>
+                                        <span className="text-popover-foreground/60 text-sm font-medium uppercase">
+                                            Counters
+                                        </span>
                                         <Button
                                             variant="ghost"
                                             size="icon"
-                                            className="h-8 w-8 text-popover-foreground"
+                                            className="text-popover-foreground h-8 w-8"
                                             onClick={onCreateCounter}
                                             title="Add counter"
                                         >
@@ -153,7 +177,9 @@ export function MobileSidebarView({
                                 {/* View Options */}
                                 {project.pdf_path && (
                                     <div className="flex flex-col">
-                                        <span className="text-sm font-medium uppercase text-popover-foreground/60 mb-2">View</span>
+                                        <span className="text-popover-foreground/60 mb-2 text-sm font-medium uppercase">
+                                            View
+                                        </span>
                                         <SidebarViewState
                                             view={view}
                                             onViewChange={onViewChange}
@@ -164,7 +190,9 @@ export function MobileSidebarView({
 
                                 {/* PDF Upload */}
                                 <div className="flex flex-col">
-                                    <span className="text-sm font-medium uppercase text-popover-foreground/60 mb-2">Pattern PDF</span>
+                                    <span className="text-popover-foreground/60 mb-2 text-sm font-medium uppercase">
+                                        Pattern PDF
+                                    </span>
                                     <div>
                                         <Input
                                             type="file"
@@ -177,18 +205,28 @@ export function MobileSidebarView({
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            className="w-full justify-start bg-muted/30 text-popover-foreground font-light"
-                                            onClick={() => document.getElementById("pdf-upload-mobile")?.click()}
+                                            className="bg-muted/30 text-popover-foreground w-full justify-start font-light"
+                                            onClick={() =>
+                                                document
+                                                    .getElementById(
+                                                        'pdf-upload-mobile',
+                                                    )
+                                                    ?.click()
+                                            }
                                             disabled={isUploading}
                                         >
                                             <Upload className="mr-2 h-4 w-4" />
-                                            {isUploading ? "Uploading..." : project.pdf_path ? "Change PDF" : "Upload PDF"}
+                                            {isUploading
+                                                ? 'Uploading...'
+                                                : project.pdf_path
+                                                  ? 'Change PDF'
+                                                  : 'Upload PDF'}
                                         </Button>
                                         {project.pdf_path && !isUploading && (
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 font-light mt-2"
+                                                className="text-destructive hover:text-destructive hover:bg-destructive/10 mt-2 w-full justify-start font-light"
                                                 onClick={handlePdfDelete}
                                             >
                                                 <Trash2 className="mr-2 h-4 w-4" />
@@ -200,7 +238,9 @@ export function MobileSidebarView({
 
                                 {/* Stopwatch */}
                                 <div className="flex flex-col">
-                                    <span className="text-sm font-medium uppercase text-popover-foreground/60 mb-2">Time Tracker</span>
+                                    <span className="text-popover-foreground/60 mb-2 text-sm font-medium uppercase">
+                                        Time Tracker
+                                    </span>
                                     <SidebarStopwatch
                                         seconds={stopwatchSeconds}
                                         isRunning={isStopwatchRunning}
@@ -215,5 +255,5 @@ export function MobileSidebarView({
                 </div>
             )}
         </>
-    )
+    );
 }

@@ -1,4 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/Components/ui/card';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link } from '@inertiajs/react';
 import { AlertCircle } from 'lucide-react';
@@ -10,16 +16,22 @@ export default function Error() {
 
             <Card className="border-border text-center">
                 <CardHeader>
-                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
-                        <AlertCircle className="h-6 w-6 text-destructive" />
+                    <div className="bg-destructive/10 mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full">
+                        <AlertCircle className="text-destructive h-6 w-6" />
                     </div>
-                    <CardTitle className="text-2xl text-foreground">Authentication Error</CardTitle>
+                    <CardTitle className="text-foreground text-2xl">
+                        Authentication Error
+                    </CardTitle>
                     <CardDescription className="text-muted-foreground">
-                        Something went wrong during authentication. Please try again.
+                        Something went wrong during authentication. Please try
+                        again.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Link href={route('login')} className="text-sm text-primary underline underline-offset-4 hover:text-primary/80">
+                    <Link
+                        href={route('login')}
+                        className="text-primary hover:text-primary/80 text-sm underline underline-offset-4"
+                    >
                         Back to login
                     </Link>
                 </CardContent>

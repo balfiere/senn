@@ -1,14 +1,13 @@
 /// <reference lib="webworker" />
 declare const self: ServiceWorkerGlobalScope;
 
-import { CacheFirst, NetworkFirst } from 'workbox-strategies';
+import { ExpirationPlugin } from 'workbox-expiration';
 import { precacheAndRoute } from 'workbox-precaching';
+import { NavigationRoute, registerRoute } from 'workbox-routing';
+import { CacheFirst, NetworkFirst } from 'workbox-strategies';
 
 // Precache manifest injected by VitePWA
 precacheAndRoute(self.__WB_MANIFEST);
-import { ExpirationPlugin } from 'workbox-expiration';
-import { registerRoute, NavigationRoute } from 'workbox-routing';
-import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 
 // Cache names
 const INERTIA_CACHE = 'inertia-responses';
@@ -30,7 +29,7 @@ registerRoute(
                 maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days
             }),
         ],
-    })
+    }),
 );
 
 // Document requests (full page loads) - NetworkFirst with HTML fallback
@@ -45,7 +44,7 @@ registerRoute(
                 maxAgeSeconds: 60 * 60 * 24,
             }),
         ],
-    })
+    }),
 );
 
 // Static assets - CacheFirst
@@ -62,7 +61,7 @@ registerRoute(
                 maxAgeSeconds: 60 * 60 * 24 * 30,
             }),
         ],
-    })
+    }),
 );
 
 // Images - CacheFirst
@@ -76,14 +75,14 @@ registerRoute(
                 maxAgeSeconds: 60 * 60 * 24 * 30,
             }),
         ],
-    })
+    }),
 );
 
 // Navigation fallback for project routes - serve the cached HTML shell
 const navigationRoute = new NavigationRoute(
     async ({ request }) => {
         const cache = await caches.open(DOCUMENTS_CACHE);
-        
+
         // Try to get the cached HTML shell (from /projects or root)
         let cachedResponse = await cache.match('/projects');
         if (!cachedResponse) {
@@ -118,13 +117,13 @@ const navigationRoute = new NavigationRoute(
                 {
                     status: 503,
                     headers: { 'Content-Type': 'text/html' },
-                }
+                },
             );
         }
     },
     {
         allowlist: [/^\/projects/],
-    }
+    },
 );
 
 registerRoute(navigationRoute);

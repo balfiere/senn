@@ -1,16 +1,28 @@
-import { useState } from 'react';
-import { Link, router } from '@inertiajs/react';
-import { PageProps, User } from '@/types';
-import { AlertTriangle, ArrowLeft, Check, ExternalLink, KeyRound, Link as LinkIcon, LogOut, Mail, Plus, RotateCcw, Trash2, User as UserIcon, X } from 'lucide-react';
-
-import { SettingAction } from '@/Components/ui/setting-action';
-import { SettingGroup } from '@/Components/ui/setting-group';
 import { Button } from '@/Components/ui/button';
 import { FormField } from '@/Components/ui/form-field';
 import { FormGroup } from '@/Components/ui/form-group';
 import { Input } from '@/Components/ui/input';
 import { Separator } from '@/Components/ui/separator';
-import { Form } from '@inertiajs/react';
+import { SettingAction } from '@/Components/ui/setting-action';
+import { SettingGroup } from '@/Components/ui/setting-group';
+import { PageProps, User } from '@/types';
+import { Form, Link, router } from '@inertiajs/react';
+import {
+    AlertTriangle,
+    ArrowLeft,
+    Check,
+    ExternalLink,
+    KeyRound,
+    Link as LinkIcon,
+    LogOut,
+    Mail,
+    Plus,
+    RotateCcw,
+    Trash2,
+    User as UserIcon,
+    X,
+} from 'lucide-react';
+import { useState } from 'react';
 
 function ChangeEmailSection({ currentName }: { currentName: string }) {
     const [email, setEmail] = useState('');
@@ -18,15 +30,13 @@ function ChangeEmailSection({ currentName }: { currentName: string }) {
     const [showSuccess, setShowSuccess] = useState(false);
 
     return (
-        <SettingGroup
-            icon={<Mail />}
-            title="Change Email"
-            variant="default"
-        >
+        <SettingGroup icon={<Mail />} title="Change Email" variant="default">
             {({ setExpanded }) => (
                 <>
-                    <p className="text-sm text-muted-foreground mb-4">
-                        Enter your new email address and current password. You'll need to verify the new email before the change takes effect.
+                    <p className="text-muted-foreground mb-4 text-sm">
+                        Enter your new email address and current password.
+                        You'll need to verify the new email before the change
+                        takes effect.
                     </p>
                     <Form
                         action={route('profile.update')}
@@ -43,30 +53,53 @@ function ChangeEmailSection({ currentName }: { currentName: string }) {
                     >
                         {({ processing, errors }) => (
                             <>
-                                <input type="hidden" name="name" value={currentName} />
-                                <FormField label="Current Password" error={errors.password} required>
+                                <input
+                                    type="hidden"
+                                    name="name"
+                                    value={currentName}
+                                />
+                                <FormField
+                                    label="Current Password"
+                                    error={errors.password}
+                                    required
+                                >
                                     <Input
                                         type="password"
                                         name="password"
                                         placeholder="Enter your current password"
                                         value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
+                                        onChange={(e) =>
+                                            setPassword(e.target.value)
+                                        }
                                         required
                                     />
                                 </FormField>
-                                <FormField label="New Email Address" error={errors.email} required>
+                                <FormField
+                                    label="New Email Address"
+                                    error={errors.email}
+                                    required
+                                >
                                     <Input
                                         type="email"
                                         name="email"
                                         placeholder="you@example.com"
                                         value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        onChange={(e) =>
+                                            setEmail(e.target.value)
+                                        }
                                         required
                                     />
                                 </FormField>
                                 <div className="flex gap-3">
-                                    <Button type="submit" disabled={processing || !email || !password}>
-                                        {processing ? 'Updating...' : 'Update Email'}
+                                    <Button
+                                        type="submit"
+                                        disabled={
+                                            processing || !email || !password
+                                        }
+                                    >
+                                        {processing
+                                            ? 'Updating...'
+                                            : 'Update Email'}
                                     </Button>
                                     <Button
                                         type="button"
@@ -81,8 +114,10 @@ function ChangeEmailSection({ currentName }: { currentName: string }) {
                                     </Button>
                                 </div>
                                 {showSuccess && (
-                                    <div className="text-sm text-green-600 dark:text-green-400 mt-4">
-                                        Email updated successfully! Please check your inbox to verify the new email address.
+                                    <div className="mt-4 text-sm text-green-600 dark:text-green-400">
+                                        Email updated successfully! Please check
+                                        your inbox to verify the new email
+                                        address.
                                     </div>
                                 )}
                             </>
@@ -103,7 +138,9 @@ function ChangePasswordSection({ hasPassword }: { hasPassword: boolean }) {
     const [showSuccess, setShowSuccess] = useState(false);
 
     const isFormValid = hasPassword
-        ? formData.currentPassword && formData.password && formData.password_confirmation
+        ? formData.currentPassword &&
+          formData.password &&
+          formData.password_confirmation
         : formData.password && formData.password_confirmation;
 
     return (
@@ -116,17 +153,20 @@ function ChangePasswordSection({ hasPassword }: { hasPassword: boolean }) {
                 <>
                     {hasPassword ? (
                         <>
-                            <p className="text-sm text-amber-600 dark:text-amber-400 mb-4">
-                                <AlertTriangle className="inline h-4 w-4 mr-2" />
-                                Changing your password will log you out of all other devices.
+                            <p className="mb-4 text-sm text-amber-600 dark:text-amber-400">
+                                <AlertTriangle className="mr-2 inline h-4 w-4" />
+                                Changing your password will log you out of all
+                                other devices.
                             </p>
-                            <p className="text-sm text-muted-foreground mb-4">
-                                Enter your current password and choose a new one.
+                            <p className="text-muted-foreground mb-4 text-sm">
+                                Enter your current password and choose a new
+                                one.
                             </p>
                         </>
                     ) : (
-                        <p className="text-sm text-muted-foreground mb-4">
-                            You signed up with an external provider. Set a password to enable password-based login.
+                        <p className="text-muted-foreground mb-4 text-sm">
+                            You signed up with an external provider. Set a
+                            password to enable password-based login.
                         </p>
                     )}
                     <Form
@@ -134,7 +174,11 @@ function ChangePasswordSection({ hasPassword }: { hasPassword: boolean }) {
                         method="put"
                         resetOnSuccess={['password', 'password_confirmation']}
                         onSuccess={() => {
-                            setFormData({ currentPassword: '', password: '', password_confirmation: '' });
+                            setFormData({
+                                currentPassword: '',
+                                password: '',
+                                password_confirmation: '',
+                            });
                             setShowSuccess(true);
                             // Hide success message after 5 seconds
                             setTimeout(() => setShowSuccess(false), 5000);
@@ -142,7 +186,10 @@ function ChangePasswordSection({ hasPassword }: { hasPassword: boolean }) {
                         onError={(errors) => {
                             console.error('Password update error:', errors);
                             if (Object.keys(errors).length > 0) {
-                                alert('Error updating password: ' + Object.values(errors)[0]);
+                                alert(
+                                    'Error updating password: ' +
+                                        Object.values(errors)[0],
+                                );
                             }
                         }}
                         className="space-y-4"
@@ -150,31 +197,64 @@ function ChangePasswordSection({ hasPassword }: { hasPassword: boolean }) {
                         {({ processing, errors }) => (
                             <>
                                 {hasPassword && (
-                                    <FormField label="Current Password" error={errors.current_password} required>
+                                    <FormField
+                                        label="Current Password"
+                                        error={errors.current_password}
+                                        required
+                                    >
                                         <Input
                                             type="password"
                                             name="current_password"
                                             value={formData.currentPassword}
-                                            onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
+                                            onChange={(e) =>
+                                                setFormData({
+                                                    ...formData,
+                                                    currentPassword:
+                                                        e.target.value,
+                                                })
+                                            }
                                             required
                                         />
                                     </FormField>
                                 )}
-                                <FormField label={hasPassword ? 'New Password' : 'Password'} error={errors.password} required>
+                                <FormField
+                                    label={
+                                        hasPassword
+                                            ? 'New Password'
+                                            : 'Password'
+                                    }
+                                    error={errors.password}
+                                    required
+                                >
                                     <Input
                                         type="password"
                                         name="password"
                                         value={formData.password}
-                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                        onChange={(e) =>
+                                            setFormData({
+                                                ...formData,
+                                                password: e.target.value,
+                                            })
+                                        }
                                         required
                                     />
                                 </FormField>
-                                <FormField label="Confirm Password" error={errors.password_confirmation} required>
+                                <FormField
+                                    label="Confirm Password"
+                                    error={errors.password_confirmation}
+                                    required
+                                >
                                     <Input
                                         type="password"
                                         name="password_confirmation"
                                         value={formData.password_confirmation}
-                                        onChange={(e) => setFormData({ ...formData, password_confirmation: e.target.value })}
+                                        onChange={(e) =>
+                                            setFormData({
+                                                ...formData,
+                                                password_confirmation:
+                                                    e.target.value,
+                                            })
+                                        }
                                         required
                                     />
                                 </FormField>
@@ -183,22 +263,33 @@ function ChangePasswordSection({ hasPassword }: { hasPassword: boolean }) {
                                         type="submit"
                                         disabled={processing || !isFormValid}
                                     >
-                                        {processing ? (hasPassword ? 'Changing...' : 'Setting...') : (hasPassword ? 'Change Password' : 'Set Password')}
+                                        {processing
+                                            ? hasPassword
+                                                ? 'Changing...'
+                                                : 'Setting...'
+                                            : hasPassword
+                                              ? 'Change Password'
+                                              : 'Set Password'}
                                     </Button>
                                     <Button
                                         type="button"
                                         variant="outline"
                                         onClick={() => {
                                             setExpanded(false);
-                                            setFormData({ currentPassword: '', password: '', password_confirmation: '' });
+                                            setFormData({
+                                                currentPassword: '',
+                                                password: '',
+                                                password_confirmation: '',
+                                            });
                                         }}
                                     >
                                         Cancel
                                     </Button>
                                 </div>
                                 {showSuccess && (
-                                    <div className="text-sm text-green-600 dark:text-green-400 mt-4">
-                                        Your password has been successfully {hasPassword ? 'updated' : 'set'}!
+                                    <div className="mt-4 text-sm text-green-600 dark:text-green-400">
+                                        Your password has been successfully{' '}
+                                        {hasPassword ? 'updated' : 'set'}!
                                     </div>
                                 )}
                             </>
@@ -219,26 +310,36 @@ function ResetPasswordSection() {
             processingText="Sending..."
             action={async () => {
                 await new Promise((resolve, reject) => {
-                    router.post(route('account.password.reset'), {}, {
-                        onSuccess: (page) => {
-                            const flash = page?.props?.flash as { success?: string; error?: string } | undefined;
-                            if (flash?.success) {
-                                alert(flash.success);
-                            } else {
-                                alert('Password reset email sent! Check your inbox.');
-                            }
-                            resolve(void 0);
+                    router.post(
+                        route('account.password.reset'),
+                        {},
+                        {
+                            onSuccess: (page) => {
+                                const flash = page?.props?.flash as
+                                    | { success?: string; error?: string }
+                                    | undefined;
+                                if (flash?.success) {
+                                    alert(flash.success);
+                                } else {
+                                    alert(
+                                        'Password reset email sent! Check your inbox.',
+                                    );
+                                }
+                                resolve(void 0);
+                            },
+                            onError: (errors) => {
+                                console.error('Password reset error:', errors);
+                                if (errors?.error) {
+                                    alert(errors.error);
+                                } else {
+                                    alert(
+                                        'Failed to send password reset email. Please try again.',
+                                    );
+                                }
+                                reject(errors);
+                            },
                         },
-                        onError: (errors) => {
-                            console.error('Password reset error:', errors);
-                            if (errors?.error) {
-                                alert(errors.error);
-                            } else {
-                                alert('Failed to send password reset email. Please try again.');
-                            }
-                            reject(errors);
-                        }
-                    });
+                    );
                 });
             }}
         />
@@ -258,8 +359,9 @@ function ChangeUsernameSection({ currentName }: { currentName: string }) {
         >
             {({ setExpanded }) => (
                 <>
-                    <p className="text-sm text-muted-foreground mb-4">
-                        Enter your new username and current password to update your account.
+                    <p className="text-muted-foreground mb-4 text-sm">
+                        Enter your new username and current password to update
+                        your account.
                     </p>
                     <Form
                         action={route('profile.update')}
@@ -276,31 +378,54 @@ function ChangeUsernameSection({ currentName }: { currentName: string }) {
                     >
                         {({ processing, errors }) => (
                             <>
-                                <input type="hidden" name="name" value={currentName} />
+                                <input
+                                    type="hidden"
+                                    name="name"
+                                    value={currentName}
+                                />
                                 <input type="hidden" name="email" value="" />
-                                <FormField label="Current Password" error={errors.password} required>
+                                <FormField
+                                    label="Current Password"
+                                    error={errors.password}
+                                    required
+                                >
                                     <Input
                                         type="password"
                                         name="password"
                                         placeholder="Enter your current password"
                                         value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
+                                        onChange={(e) =>
+                                            setPassword(e.target.value)
+                                        }
                                         required
                                     />
                                 </FormField>
-                                <FormField label="New Username" error={errors.username} required>
+                                <FormField
+                                    label="New Username"
+                                    error={errors.username}
+                                    required
+                                >
                                     <Input
                                         type="text"
                                         name="username"
                                         placeholder="your_new_username"
                                         value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
+                                        onChange={(e) =>
+                                            setUsername(e.target.value)
+                                        }
                                         required
                                     />
                                 </FormField>
                                 <div className="flex gap-3">
-                                    <Button type="submit" disabled={processing || !username || !password}>
-                                        {processing ? 'Updating...' : 'Update Username'}
+                                    <Button
+                                        type="submit"
+                                        disabled={
+                                            processing || !username || !password
+                                        }
+                                    >
+                                        {processing
+                                            ? 'Updating...'
+                                            : 'Update Username'}
                                     </Button>
                                     <Button
                                         type="button"
@@ -315,7 +440,7 @@ function ChangeUsernameSection({ currentName }: { currentName: string }) {
                                     </Button>
                                 </div>
                                 {showSuccess && (
-                                    <div className="text-sm text-green-600 dark:text-green-400 mt-4">
+                                    <div className="mt-4 text-sm text-green-600 dark:text-green-400">
                                         Username updated successfully!
                                     </div>
                                 )}
@@ -328,7 +453,13 @@ function ChangeUsernameSection({ currentName }: { currentName: string }) {
     );
 }
 
-function DeleteAccountSection({ hasPassword, username }: { hasPassword: boolean; username: string }) {
+function DeleteAccountSection({
+    hasPassword,
+    username,
+}: {
+    hasPassword: boolean;
+    username: string;
+}) {
     const [password, setPassword] = useState('');
     const [usernameConfirm, setUsernameConfirm] = useState('');
 
@@ -342,8 +473,9 @@ function DeleteAccountSection({ hasPassword, username }: { hasPassword: boolean;
         >
             {({ setExpanded }) => (
                 <>
-                    <p className="text-sm text-muted-foreground mb-4">
-                        This action is permanent and cannot be undone. All your projects and data will be permanently deleted.
+                    <p className="text-muted-foreground mb-4 text-sm">
+                        This action is permanent and cannot be undone. All your
+                        projects and data will be permanently deleted.
                     </p>
                     <Form
                         action={route('profile.destroy')}
@@ -354,24 +486,38 @@ function DeleteAccountSection({ hasPassword, username }: { hasPassword: boolean;
                         {({ processing, errors }) => (
                             <>
                                 {hasPassword ? (
-                                    <FormField label="Enter your password to confirm" error={errors.password} required>
+                                    <FormField
+                                        label="Enter your password to confirm"
+                                        error={errors.password}
+                                        required
+                                    >
                                         <Input
                                             type="password"
                                             name="password"
                                             placeholder="Enter your password"
                                             value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
+                                            onChange={(e) =>
+                                                setPassword(e.target.value)
+                                            }
                                             required
                                         />
                                     </FormField>
                                 ) : (
-                                    <FormField label={`Type "${username}" to confirm`} error={errors.username} required>
+                                    <FormField
+                                        label={`Type "${username}" to confirm`}
+                                        error={errors.username}
+                                        required
+                                    >
                                         <Input
                                             type="text"
                                             name="username"
                                             placeholder={username}
                                             value={usernameConfirm}
-                                            onChange={(e) => setUsernameConfirm(e.target.value)}
+                                            onChange={(e) =>
+                                                setUsernameConfirm(
+                                                    e.target.value,
+                                                )
+                                            }
                                             required
                                         />
                                     </FormField>
@@ -382,7 +528,9 @@ function DeleteAccountSection({ hasPassword, username }: { hasPassword: boolean;
                                         variant="destructive"
                                         disabled={processing || !isFormValid}
                                     >
-                                        {processing ? 'Deleting...' : 'Delete Account'}
+                                        {processing
+                                            ? 'Deleting...'
+                                            : 'Delete Account'}
                                     </Button>
                                     <Button
                                         type="button"
@@ -427,7 +575,13 @@ interface AccountPageProps extends PageProps {
     status?: string;
 }
 
-function LinkedAccountsSection({ providers, hasPassword }: { providers: OidcProvider[]; hasPassword: boolean }) {
+function LinkedAccountsSection({
+    providers,
+    hasPassword,
+}: {
+    providers: OidcProvider[];
+    hasPassword: boolean;
+}) {
     const handleLink = (slug: string) => {
         // Use full page navigation for OIDC redirect (required for external OAuth flow)
         window.location.href = route('oidc.link', { provider: slug });
@@ -435,7 +589,9 @@ function LinkedAccountsSection({ providers, hasPassword }: { providers: OidcProv
 
     const handleUnlink = (slug: string) => {
         if (!hasPassword) {
-            alert('Cannot unlink your only authentication method. Please set a password first.');
+            alert(
+                'Cannot unlink your only authentication method. Please set a password first.',
+            );
             return;
         }
         if (confirm('Are you sure you want to unlink this provider?')) {
@@ -448,20 +604,27 @@ function LinkedAccountsSection({ providers, hasPassword }: { providers: OidcProv
     }
 
     return (
-        <div className="border border-border">
-            <div className="px-4 py-3 bg-muted/30 border-b border-border">
+        <div className="border-border border">
+            <div className="bg-muted/30 border-border border-b px-4 py-3">
                 <div className="flex items-center gap-2">
-                    <LinkIcon className="h-4 w-4 text-muted-foreground" />
+                    <LinkIcon className="text-muted-foreground h-4 w-4" />
                     <span className="text-sm font-medium">Linked Accounts</span>
                 </div>
             </div>
-            <div className="divide-y divide-border">
+            <div className="divide-border divide-y">
                 {providers.map((provider) => (
-                    <div key={provider.slug} className="px-4 py-3 flex items-center justify-between">
+                    <div
+                        key={provider.slug}
+                        className="flex items-center justify-between px-4 py-3"
+                    >
                         <div className="flex items-center gap-3">
-                            <span className="text-sm font-medium">{provider.name}</span>
+                            <span className="text-sm font-medium">
+                                {provider.name}
+                            </span>
                             {provider.linked && provider.email && (
-                                <span className="text-xs text-muted-foreground">({provider.email})</span>
+                                <span className="text-muted-foreground text-xs">
+                                    ({provider.email})
+                                </span>
                             )}
                         </div>
                         <div className="flex items-center gap-2">
@@ -474,10 +637,12 @@ function LinkedAccountsSection({ providers, hasPassword }: { providers: OidcProv
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="h-7 text-xs text-muted-foreground hover:text-destructive"
-                                        onClick={() => handleUnlink(provider.slug)}
+                                        className="text-muted-foreground hover:text-destructive h-7 text-xs"
+                                        onClick={() =>
+                                            handleUnlink(provider.slug)
+                                        }
                                     >
-                                        <X className="h-3 w-3 mr-1" />
+                                        <X className="mr-1 h-3 w-3" />
                                         Unlink
                                     </Button>
                                 </>
@@ -488,7 +653,7 @@ function LinkedAccountsSection({ providers, hasPassword }: { providers: OidcProv
                                     className="h-7 text-xs"
                                     onClick={() => handleLink(provider.slug)}
                                 >
-                                    <Plus className="h-3 w-3 mr-1" />
+                                    <Plus className="mr-1 h-3 w-3" />
                                     Link
                                 </Button>
                             )}
@@ -509,25 +674,30 @@ export default function Account(props: AccountPageProps) {
 
     return (
         <div className="bg-background min-h-svh">
-            <header className="bg-background/80 backdrop-blur-sm top-0 z-40 w-full sticky border-b border-border">
+            <header className="bg-background/80 border-border sticky top-0 z-40 w-full border-b backdrop-blur-sm">
                 <div className="mx-auto flex max-w-2xl items-center justify-between px-6 py-5">
                     <Link
                         href={route('projects.index')}
-                        className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm uppercase tracking-wider"
+                        className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm tracking-wider uppercase transition-colors"
                     >
                         <ArrowLeft className="h-4 w-4" />
                         Back to Projects
                     </Link>
-                    <h1 className="text-foreground text-sm uppercase tracking-[0.2em] font-medium">
-                        {authMode === 'simple' ? (user.username || user.email) : (user.email || user.username)}
+                    <h1 className="text-foreground text-sm font-medium tracking-[0.2em] uppercase">
+                        {authMode === 'simple'
+                            ? user.username || user.email
+                            : user.email || user.username}
                     </h1>
                 </div>
             </header>
 
             <main className="mx-auto max-w-2xl px-6 py-12">
                 <div className="mb-10">
-                    <h2 className="text-3xl sm:text-4xl font-light tracking-tight">
-                        Account <span className="ml-1 font-serif italic tracking-wide">settings</span>
+                    <h2 className="text-3xl font-light tracking-tight sm:text-4xl">
+                        Account{' '}
+                        <span className="ml-1 font-serif tracking-wide italic">
+                            settings
+                        </span>
                     </h2>
                     <p className="text-muted-foreground mt-2 text-sm tracking-wide">
                         Manage your account preferences and security
@@ -542,7 +712,9 @@ export default function Account(props: AccountPageProps) {
                         ) : (
                             <ChangeUsernameSection currentName={user.name} />
                         )}
-                        <ChangePasswordSection hasPassword={user.has_password} />
+                        <ChangePasswordSection
+                            hasPassword={user.has_password}
+                        />
                         {authMode === 'production' && <ResetPasswordSection />}
                     </div>
                 </FormGroup>
@@ -550,14 +722,20 @@ export default function Account(props: AccountPageProps) {
                 {/* Linked Accounts Section */}
                 {oidc.enabled && oidc.providers.length > 0 && (
                     <FormGroup title="Linked Accounts" className="mb-12">
-                        <LinkedAccountsSection providers={oidc.providers} hasPassword={user.has_password} />
+                        <LinkedAccountsSection
+                            providers={oidc.providers}
+                            hasPassword={user.has_password}
+                        />
                     </FormGroup>
                 )}
 
                 {/* Danger Zone */}
                 <FormGroup title="Danger Zone" className="mb-12">
                     <div>
-                        <DeleteAccountSection hasPassword={user.has_password} username={user.username || ''} />
+                        <DeleteAccountSection
+                            hasPassword={user.has_password}
+                            username={user.username || ''}
+                        />
                     </div>
                 </FormGroup>
 
@@ -577,17 +755,17 @@ export default function Account(props: AccountPageProps) {
 
                 {/* About the App */}
                 <section>
-                    <h3 className="text-xs uppercase tracking-wider font-medium text-muted-foreground mb-2">
+                    <h3 className="text-muted-foreground mb-2 text-xs font-medium tracking-wider uppercase">
                         About the App
                     </h3>
-                    <p className="text-sm text-muted-foreground mb-4">
+                    <p className="text-muted-foreground mb-4 text-sm">
                         Open-source pattern management for makers
                     </p>
                     <a
                         href="https://github.com/balfiere/rowcounter"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-between w-full px-4 py-3 border border-border text-sm uppercase tracking-wider hover:bg-foreground hover:text-background transition-all duration-300"
+                        className="border-border hover:bg-foreground hover:text-background flex w-full items-center justify-between border px-4 py-3 text-sm tracking-wider uppercase transition-all duration-300"
                     >
                         <span>View on GitHub</span>
                         <ExternalLink className="h-4 w-4" />

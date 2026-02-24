@@ -6,7 +6,9 @@ import { useEffect, useState } from 'react';
  * The server is the source of truth for the accumulated seconds and start timestamp.
  */
 export function useStopwatch(project: Project | null) {
-    const [displaySeconds, setDisplaySeconds] = useState(project?.stopwatch_seconds ?? 0);
+    const [displaySeconds, setDisplaySeconds] = useState(
+        project?.stopwatch_seconds ?? 0,
+    );
 
     useEffect(() => {
         if (!project) {

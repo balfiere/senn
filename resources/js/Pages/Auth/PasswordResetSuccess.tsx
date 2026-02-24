@@ -1,7 +1,13 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Button } from '@/Components/ui/button';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/Components/ui/card';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link } from '@inertiajs/react';
-import { Button } from '@/Components/ui/button';
 
 export default function PasswordResetSuccess() {
     return (
@@ -10,9 +16,12 @@ export default function PasswordResetSuccess() {
 
             <Card className="border-border">
                 <CardHeader className="text-center">
-                    <CardTitle className="text-2xl">Password Reset Successful</CardTitle>
+                    <CardTitle className="text-2xl">
+                        Password Reset Successful
+                    </CardTitle>
                     <CardDescription>
-                        Your password has been reset successfully. You can now sign in with your new password.
+                        Your password has been reset successfully. You can now
+                        sign in with your new password.
                     </CardDescription>
                 </CardHeader>
 

@@ -8,19 +8,17 @@ import {
 import { FormField } from '@/Components/ui/form-field';
 import { FormGroup } from '@/Components/ui/form-group';
 import { Input } from '@/Components/ui/input';
-import { Label } from '@/Components/ui/label';
 import { Switch } from '@/Components/ui/switch';
 import { Textarea } from '@/Components/ui/textarea';
+import {
+    createCounterCommentLocally,
+    deleteCounterCommentLocally,
+    deleteCounterLocally,
+    updateCounterLocally,
+} from '@/lib/offline/repositories/counters';
 import { Counter } from '@/types';
 import { Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import {
-    updateCounterLocally,
-    deleteCounterLocally,
-    createCounterCommentLocally,
-    deleteCounterCommentLocally
-} from '@/lib/offline/repositories/counters';
-import { router } from '@inertiajs/react';
 
 interface EditCounterDialogProps {
     counter: Counter;
@@ -32,9 +30,13 @@ export function EditCounterDialog({
     onClose,
 }: EditCounterDialogProps) {
     const [name, setName] = useState(counter.name);
-    const [currentValue, setCurrentValue] = useState(counter.current_value.toString());
+    const [currentValue, setCurrentValue] = useState(
+        counter.current_value.toString(),
+    );
     const [resetAt, setResetAt] = useState(counter.reset_at?.toString() || '');
-    const [showResetCount, setShowResetCount] = useState(counter.show_reset_count);
+    const [showResetCount, setShowResetCount] = useState(
+        counter.show_reset_count,
+    );
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Row comment form state
@@ -127,7 +129,7 @@ export function EditCounterDialog({
                         </FormField>
                         <FormField label="Show reset count">
                             <div className="flex items-center justify-between">
-                                <span className="text-sm text-muted-foreground">
+                                <span className="text-muted-foreground text-sm">
                                     Display reset counter in UI
                                 </span>
                                 <Switch
@@ -148,7 +150,9 @@ export function EditCounterDialog({
                                 className="bg-muted/30 flex items-start gap-2 rounded-none border p-2 text-sm"
                             >
                                 <div className="flex-1">
-                                    <p className="font-semibold">Row {comment.row_pattern}</p>
+                                    <p className="font-semibold">
+                                        Row {comment.row_pattern}
+                                    </p>
                                     <p className="text-muted-foreground">
                                         {comment.comment_text}
                                     </p>
@@ -158,7 +162,9 @@ export function EditCounterDialog({
                                     variant="ghost"
                                     size="icon"
                                     className="text-destructive h-6 w-6"
-                                    onClick={() => handleDeleteComment(comment.id)}
+                                    onClick={() =>
+                                        handleDeleteComment(comment.id)
+                                    }
                                 >
                                     <Trash2 className="h-3 w-3" />
                                 </Button>
@@ -174,7 +180,9 @@ export function EditCounterDialog({
                             <FormField label="Row(s)">
                                 <Input
                                     value={newPattern}
-                                    onChange={(e) => setNewPattern(e.target.value)}
+                                    onChange={(e) =>
+                                        setNewPattern(e.target.value)
+                                    }
                                     placeholder="1,3,5-10"
                                 />
                             </FormField>
@@ -182,9 +190,9 @@ export function EditCounterDialog({
                                 <FormField label="Note">
                                     <Textarea
                                         value={newText}
-                                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                                            setNewText(e.target.value)
-                                        }
+                                        onChange={(
+                                            e: React.ChangeEvent<HTMLTextAreaElement>,
+                                        ) => setNewText(e.target.value)}
                                         placeholder="Remind me..."
                                         className="min-h-[50px] py-1"
                                     />
@@ -195,7 +203,7 @@ export function EditCounterDialog({
                             type="button"
                             variant="outline"
                             size="sm"
-                            className="h-8 w-full font-light bg-muted/30"
+                            className="bg-muted/30 h-8 w-full font-light"
                             onClick={handleAddComment}
                         >
                             <Plus className="mr-1 h-3 w-3" /> Add Note

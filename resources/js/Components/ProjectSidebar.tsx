@@ -1,85 +1,99 @@
-import { useState, useEffect } from "react"
-import { router } from "@inertiajs/react"
-import { Project, Part } from "@/types"
-import { MobileSidebarView } from "./Features/ProjectSidebar/MobileSidebarView"
-import { DesktopSidebarView } from "./Features/ProjectSidebar/DesktopSidebarView"
+import { Part, Project } from '@/types';
+import { router } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
+
+import { DesktopSidebarView } from './Features/ProjectSidebar/DesktopSidebarView';
+import { MobileSidebarView } from './Features/ProjectSidebar/MobileSidebarView';
 
 interface ProjectSidebarProps {
-    project: Project
-    parts: Part[]
-    currentPartId: string
-    onSelectPart: (partId: string) => void
-    onCreatePart: () => void
-    onUpdatePart: (partId: string, updates: Partial<Part>) => void
-    onDeletePart: (partId: string) => void
-    onCreateCounter: () => void
-    view: "counters" | "pdf" | "split"
-    onViewChange: (view: "counters" | "pdf" | "split") => void
-    stopwatchSeconds: number
-    isStopwatchRunning: boolean
-    onToggleStopwatch: () => void
-    onResetStopwatch: () => void
-    onPdfUpload: (url: string | null) => void
+    project: Project;
+    parts: Part[];
+    currentPartId: string;
+    onSelectPart: (partId: string) => void;
+    onCreatePart: () => void;
+    onUpdatePart: (partId: string, updates: Partial<Part>) => void;
+    onDeletePart: (partId: string) => void;
+    onCreateCounter: () => void;
+    view: 'counters' | 'pdf' | 'split';
+    onViewChange: (view: 'counters' | 'pdf' | 'split') => void;
+    stopwatchSeconds: number;
+    isStopwatchRunning: boolean;
+    onToggleStopwatch: () => void;
+    onResetStopwatch: () => void;
+    onPdfUpload: (url: string | null) => void;
 }
 
 export function ProjectSidebar(props: ProjectSidebarProps) {
-    const [isCollapsed, setIsCollapsed] = useState(false)
-    const [isUploading, setIsUploading] = useState(false)
-    const [isMobile, setIsMobile] = useState(false)
-    const [isMobileExpanded, setIsMobileExpanded] = useState(false)
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+    const [isMobileExpanded, setIsMobileExpanded] = useState(false);
 
     // Detect mobile viewport
     useEffect(() => {
         const checkMobile = () => {
-            setIsMobile(window.innerWidth <= 880)
-        }
+            setIsMobile(window.innerWidth <= 880);
+        };
 
-        checkMobile()
-        window.addEventListener('resize', checkMobile)
-        return () => window.removeEventListener('resize', checkMobile)
-    }, [])
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]
-        if (!file) return
+        const file = e.target.files?.[0];
+        if (!file) return;
 
-        setIsUploading(true)
+        setIsUploading(true);
 
-        router.post(route('projects.update', props.project.id), {
-            _method: 'PATCH',
-            pdf_file: file,
-        }, {
-            forceFormData: true,
-            preserveScroll: true,
-            onSuccess: () => {
-                setIsUploading(false)
-                // props.onPdfUpload(null)
-                router.reload({ only: ['project'] })
+        router.post(
+            route('projects.update', props.project.id),
+            {
+                _method: 'PATCH',
+                pdf_file: file,
             },
-            onFinish: () => setIsUploading(false),
-        })
-    }
+            {
+                forceFormData: true,
+                preserveScroll: true,
+                onSuccess: () => {
+                    setIsUploading(false);
+                    // props.onPdfUpload(null)
+                    router.reload({ only: ['project'] });
+                },
+                onFinish: () => setIsUploading(false),
+            },
+        );
+    };
 
     const handlePdfDelete = async () => {
-        if (!confirm("Are you sure you want to delete the pattern PDF? This will also remove all annotations.")) return
+        if (
+            !confirm(
+                'Are you sure you want to delete the pattern PDF? This will also remove all annotations.',
+            )
+        )
+            return;
 
-        router.post(route('projects.update', props.project.id), {
-            _method: 'PATCH',
-            delete_pdf: true,
-        }, {
-            preserveScroll: true,
-            onSuccess: () => {
-                router.reload({ only: ['project'] })
+        router.post(
+            route('projects.update', props.project.id),
+            {
+                _method: 'PATCH',
+                delete_pdf: true,
             },
-        })
-    }
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    router.reload({ only: ['project'] });
+                },
+            },
+        );
+    };
 
     const commonProps = {
         ...props,
         isUploading,
         handleFileUpload,
         handlePdfDelete,
-    }
+    };
 
     if (isMobile) {
         return (
@@ -88,7 +102,7 @@ export function ProjectSidebar(props: ProjectSidebarProps) {
                 isMobileExpanded={isMobileExpanded}
                 setIsMobileExpanded={setIsMobileExpanded}
             />
-        )
+        );
     }
 
     return (
@@ -97,5 +111,5 @@ export function ProjectSidebar(props: ProjectSidebarProps) {
             isCollapsed={isCollapsed}
             setIsCollapsed={setIsCollapsed}
         />
-    )
+    );
 }

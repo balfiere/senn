@@ -1,17 +1,22 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Button } from '@/Components/ui/button';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/Components/ui/card';
 import { MailIcon } from '@/Components/ui/mail-icon';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, router } from '@inertiajs/react';
+import { Form, Head, Link } from '@inertiajs/react';
 import { RefreshCw } from 'lucide-react';
-import { Button } from '@/Components/ui/button';
-import { Form } from '@inertiajs/react';
 import { useState } from 'react';
 
 interface Props {
     // status prop no longer needed - success handled client-side
 }
 
-export default function VerifyEmail({ }: Props) {
+export default function VerifyEmail({}: Props) {
     const [showSuccess, setShowSuccess] = useState(false);
 
     return (
@@ -21,16 +26,20 @@ export default function VerifyEmail({ }: Props) {
             <Card className="border-border text-center">
                 <CardHeader>
                     <MailIcon />
-                    <CardTitle className="text-2xl text-foreground">Email Verification</CardTitle>
+                    <CardTitle className="text-foreground text-2xl">
+                        Email Verification
+                    </CardTitle>
                     <CardDescription className="text-muted-foreground">
-                        Before proceeding, please check your email for a verification link.
-                        If you did not receive the email, we will gladly send you another.
+                        Before proceeding, please check your email for a
+                        verification link. If you did not receive the email, we
+                        will gladly send you another.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {showSuccess && (
-                        <div className="text-sm p-3">
-                            A new verification link has been sent to your email address.
+                        <div className="p-3 text-sm">
+                            A new verification link has been sent to your email
+                            address.
                         </div>
                     )}
 
@@ -54,7 +63,7 @@ export default function VerifyEmail({ }: Props) {
                         href={route('logout')}
                         method="post"
                         as="button"
-                        className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+                        className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
                     >
                         Log Out
                     </Link>

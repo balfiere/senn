@@ -5,8 +5,9 @@ import { createInertiaApp, router } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 
-import { registerServiceWorker } from './pwa/register-service-worker';
+import { HydrationWrapper } from './Components/HydrationWrapper';
 import { initSyncEngine } from './lib/offline';
+import { registerServiceWorker } from './pwa/register-service-worker';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -25,8 +26,6 @@ router.on('invalid', (event) => {
         router.visit(route('projects.index'), { replace: true });
     }
 });
-
-import { HydrationWrapper } from './Components/HydrationWrapper';
 
 // For developer console testing
 if (import.meta.env.DEV) {

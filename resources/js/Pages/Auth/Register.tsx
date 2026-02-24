@@ -1,10 +1,16 @@
+import { OidcButtons } from '@/Components/Auth/OidcButtons';
 import { Button } from '@/Components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/Components/ui/card';
 import { FormField } from '@/Components/ui/form-field';
 import { Input } from '@/Components/ui/input';
-import { OidcButtons } from '@/Components/Auth/OidcButtons';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, Form, usePage } from '@inertiajs/react';
+import { Form, Head, Link, usePage } from '@inertiajs/react';
 
 interface OidcProvider {
     slug: string;
@@ -12,7 +18,9 @@ interface OidcProvider {
 }
 
 export default function Register() {
-    const { oidc } = usePage<{ oidc: { enabled: boolean; providers: OidcProvider[] } }>().props;
+    const { oidc } = usePage<{
+        oidc: { enabled: boolean; providers: OidcProvider[] };
+    }>().props;
 
     return (
         <GuestLayout>
@@ -20,8 +28,12 @@ export default function Register() {
 
             <Card className="border-border">
                 <CardHeader className="text-center">
-                    <CardTitle className="text-2xl text-foreground">Create Account</CardTitle>
-                    <CardDescription className="text-muted-foreground">Start tracking your knitting projects</CardDescription>
+                    <CardTitle className="text-foreground text-2xl">
+                        Create Account
+                    </CardTitle>
+                    <CardDescription className="text-muted-foreground">
+                        Start tracking your knitting projects
+                    </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Form
@@ -32,7 +44,11 @@ export default function Register() {
                     >
                         {({ processing, errors }) => (
                             <>
-                                <FormField label="Name" error={errors.name} required>
+                                <FormField
+                                    label="Name"
+                                    error={errors.name}
+                                    required
+                                >
                                     <Input
                                         type="text"
                                         name="name"
@@ -42,7 +58,11 @@ export default function Register() {
                                         autoFocus
                                     />
                                 </FormField>
-                                <FormField label="Email" error={errors.email} required>
+                                <FormField
+                                    label="Email"
+                                    error={errors.email}
+                                    required
+                                >
                                     <Input
                                         type="email"
                                         name="email"
@@ -51,7 +71,11 @@ export default function Register() {
                                         autoComplete="username"
                                     />
                                 </FormField>
-                                <FormField label="Password" error={errors.password} required>
+                                <FormField
+                                    label="Password"
+                                    error={errors.password}
+                                    required
+                                >
                                     <Input
                                         type="password"
                                         name="password"
@@ -59,7 +83,11 @@ export default function Register() {
                                         autoComplete="new-password"
                                     />
                                 </FormField>
-                                <FormField label="Confirm Password" error={errors.password_confirmation} required>
+                                <FormField
+                                    label="Confirm Password"
+                                    error={errors.password_confirmation}
+                                    required
+                                >
                                     <Input
                                         type="password"
                                         name="password_confirmation"
@@ -67,18 +95,33 @@ export default function Register() {
                                         autoComplete="new-password"
                                     />
                                 </FormField>
-                                <Button type="submit" className="w-full" disabled={processing}>
-                                    {processing ? 'Creating account...' : 'Sign Up'}
+                                <Button
+                                    type="submit"
+                                    className="w-full"
+                                    disabled={processing}
+                                >
+                                    {processing
+                                        ? 'Creating account...'
+                                        : 'Sign Up'}
                                 </Button>
                             </>
                         )}
                     </Form>
 
-                    {oidc.enabled && <OidcButtons providers={oidc.providers} actionVerb="up" className="mt-4" />}
+                    {oidc.enabled && (
+                        <OidcButtons
+                            providers={oidc.providers}
+                            actionVerb="up"
+                            className="mt-4"
+                        />
+                    )}
 
-                    <div className="mt-4 text-center text-sm text-muted-foreground">
+                    <div className="text-muted-foreground mt-4 text-center text-sm">
                         Already have an account?{' '}
-                        <Link href={route('login')} className="text-primary underline underline-offset-4 hover:text-primary/80">
+                        <Link
+                            href={route('login')}
+                            className="text-primary hover:text-primary/80 underline underline-offset-4"
+                        >
                             Sign in
                         </Link>
                     </div>

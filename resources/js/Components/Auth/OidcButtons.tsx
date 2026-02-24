@@ -1,5 +1,5 @@
-import { Button } from '@/Components/ui/button';
 import { Divider } from '@/Components/Auth/Divider';
+import { Button } from '@/Components/ui/button';
 
 interface OidcProvider {
     slug: string;
@@ -13,7 +13,11 @@ interface OidcButtonsProps {
     actionVerb?: 'in' | 'up';
 }
 
-export function OidcButtons({ providers, className = '', actionVerb = 'in' }: OidcButtonsProps) {
+export function OidcButtons({
+    providers,
+    className = '',
+    actionVerb = 'in',
+}: OidcButtonsProps) {
     if (!providers || providers.length === 0) {
         return null;
     }

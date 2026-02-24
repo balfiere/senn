@@ -1,8 +1,7 @@
-import * as React from 'react';
+import { cn } from '@/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { Mail } from 'lucide-react';
-
-import { cn } from '@/lib/utils';
+import * as React from 'react';
 
 const mailIconVariants = cva(
     "mx-auto flex h-12 w-12 items-center justify-center bg-primary/10",
