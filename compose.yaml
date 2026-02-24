@@ -1,0 +1,27 @@
+services:
+    senn:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: final
+        image: senn:latest
+        restart: unless-stopped
+        environment:
+            WEBROOT: /app/public
+            NGINX_WEBROOT: /app/public
+            LOG_OUTPUT_LEVEL: info
+            AUTORUN_ENABLED: true
+        env_file: .env.docker
+        ports:
+            - 8000:8080
+        volumes:
+            # Persistent SQLite database (maps to DB_DATABASE in .env)
+            - ./database:/app/database
+            # Persistent Laravel storage (logs, framework cache, uploaded files)
+            - ./storage:/app/storage
+        healthcheck:
+            test: [CMD, curl, -f, http://localhost:8080/up]
+            interval: 30s
+            timeout: 5s
+            retries: 3
+            start_period: 30s
