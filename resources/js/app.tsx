@@ -29,9 +29,17 @@ router.on('invalid', (event) => {
 
 // For developer console testing
 if (import.meta.env.DEV) {
-    (window as any).db = (await import('./lib/offline')).db;
-    (window as any).syncNow = (await import('./lib/offline')).syncNow;
-    (window as any).offline = await import('./lib/offline');
+    const offlineModule = await import('./lib/offline');
+    window.db = offlineModule.db;
+    window.syncNow = offlineModule.syncNow;
+    window.offline = offlineModule;
+}
+
+interface PageModule {
+    default: {
+        layout?: (children: React.ReactNode) => React.ReactNode;
+        [key: string]: unknown;
+    };
 }
 
 createInertiaApp({
@@ -40,11 +48,11 @@ createInertiaApp({
         const page = resolvePageComponent(
             `./Pages/${name}.tsx`,
             import.meta.glob('./Pages/**/*.tsx'),
-        );
-        page.then((module: any) => {
-            const page = module.default;
-            const oldLayout = page.layout;
-            page.layout = (children: React.ReactNode) => {
+        ) as Promise<PageModule>;
+        page.then((module) => {
+            const pageComponent = module.default;
+            const oldLayout = pageComponent.layout;
+            pageComponent.layout = (children: React.ReactNode) => {
                 const content = oldLayout ? oldLayout(children) : children;
                 return <HydrationWrapper>{content}</HydrationWrapper>;
             };
