@@ -85,29 +85,8 @@ RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" 2>/dev/null || t
 RUN apk add --no-cache ghostscript \
     && rm -rf /var/cache/apk/* /tmp/*
 
-# Same extensions as builder — only what serversideup doesn't already ship.
-# pdo_sqlite and sqlite3 are already bundled, so they're excluded here.
-# /usr/src/php* cleanup is intentionally done after, as install-php-extensions needs it.
-RUN install-php-extensions \
-    bcmath \
-    gd \
-    intl \
-    pgsql \
-    && rm -rf /usr/src/php*
-
-# Copy only necessary application files
-COPY --from=builder /var/www/html/app /var/www/html/app
-COPY --from=builder /var/www/html/bootstrap /var/www/html/bootstrap
-COPY --from=builder /var/www/html/config /var/www/html/config
-COPY --from=builder /var/www/html/database /var/www/html/database
-COPY --from=builder /var/www/html/public /var/www/html/public
-COPY --from=builder /var/www/html/resources/views /var/www/html/resources/views
-COPY --from=builder /var/www/html/routes /var/www/html/routes
-COPY --from=builder /var/www/html/storage /var/www/html/storage
-COPY --from=builder /var/www/html/vendor /var/www/html/vendor
-COPY --from=builder /var/www/html/artisan /var/www/html/artisan
-COPY --from=builder /var/www/html/composer.json /var/www/html/composer.json
-COPY --from=builder /var/www/html/composer.lock /var/www/html/composer.lock
+# Copy built application from builder stage (includes PHP extensions)
+COPY --from=builder /var/www/html /var/www/html
 
 # Correct permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public /var/www/html/database
@@ -121,7 +100,8 @@ COPY 00-laravel-setup.sh /etc/entrypoint.d/00-laravel-setup.sh
 COPY 99-laravel-perms.sh /etc/entrypoint.d/99-laravel-perms.sh
 RUN chmod +x /etc/entrypoint.d/00-laravel-setup.sh /etc/entrypoint.d/99-laravel-perms.sh
 
-# No ENTRYPOINT or CMD needed — the base image's S6 supervisor handles it.
+# Switch back to non-root user
+USER www-data
 
 # Healthcheck to verify nginx is responding
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
