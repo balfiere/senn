@@ -64,8 +64,6 @@ export function AnnotationToolbar({
     documentId,
     activeTool,
     setActiveTool,
-    settings,
-    setSettings,
     searchQuery,
     onSearch,
     zoom,

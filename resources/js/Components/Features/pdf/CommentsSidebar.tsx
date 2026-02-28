@@ -28,7 +28,7 @@ const formatDate = (dateString: string) => {
             hour: '2-digit',
             minute: '2-digit',
         }).format(date);
-    } catch (e) {
+    } catch {
         return dateString;
     }
 };
@@ -69,7 +69,7 @@ export function CommentsSidebar({
         } else {
             setIsEditing(false);
         }
-    }, [selectedAnnotation?.id]);
+    }, [selectedAnnotation, setEditingComment, setIsEditing]);
 
     // Respond to external comment trigger (e.g. from context menu)
     useEffect(() => {
@@ -83,7 +83,7 @@ export function CommentsSidebar({
                 });
             }, 50);
         }
-    }, [commentTrigger, selectedAnnotation]);
+    }, [commentTrigger, selectedAnnotation, setIsEditing]);
 
     // Focus input when isEditing becomes true
     useEffect(() => {
@@ -226,7 +226,7 @@ export function CommentsSidebar({
                                                                     root.annotation_type,
                                                                 )
                                                                     ? root.stroke_color ||
-                                                                      root.color
+                                                                    root.color
                                                                     : root.color) ||
                                                                 '#cba6f7',
                                                         }}
@@ -247,7 +247,7 @@ export function CommentsSidebar({
                                                                 handleDeleteAnnotation(
                                                                     root.embedpdf_annotation_id,
                                                                     root.page_number -
-                                                                        1,
+                                                                    1,
                                                                 );
                                                             }}
                                                         >
@@ -342,7 +342,7 @@ export function CommentsSidebar({
                                                                         );
                                                                         setEditingComment(
                                                                             root.comment ||
-                                                                                '',
+                                                                            '',
                                                                         );
                                                                     }}
                                                                 >

@@ -64,9 +64,10 @@ export function SettingAction({
 
     const renderIcon = () => {
         if (React.isValidElement(icon)) {
-            return React.cloneElement(icon as React.ReactElement<{ className?: string }>, {
-                className: cn((icon.props as any)?.className, iconClasses),
-            } as any);
+            const iconElement = icon as React.ReactElement<{ className?: string }>;
+            return React.cloneElement(iconElement, {
+                className: cn(iconElement.props.className, iconClasses),
+            });
         }
         return icon;
     };

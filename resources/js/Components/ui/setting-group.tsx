@@ -59,9 +59,10 @@ export function SettingGroup({
 
     const renderIcon = () => {
         if (React.isValidElement(icon)) {
-            return React.cloneElement(icon as React.ReactElement<{ className?: string }>, {
-                className: cn((icon.props as any)?.className, iconClasses),
-            } as any);
+            const element = icon as React.ReactElement<{ className?: string }>;
+            return React.cloneElement(element, {
+                className: cn(element.props.className, iconClasses),
+            });
         }
         return icon;
     };

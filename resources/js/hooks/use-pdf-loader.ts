@@ -89,7 +89,7 @@ export function usePdfLoader(
                 URL.revokeObjectURL(pdfBlobUrl);
             }
         };
-    }, [projectId, serverPdfUrl, projectUpdatedAt]);
+    }, [pdfBlobUrl, projectId, serverPdfUrl, projectUpdatedAt]);
 
     return { pdfBlobUrl, isLoading, error };
 }

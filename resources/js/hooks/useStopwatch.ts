@@ -40,6 +40,7 @@ export function useStopwatch(project: Project | null) {
             if (interval) clearInterval(interval);
         };
     }, [
+        project,
         project?.stopwatch_running,
         project?.stopwatch_seconds,
         project?.stopwatch_started_at,

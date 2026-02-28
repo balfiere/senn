@@ -1,10 +1,12 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 
 import { db, LocalPdfAnnotation, LocalProject } from '@/lib/offline/db';
+import { Part } from '@/types';
+
 
 export function useProjectData(
     initialProject: LocalProject,
-    initialParts: any[] = [],
+    initialParts: Part[] = [],
     initialAnnotations: LocalPdfAnnotation[] = [],
 ) {
     return useLiveQuery(

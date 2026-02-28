@@ -23,7 +23,8 @@ export function FormField({
   id,
   ...props
 }: FormFieldProps) {
-  const fieldId = id || React.useId();
+  const generatedId = React.useId();
+  const fieldId = id || generatedId;
 
   return (
     <div className={cn('space-y-2', className)} {...props}>
@@ -40,12 +41,12 @@ export function FormField({
       )}
 
       <div className="relative">
-        {React.cloneElement(children as React.ReactElement<any>, {
+        {React.cloneElement(children as React.ReactElement<{ className?: string; id?: string; 'aria-invalid'?: boolean; 'aria-describedby'?: string }>, {
           id: fieldId,
           'aria-invalid': !!error,
           'aria-describedby': error ? `${fieldId}-error` : description ? `${fieldId}-description` : undefined,
           className: cn(
-            (children as React.ReactElement<any>).props.className,
+            (children as React.ReactElement<{ className?: string }>).props.className,
             error && 'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive'
           ),
         })}

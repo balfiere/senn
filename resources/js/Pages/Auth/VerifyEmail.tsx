@@ -13,11 +13,7 @@ import {
 import { MailIcon } from '@/Components/ui/mail-icon';
 import GuestLayout from '@/Layouts/GuestLayout';
 
-interface Props {
-    // status prop no longer needed - success handled client-side
-}
-
-export default function VerifyEmail({}: Props) {
+export default function VerifyEmail() {
     const [showSuccess, setShowSuccess] = useState(false);
 
     return (

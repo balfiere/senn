@@ -59,7 +59,6 @@ const tools: {
 ];
 
 export function AnnotationToolsMenu({
-    documentId,
     activeTool,
     onToolSelect,
     isPanning,
