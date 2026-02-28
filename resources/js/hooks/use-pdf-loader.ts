@@ -80,16 +80,17 @@ export function usePdfLoader(
 
         return () => {
             isMounted = false;
-            // Cleanup object URL to prevent memory leaks?
-            // Note: If we revoke it here, we might break the current view if the component unmounts/remounts quickly
-            // But strict mode might trigger this.
-            // For now, rely on garbage collection or standard browser behavior for Blob URLs from IDB?
-            // Actually, created Object URLs should be revoked.
+        };
+    }, [projectId, serverPdfUrl, projectUpdatedAt]);
+
+    // Separate effect for revoking the URL on unmount or refresh
+    useEffect(() => {
+        return () => {
             if (pdfBlobUrl) {
                 URL.revokeObjectURL(pdfBlobUrl);
             }
         };
-    }, [pdfBlobUrl, projectId, serverPdfUrl, projectUpdatedAt]);
+    }, [pdfBlobUrl]);
 
     return { pdfBlobUrl, isLoading, error };
 }

@@ -1,4 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks';
+import { useMemo } from 'react';
 
 import { db, LocalPdfAnnotation, LocalProject } from '@/lib/offline/db';
 import { Part } from '@/types';
@@ -9,17 +10,23 @@ export function useProjectData(
     initialParts: Part[] = [],
     initialAnnotations: LocalPdfAnnotation[] = [],
 ) {
-    return useLiveQuery(
+    const defaultValue = useMemo(
+        () => ({
+            project: initialProject,
+            parts: initialParts,
+            annotations: initialAnnotations,
+        }),
+        [initialProject, initialParts, initialAnnotations],
+    );
+
+    const data = useLiveQuery(
         async () => {
             const project = await db.projects.get(initialProject.id);
 
             // If project not found locally, and we have a server version, use it
-            if (!project)
-                return {
-                    project: initialProject,
-                    parts: initialParts,
-                    annotations: initialAnnotations,
-                };
+            if (!project) {
+                return defaultValue;
+            }
 
             const parts = await db.parts
                 .where('project_id')
@@ -75,11 +82,9 @@ export function useProjectData(
                 annotations,
             };
         },
-        [initialProject?.id],
-        {
-            project: initialProject,
-            parts: initialParts,
-            annotations: initialAnnotations,
-        },
+        [initialProject?.id, defaultValue],
+        defaultValue,
     );
+
+    return data;
 }
