@@ -7,8 +7,8 @@ services:
         image: senn:latest
         restart: unless-stopped
         environment:
-            WEBROOT: /app/public
-            NGINX_WEBROOT: /app/public
+            WEBROOT: /var/www/html/public
+            NGINX_WEBROOT: /var/www/html/public
             LOG_OUTPUT_LEVEL: info
             AUTORUN_ENABLED: true
         env_file: .env.docker
@@ -16,11 +16,11 @@ services:
             - 8000:8080
         volumes:
             # Persistent SQLite database (maps to DB_DATABASE in .env)
-            - ./database:/app/database
+            - ./database:/var/www/html/database
             # Persistent Laravel storage (logs, framework cache, uploaded files)
-            - ./storage:/app/storage
+            - ./storage:/var/www/html/storage
         healthcheck:
-            test: [CMD, curl, -f, http://localhost:8080/up]
+            test: [ CMD, curl, -f, http://localhost:8080/up ]
             interval: 30s
             timeout: 5s
             retries: 3

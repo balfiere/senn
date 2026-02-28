@@ -1,6 +1,6 @@
 # Stage 1: Build application assets
 FROM serversideup/php:8.4-fpm-nginx-alpine AS builder
-WORKDIR /app
+WORKDIR /var/www/html
 
 # serversideup images run as non-root by default; switch to root for setup
 # trunk-ignore(hadolint/DL3002)
@@ -65,14 +65,15 @@ RUN rm -rf node_modules .git .github tests \
 # Stage 2: Final Production Image
 FROM serversideup/php:8.4-fpm-nginx-alpine AS final
 
-WORKDIR /app
+WORKDIR /var/www/html
 
 ENV OPCACHE_VALIDATE_TIMESTAMPS=0
 ENV APP_ENV=production
 ENV APP_DEBUG=false
 ENV PHP_OPCACHE_ENABLE=1
 # Tell serversideup where Laravel's public dir is
-ENV WEBROOT=/app/public
+ENV WEBROOT=/var/www/html/public
+ENV APP_NAME=senn
 
 # serversideup images run as non-root by default; switch to root for setup
 USER root
@@ -95,34 +96,32 @@ RUN install-php-extensions \
     && rm -rf /usr/src/php*
 
 # Copy only necessary application files
-COPY --from=builder /app/app /app/app
-COPY --from=builder /app/bootstrap /app/bootstrap
-COPY --from=builder /app/config /app/config
-COPY --from=builder /app/database /app/database
-COPY --from=builder /app/public /app/public
-COPY --from=builder /app/resources/views /app/resources/views
-COPY --from=builder /app/routes /app/routes
-COPY --from=builder /app/storage /app/storage
-COPY --from=builder /app/vendor /app/vendor
-COPY --from=builder /app/artisan /app/artisan
-COPY --from=builder /app/composer.json /app/composer.json
-COPY --from=builder /app/composer.lock /app/composer.lock
+COPY --from=builder /var/www/html/app /var/www/html/app
+COPY --from=builder /var/www/html/bootstrap /var/www/html/bootstrap
+COPY --from=builder /var/www/html/config /var/www/html/config
+COPY --from=builder /var/www/html/database /var/www/html/database
+COPY --from=builder /var/www/html/public /var/www/html/public
+COPY --from=builder /var/www/html/resources/views /var/www/html/resources/views
+COPY --from=builder /var/www/html/routes /var/www/html/routes
+COPY --from=builder /var/www/html/storage /var/www/html/storage
+COPY --from=builder /var/www/html/vendor /var/www/html/vendor
+COPY --from=builder /var/www/html/artisan /var/www/html/artisan
+COPY --from=builder /var/www/html/composer.json /var/www/html/composer.json
+COPY --from=builder /var/www/html/composer.lock /var/www/html/composer.lock
 
 # Correct permissions
-RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public /var/www/html/database
 
 # Bundle custom nginx config
 COPY nginx-headers.conf /etc/nginx/conf.d/nginx-headers.conf
 
 # Drop init logic into serversideup's hook directory.
 # Scripts here run before nginx/fpm start, in filename order.
-COPY entrypoint.sh /etc/entrypoint.d/00-laravel-init.sh
-RUN chmod +x /etc/entrypoint.d/00-laravel-init.sh
+COPY 00-laravel-setup.sh /etc/entrypoint.d/00-laravel-setup.sh
+COPY 99-laravel-perms.sh /etc/entrypoint.d/99-laravel-perms.sh
+RUN chmod +x /etc/entrypoint.d/00-laravel-setup.sh /etc/entrypoint.d/99-laravel-perms.sh
 
 # No ENTRYPOINT or CMD needed — the base image's S6 supervisor handles it.
-
-# Switch back to non-root user for security
-USER www-data
 
 # Healthcheck to verify nginx is responding
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
