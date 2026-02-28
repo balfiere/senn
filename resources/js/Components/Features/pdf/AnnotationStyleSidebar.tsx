@@ -30,6 +30,42 @@ import { cn } from '@/lib/utils';
 
 import { ANNOTATION_COLORS, type AnnotationToolType } from './utils';
 
+interface PdfAnnotation {
+    id: string;
+    type: number;
+    pageIndex: number;
+    color?: string;
+    strokeColor?: string;
+    fillColor?: string;
+    opacity?: number;
+    blendMode?: number;
+    strokeWidth?: number;
+    fontSize?: number;
+    fontFamily?: string;
+    fontColor?: string;
+    textAlign?: number;
+    verticalAlign?: number;
+    [key: string]: unknown;
+}
+
+interface TrackedAnnotation {
+    object: PdfAnnotation;
+    commitState?: unknown;
+}
+
+interface AnnotationTool {
+    id: string;
+    defaults?: Partial<PdfAnnotation>;
+    [key: string]: unknown;
+}
+
+interface AnnotationApi {
+    updateAnnotation: (pageIndex: number, id: string, patch: Partial<PdfAnnotation>) => void;
+    setToolDefaults: (type: string, patch: Partial<PdfAnnotation>) => void;
+    getActiveTool?: () => AnnotationTool;
+    selectAnnotation?: (pageIndex: number, id: string) => void;
+}
+
 // Utility component for color swatches
 function ColorSwatch({
     color,
@@ -82,8 +118,8 @@ function SliderControl({
     const display = displayValue
         ? displayValue(value)
         : suffix
-          ? `${value}${suffix}`
-          : `${value}`;
+            ? `${value}${suffix}`
+            : `${value}`;
     return (
         <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -106,11 +142,12 @@ function TextMarkupPanel({
     selectedAnnotation,
     activeTool,
 }: {
-    selectedAnnotation: any;
-    activeTool: any;
+    selectedAnnotation: TrackedAnnotation | null;
+    activeTool: AnnotationToolType | AnnotationTool;
 }) {
-    const { provides: annotationApi } = useAnnotationCapability();
-    if (!annotationApi) return null;
+    const { provides: annotationApi } = useAnnotationCapability() as {
+        provides: AnnotationApi;
+    };
 
     const annotation = selectedAnnotation?.object;
     const toolType =
@@ -120,24 +157,30 @@ function TextMarkupPanel({
     const editing = !!annotation;
 
     const baseColor = editing
-        ? annotation.object.color
+        ? (annotation.color ?? annotation.strokeColor)
         : (defaults?.color ??
-          ANNOTATION_COLORS.find((color) => color.name === 'Yellow')?.value ??
-          '#000000');
+            ANNOTATION_COLORS.find((color) => color.name === 'Yellow')?.value ??
+            '#000000');
     const baseOpacity = editing
-        ? (annotation.object.opacity ?? 0.5)
+        ? (annotation.opacity ?? 0.5)
         : (defaults?.opacity ?? 0.5);
     const baseBlendMode = editing
-        ? (annotation.object.blendMode ?? PdfBlendMode.Normal)
+        ? (annotation.blendMode ?? PdfBlendMode.Normal)
         : (defaults?.blendMode ?? PdfBlendMode.Normal);
 
-    const [color, setColor] = useState(baseColor);
+    const [color, setColor] = useState(baseColor ?? '#000000');
     const [opacity, setOpacity] = useState(baseOpacity);
     const [blendMode, setBlendMode] = useState(baseBlendMode);
 
-    useEffect(() => setColor(baseColor), [baseColor]);
+    useEffect(() => {
+        if (baseColor) {
+            setColor(baseColor);
+        }
+    }, [baseColor]);
     useEffect(() => setOpacity(baseOpacity), [baseOpacity]);
     useEffect(() => setBlendMode(baseBlendMode), [baseBlendMode]);
+
+    if (!annotationApi) return null;
 
     const changeColor = (c: string) => {
         setColor(c);
@@ -154,12 +197,12 @@ function TextMarkupPanel({
         applyPatch({ blendMode: bm });
     };
 
-    function applyPatch(patch: Partial<any>) {
+    function applyPatch(patch: Partial<PdfAnnotation>) {
         if (!annotationApi) return;
         if (editing) {
             annotationApi.updateAnnotation(
-                annotation.object.pageIndex,
-                annotation.object.id,
+                annotation.pageIndex,
+                annotation.id,
                 patch,
             );
         } else if (toolType) {
@@ -216,11 +259,12 @@ function ShapePanel({
     selectedAnnotation,
     activeTool,
 }: {
-    selectedAnnotation: any;
-    activeTool: any;
+    selectedAnnotation: TrackedAnnotation | null;
+    activeTool: AnnotationToolType | AnnotationTool;
 }) {
-    const { provides: annotationApi } = useAnnotationCapability();
-    if (!annotationApi) return null;
+    const { provides: annotationApi } = useAnnotationCapability() as {
+        provides: AnnotationApi;
+    };
 
     const annotation = selectedAnnotation?.object;
     const toolType =
@@ -229,28 +273,34 @@ function ShapePanel({
         typeof activeTool === 'string' ? null : activeTool?.defaults;
     const editing = !!annotation;
 
-    const baseFill = editing
-        ? annotation.object.color
-        : (defaults?.color ?? '#0000');
+    const baseFill = editing ? annotation.color : (defaults?.color ?? '#0000');
     const baseStroke = editing
-        ? annotation.object.strokeColor
+        ? annotation.strokeColor
         : (defaults?.strokeColor ?? '#000000');
-    const baseOpacity = editing
-        ? annotation.object.opacity
-        : (defaults?.opacity ?? 1);
+    const baseOpacity = editing ? (annotation.opacity ?? 1) : (defaults?.opacity ?? 1);
     const baseStrokeWidth = editing
-        ? annotation.object.strokeWidth
+        ? (annotation.strokeWidth ?? 2)
         : (defaults?.strokeWidth ?? 2);
 
-    const [fill, setFill] = useState(baseFill);
-    const [stroke, setStroke] = useState(baseStroke);
+    const [fill, setFill] = useState(baseFill ?? '#0000');
+    const [stroke, setStroke] = useState(baseStroke ?? '#000000');
     const [opacity, setOpacity] = useState(baseOpacity);
     const [strokeWidth, setStrokeWidth] = useState(baseStrokeWidth);
 
-    useEffect(() => setFill(baseFill), [baseFill]);
-    useEffect(() => setStroke(baseStroke), [baseStroke]);
+    useEffect(() => {
+        if (baseFill) {
+            setFill(baseFill);
+        }
+    }, [baseFill]);
+    useEffect(() => {
+        if (baseStroke) {
+            setStroke(baseStroke);
+        }
+    }, [baseStroke]);
     useEffect(() => setOpacity(baseOpacity), [baseOpacity]);
     useEffect(() => setStrokeWidth(baseStrokeWidth), [baseStrokeWidth]);
+
+    if (!annotationApi) return null;
 
     const changeFill = (c: string) => {
         setFill(c);
@@ -272,12 +322,12 @@ function ShapePanel({
         applyPatch({ strokeWidth: w });
     };
 
-    function applyPatch(patch: Partial<any>) {
+    function applyPatch(patch: Partial<PdfAnnotation>) {
         if (!annotationApi) return;
         if (editing) {
             annotationApi.updateAnnotation(
-                annotation.object.pageIndex,
-                annotation.object.id,
+                annotation.pageIndex,
+                annotation.id,
                 patch,
             );
         } else if (toolType) {
@@ -348,11 +398,12 @@ function FreeTextPanel({
     selectedAnnotation,
     activeTool,
 }: {
-    selectedAnnotation: any;
-    activeTool: any;
+    selectedAnnotation: TrackedAnnotation | null;
+    activeTool: AnnotationTool | AnnotationToolType;
 }) {
-    const { provides: annotationApi } = useAnnotationCapability();
-    if (!annotationApi) return null;
+    const { provides: annotationApi } = (useAnnotationCapability() ?? {}) as {
+        provides: AnnotationApi;
+    };
 
     const annotation = selectedAnnotation?.object;
     const toolType =
@@ -362,22 +413,22 @@ function FreeTextPanel({
     const editing = !!annotation;
 
     const baseFontColor = editing
-        ? String(annotation.object.fontColor || '#00000')
+        ? String(annotation.fontColor || '#00000')
         : String(defaults?.fontColor || '#000000');
     const baseOpacity = editing
-        ? Number(annotation.object.opacity || 1)
+        ? Number(annotation.opacity || 1)
         : Number(defaults?.opacity || 1);
     const baseFontSize = editing
-        ? Number(annotation.object.fontSize || 14)
+        ? Number(annotation.fontSize || 14)
         : Number(defaults?.fontSize || 14);
     const baseFontFamily = editing
-        ? String(annotation.object.fontFamily || 'Helvetica')
+        ? String(annotation.fontFamily || 'Helvetica')
         : String(defaults?.fontFamily || 'Helvetica');
     const baseTextAlign = editing
-        ? Number(annotation.object.textAlign ?? 0)
+        ? Number(annotation.textAlign ?? 0)
         : Number(defaults?.textAlign ?? 0);
     const baseVerticalAlign = editing
-        ? Number(annotation.object.verticalAlign ?? 0)
+        ? Number(annotation.verticalAlign ?? 0)
         : Number(defaults?.verticalAlign ?? 0);
 
     const [fontColor, setFontColor] = useState(baseFontColor);
@@ -393,6 +444,8 @@ function FreeTextPanel({
     useEffect(() => setFontFamily(baseFontFamily), [baseFontFamily]);
     useEffect(() => setTextAlign(baseTextAlign), [baseTextAlign]);
     useEffect(() => setVerticalAlign(baseVerticalAlign), [baseVerticalAlign]);
+
+    if (!annotationApi) return null;
 
     const changeFontColor = (c: string) => {
         setFontColor(c);
@@ -424,12 +477,12 @@ function FreeTextPanel({
         applyPatch({ verticalAlign: align });
     };
 
-    function applyPatch(patch: Partial<any>) {
+    function applyPatch(patch: Partial<PdfAnnotation>) {
         if (!annotationApi) return;
         if (editing) {
             annotationApi.updateAnnotation(
-                annotation.object.pageIndex,
-                annotation.object.id,
+                annotation.pageIndex,
+                annotation.id,
                 patch,
             );
         } else if (toolType) {
@@ -556,11 +609,12 @@ function LinePanel({
     selectedAnnotation,
     activeTool,
 }: {
-    selectedAnnotation: any;
-    activeTool: any;
+    selectedAnnotation: TrackedAnnotation | null;
+    activeTool: AnnotationToolType | AnnotationTool;
 }) {
-    const { provides: annotationApi } = useAnnotationCapability();
-    if (!annotationApi) return null;
+    const { provides: annotationApi } = useAnnotationCapability() as {
+        provides: AnnotationApi;
+    };
 
     const annotation = selectedAnnotation?.object;
     const toolType =
@@ -570,22 +624,26 @@ function LinePanel({
     const editing = !!annotation;
 
     const baseColor = editing
-        ? annotation.object.strokeColor
+        ? annotation.strokeColor
         : (defaults?.strokeColor ?? '#000000');
-    const baseOpacity = editing
-        ? annotation.object.opacity
-        : (defaults?.opacity ?? 1);
+    const baseOpacity = editing ? (annotation.opacity ?? 1) : (defaults?.opacity ?? 1);
     const baseStrokeWidth = editing
-        ? annotation.object.strokeWidth
+        ? (annotation.strokeWidth ?? 2)
         : (defaults?.strokeWidth ?? 2);
 
-    const [color, setColor] = useState(baseColor);
+    const [color, setColor] = useState(baseColor ?? '#000000');
     const [opacity, setOpacity] = useState(baseOpacity);
     const [strokeWidth, setStrokeWidth] = useState(baseStrokeWidth);
 
-    useEffect(() => setColor(baseColor), [baseColor]);
+    useEffect(() => {
+        if (baseColor) {
+            setColor(baseColor);
+        }
+    }, [baseColor]);
     useEffect(() => setOpacity(baseOpacity), [baseOpacity]);
     useEffect(() => setStrokeWidth(baseStrokeWidth), [baseStrokeWidth]);
+
+    if (!annotationApi) return null;
 
     const changeColor = (c: string) => {
         setColor(c);
@@ -602,12 +660,12 @@ function LinePanel({
         applyPatch({ strokeWidth: w });
     };
 
-    function applyPatch(patch: Partial<any>) {
+    function applyPatch(patch: Partial<PdfAnnotation>) {
         if (!annotationApi) return;
         if (editing) {
             annotationApi.updateAnnotation(
-                annotation.object.pageIndex,
-                annotation.object.id,
+                annotation.pageIndex,
+                annotation.id,
                 patch,
             );
         } else if (toolType) {
@@ -664,23 +722,25 @@ export function AnnotationStyleSidebar({
     documentId,
     activeTool,
 }: AnnotationStyleSidebarProps) {
-    const { provides: annotationApi } = useAnnotationCapability();
+    const { provides: annotationApi } = useAnnotationCapability() as {
+        provides: AnnotationApi;
+    };
     const { state: annotationState } = useAnnotation(documentId);
     if (!annotationApi || !annotationState) return null;
 
     // Get the selected annotation from the embedpdf state
     const selectedAnnotation = annotationState.selectedUid
-        ? {
-              object: getAnnotationByUid(
-                  annotationState,
-                  annotationState.selectedUid,
-              ),
-          }
+        ? ({
+            object: getAnnotationByUid(
+                annotationState,
+                annotationState.selectedUid,
+            ),
+        } as unknown as TrackedAnnotation)
         : null;
 
     // Use the passed activeTool prop for conditional logic, but still get the full tool object for functionality
-    const currentActiveTool = activeTool
-        ? annotationApi.getActiveTool?.()
+    const currentActiveTool = activeTool && annotationApi.getActiveTool
+        ? annotationApi.getActiveTool()
         : null;
 
     // Determine which panel to show based on annotation type or active tool
@@ -690,7 +750,7 @@ export function AnnotationStyleSidebar({
     if (selectedAnnotation && selectedAnnotation.object) {
         // If annotation is selected, use its type
         // TrackedAnnotation has: { commitState, object: { type, ... } }
-        const annotationType = (selectedAnnotation.object as any).object?.type;
+        const annotationType = selectedAnnotation.object.type;
 
         switch (annotationType) {
             case PdfAnnotationSubtype.HIGHLIGHT:
@@ -767,41 +827,41 @@ export function AnnotationStyleSidebar({
                     {panelType === 'textMarkup' && (
                         <TextMarkupPanel
                             key={
-                                selectedAnnotation?.object?.object?.id ||
+                                selectedAnnotation?.object?.id ||
                                 'default'
                             }
                             selectedAnnotation={selectedAnnotation}
-                            activeTool={activeTool}
+                            activeTool={activeTool || (currentActiveTool as AnnotationTool)}
                         />
                     )}
                     {panelType === 'shape' && (
                         <ShapePanel
                             key={
-                                selectedAnnotation?.object?.object?.id ||
+                                selectedAnnotation?.object?.id ||
                                 'default'
                             }
                             selectedAnnotation={selectedAnnotation}
-                            activeTool={activeTool}
+                            activeTool={activeTool || (currentActiveTool as AnnotationTool)}
                         />
                     )}
                     {panelType === 'line' && (
                         <LinePanel
                             key={
-                                selectedAnnotation?.object?.object?.id ||
+                                selectedAnnotation?.object?.id ||
                                 'default'
                             }
                             selectedAnnotation={selectedAnnotation}
-                            activeTool={activeTool}
+                            activeTool={activeTool || (currentActiveTool as AnnotationTool)}
                         />
                     )}
                     {panelType === 'freeText' && (
                         <FreeTextPanel
                             key={
-                                selectedAnnotation?.object?.object?.id ||
+                                selectedAnnotation?.object?.id ||
                                 'default'
                             }
                             selectedAnnotation={selectedAnnotation}
-                            activeTool={activeTool}
+                            activeTool={activeTool || (currentActiveTool as AnnotationTool)}
                         />
                     )}
                 </div>
