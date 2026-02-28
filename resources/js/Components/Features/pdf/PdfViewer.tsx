@@ -74,7 +74,7 @@ interface PdfViewerProps {
 
 interface PdfViewerContentProps {
     documentId: string;
-    projectId: string;
+    // projectId: string; // Removed as it's unused in PdfViewerContent
     pdfUrl: string;
     annotations: StoredAnnotation[];
     selectedAnnotation: StoredAnnotation | null;
@@ -94,7 +94,7 @@ interface PdfViewerContentProps {
 
 function PdfViewerContent({
     documentId: docId,
-    projectId,
+    // projectId,
     annotations,
     selectedAnnotation,
     setSelectedAnnotation,
@@ -311,10 +311,15 @@ function PdfViewerContent({
                                                                                 annotationApi
                                                                             ) {
                                                                                 (
-                                                                                    annotationApi as any
+                                                                                    annotationApi as {
+                                                                                        selectAnnotation: (
+                                                                                            pageIndex: number,
+                                                                                            id: string,
+                                                                                        ) => void;
+                                                                                    }
                                                                                 ).selectAnnotation(
                                                                                     storedAnn.page_number -
-                                                                                        1,
+                                                                                    1,
                                                                                     storedAnn.embedpdf_annotation_id,
                                                                                 );
                                                                             }
@@ -478,7 +483,6 @@ export function PdfViewer({
     const rightSidebarOpenRef = useRef(rightSidebarOpen);
     const rightSidebarTabRef = useRef(rightSidebarTab);
     const annotationsRef = useRef(annotations);
-    const annotationsLoadedRef = useRef(false);
     const loadedAnnotationIdsRef = useRef<Set<string>>(new Set());
 
     // Keep refs in sync with state
@@ -799,10 +803,10 @@ export function PdfViewer({
                             prev.map((ann) =>
                                 ann.embedpdf_annotation_id === annotationId
                                     ? ({
-                                          ...ann,
-                                          ...annotationData,
-                                          updated_at: now,
-                                      } as StoredAnnotation)
+                                        ...ann,
+                                        ...annotationData,
+                                        updated_at: now,
+                                    } as StoredAnnotation)
                                     : ann,
                             ),
                         );
@@ -998,7 +1002,7 @@ export function PdfViewer({
                     );
 
                     switch (event.type) {
-                        case 'create':
+                        case 'create': {
                             console.log(
                                 '[PDF Annotation] Creating annotation:',
                                 {
@@ -1054,8 +1058,9 @@ export function PdfViewer({
                                 }, 100);
                             }
                             break;
+                        }
 
-                        case 'update':
+                        case 'update': {
                             let updatedAnnotation = annotation;
                             if (event.patch) {
                                 updatedAnnotation = JSON.parse(
@@ -1084,8 +1089,9 @@ export function PdfViewer({
                                 annotationId,
                             );
                             break;
+                        }
 
-                        case 'delete':
+                        case 'delete': {
                             // For delete events, use the annotation ID from the event
                             const deleteAnnotationId =
                                 annotation.id || annotation.object?.id;
@@ -1111,6 +1117,7 @@ export function PdfViewer({
                                 );
                             }
                             break;
+                        }
                     }
                 });
             }}
@@ -1122,7 +1129,7 @@ export function PdfViewer({
                     <PdfViewerContent
                         documentId={docId}
                         onDocumentIdChange={setActiveDocumentId}
-                        projectId={projectId}
+                        // projectId={projectId}
                         pdfUrl={pdfBlobUrl!}
                         annotations={annotations}
                         selectedAnnotation={selectedAnnotation}

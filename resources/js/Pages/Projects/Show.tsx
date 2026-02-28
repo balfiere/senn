@@ -3,11 +3,13 @@ import { useEffect, useRef, useState } from 'react';
 
 import { CounterCard } from '@/Components/Features/Counter/CounterCard';
 import { PdfViewer } from '@/Components/Features/pdf/PdfViewer';
+import { DbAnnotation } from '@/Components/Features/pdf/utils';
 import { ResponsiveToaster } from '@/Components/Features/ResponsiveToaster';
 import { ProjectSidebar } from '@/Components/ProjectSidebar';
 import { useProjectData } from '@/hooks/use-project-data';
 import { useProjectViewState } from '@/hooks/useProjectViewState';
 import { useStopwatch } from '@/hooks/useStopwatch';
+import { LocalPdfAnnotation, LocalProject } from '@/lib/offline/db';
 import { createCounterLocally } from '@/lib/offline/repositories/counters';
 import {
     createPartLocally,
@@ -37,16 +39,20 @@ export default function Show({
         parts,
         annotations: pdfAnnotations,
     } = useProjectData(
-        initialProject as any,
-        initialParts as any,
-        initialAnnotations as any,
-    ) as { project: Project; parts: Part[]; annotations: PdfAnnotation[] };
+        initialProject as unknown as LocalProject,
+        initialParts,
+        initialAnnotations as unknown as LocalPdfAnnotation[],
+    ) as {
+        project: LocalProject;
+        parts: Part[];
+        annotations: LocalPdfAnnotation[];
+    };
 
-    const { view, setView, isMobile, effectiveView } = useProjectViewState({
+    const { setView, isMobile, effectiveView } = useProjectViewState({
         hasPdf: !!project?.pdf_path,
     });
 
-    const displaySeconds = useStopwatch(project as any);
+    const displaySeconds = useStopwatch(project as unknown as Project);
 
     const [currentPartId, setCurrentPartId] = useState<string>(
         parts[0]?.id || '',
@@ -166,7 +172,7 @@ export default function Show({
         }
     };
 
-    const handlePdfUpload = (_url: string | null) => {
+    const handlePdfUpload = () => {
         // Force a complete refresh of the PDF viewer
         setRefreshTrigger((prev) => prev + 1);
     };
@@ -234,7 +240,7 @@ export default function Show({
                 key={`pdf-viewer-${project.id}-${project.updated_at}`}
                 pdfUrl={pdfUrl}
                 projectId={project.id}
-                initialAnnotations={pdfAnnotations}
+                initialAnnotations={pdfAnnotations as unknown as DbAnnotation[]}
                 projectUpdatedAt={project.updated_at}
             />
         );
@@ -285,7 +291,7 @@ export default function Show({
                             style={{
                                 pointerEvents:
                                     effectiveView === 'pdf' ||
-                                    effectiveView === 'split'
+                                        effectiveView === 'split'
                                         ? 'auto'
                                         : 'none',
                             }}
