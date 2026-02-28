@@ -1,6 +1,7 @@
-import { Part, Project } from '@/types';
 import { router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+
+import { Part, Project } from '@/types';
 
 import { DesktopSidebarView } from './Features/ProjectSidebar/DesktopSidebarView';
 import { MobileSidebarView } from './Features/ProjectSidebar/MobileSidebarView';

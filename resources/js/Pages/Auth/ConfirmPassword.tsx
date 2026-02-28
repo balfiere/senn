@@ -1,3 +1,5 @@
+import { Form, Head } from '@inertiajs/react';
+
 import { Button } from '@/Components/ui/button';
 import {
     Card,
@@ -9,7 +11,6 @@ import {
 import { FormField } from '@/Components/ui/form-field';
 import { Input } from '@/Components/ui/input';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Form, Head } from '@inertiajs/react';
 
 export default function ConfirmPassword() {
     return (

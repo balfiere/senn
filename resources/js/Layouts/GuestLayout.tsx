@@ -1,5 +1,6 @@
-import { ResponsiveToaster } from '@/Components/Features/ResponsiveToaster';
 import { PropsWithChildren } from 'react';
+
+import { ResponsiveToaster } from '@/Components/Features/ResponsiveToaster';
 
 export default function GuestLayout({ children }: PropsWithChildren) {
     return (

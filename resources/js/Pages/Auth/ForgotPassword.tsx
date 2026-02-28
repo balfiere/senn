@@ -1,3 +1,5 @@
+import { Form, Head, Link } from '@inertiajs/react';
+
 import { Button } from '@/Components/ui/button';
 import {
     Card,
@@ -10,7 +12,6 @@ import { FormField } from '@/Components/ui/form-field';
 import { Input } from '@/Components/ui/input';
 import { MailIcon } from '@/Components/ui/mail-icon';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Form, Head, Link } from '@inertiajs/react';
 
 interface ForgotPasswordProps {
     status?: string;

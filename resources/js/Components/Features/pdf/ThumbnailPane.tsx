@@ -1,6 +1,7 @@
-import { cn } from '@/lib/utils';
 import { useScroll } from '@embedpdf/plugin-scroll/react';
 import { ThumbImg, ThumbnailsPane } from '@embedpdf/plugin-thumbnail/react';
+
+import { cn } from '@/lib/utils';
 
 interface ThumbnailPaneProps {
     documentId: string;

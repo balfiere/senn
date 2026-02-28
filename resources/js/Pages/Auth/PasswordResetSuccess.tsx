@@ -1,3 +1,5 @@
+import { Head, Link } from '@inertiajs/react';
+
 import { Button } from '@/Components/ui/button';
 import {
     Card,
@@ -7,7 +9,6 @@ import {
     CardTitle,
 } from '@/Components/ui/card';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link } from '@inertiajs/react';
 
 export default function PasswordResetSuccess() {
     return (

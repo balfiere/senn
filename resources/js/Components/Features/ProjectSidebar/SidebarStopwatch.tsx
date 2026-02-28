@@ -1,6 +1,7 @@
+import { Clock, Pause, Play, RotateCcw } from 'lucide-react';
+
 import { Button } from '@/Components/ui/button';
 import { cn } from '@/lib/utils';
-import { Clock, Pause, Play, RotateCcw } from 'lucide-react';
 
 interface SidebarStopwatchProps {
     seconds: number;

@@ -1,3 +1,6 @@
+import { Plus, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+
 import { Button } from '@/Components/ui/button';
 import {
     DialogContent,
@@ -17,8 +20,6 @@ import {
     updateCounterLocally,
 } from '@/lib/offline/repositories/counters';
 import { Counter } from '@/types';
-import { Plus, Trash2 } from 'lucide-react';
-import { useState } from 'react';
 
 interface EditCounterDialogProps {
     counter: Counter;

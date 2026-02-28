@@ -1,11 +1,12 @@
-import { Button } from '@/Components/ui/button';
-import { Separator } from '@/Components/ui/separator';
 import { PdfAnnotationSubtype, PdfBlendMode } from '@embedpdf/models';
 import { useAnnotationCapability } from '@embedpdf/plugin-annotation/react';
 import { useSelectionCapability } from '@embedpdf/plugin-selection/react';
 import { Highlighter, Underline } from 'lucide-react';
 import type React from 'react';
 import { useCallback } from 'react';
+
+import { Button } from '@/Components/ui/button';
+import { Separator } from '@/Components/ui/separator';
 
 import { ANNOTATION_COLORS } from './utils';
 

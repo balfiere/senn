@@ -1,11 +1,3 @@
-import { Button } from '@/Components/ui/button';
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from '@/Components/ui/popover';
-import { Separator } from '@/Components/ui/separator';
-import { cn } from '@/lib/utils';
 import { PdfAnnotationSubtype } from '@embedpdf/models';
 import {
     useAnnotationCapability,
@@ -14,6 +6,15 @@ import {
 import { MessageSquare, Trash2 } from 'lucide-react';
 import type React from 'react';
 import { useCallback, useState } from 'react';
+
+import { Button } from '@/Components/ui/button';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/Components/ui/popover';
+import { Separator } from '@/Components/ui/separator';
+import { cn } from '@/lib/utils';
 
 import { ANNOTATION_COLORS } from './utils';
 

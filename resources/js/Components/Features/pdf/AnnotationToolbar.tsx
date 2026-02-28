@@ -1,7 +1,3 @@
-import { Button } from '@/Components/ui/button';
-import { Input } from '@/Components/ui/input';
-import { Separator } from '@/Components/ui/separator';
-import { useToolbarBreakpoint } from '@/hooks/useToolbarBreakpoint';
 import { useAnnotation } from '@embedpdf/plugin-annotation/react';
 import { usePan } from '@embedpdf/plugin-pan/react';
 import { useScroll } from '@embedpdf/plugin-scroll/react';
@@ -30,6 +26,11 @@ import {
 } from 'lucide-react';
 import type React from 'react';
 import { useEffect } from 'react';
+
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Separator } from '@/Components/ui/separator';
+import { useToolbarBreakpoint } from '@/hooks/useToolbarBreakpoint';
 
 import { AnnotationToolsMenu } from './AnnotationToolsMenu';
 import { type AnnotationSettings, type AnnotationToolType } from './utils';

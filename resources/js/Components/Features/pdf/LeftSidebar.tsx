@@ -1,5 +1,6 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import { Bookmark, ImageIcon, Palette } from 'lucide-react';
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 
 import { AnnotationStyleSidebar } from './AnnotationStyleSidebar';
 import { BookmarkPane } from './BookmarkPane';

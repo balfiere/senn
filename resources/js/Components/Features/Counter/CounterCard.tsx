@@ -1,3 +1,13 @@
+import {
+    Link2,
+    Link2Off,
+    Minus,
+    Plus,
+    RotateCcw,
+    Settings,
+} from 'lucide-react';
+import { useState } from 'react';
+
 import { Button } from '@/Components/ui/button';
 import { Dialog, DialogTrigger } from '@/Components/ui/dialog';
 import {
@@ -9,15 +19,6 @@ import {
 import { rowMatchesPattern } from '@/lib/patterns';
 import { cn } from '@/lib/utils';
 import { Counter } from '@/types';
-import {
-    Link2,
-    Link2Off,
-    Minus,
-    Plus,
-    RotateCcw,
-    Settings,
-} from 'lucide-react';
-import { useState } from 'react';
 
 import { EditCounterDialog } from './EditCounterDialog';
 import { ProgressRing } from './ProgressRing';

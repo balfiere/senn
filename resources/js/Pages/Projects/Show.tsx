@@ -1,3 +1,6 @@
+import { Head } from '@inertiajs/react';
+import { useEffect, useRef, useState } from 'react';
+
 import { CounterCard } from '@/Components/Features/Counter/CounterCard';
 import { PdfViewer } from '@/Components/Features/pdf/PdfViewer';
 import { ResponsiveToaster } from '@/Components/Features/ResponsiveToaster';
@@ -16,8 +19,6 @@ import {
     toggleStopwatchLocally,
 } from '@/lib/offline/repositories/projects';
 import { Part, PdfAnnotation, Project } from '@/types';
-import { Head } from '@inertiajs/react';
-import { useEffect, useRef, useState } from 'react';
 
 interface Props {
     project: Project;

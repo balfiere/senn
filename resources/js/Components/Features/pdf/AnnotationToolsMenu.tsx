@@ -1,11 +1,3 @@
-import { Button } from '@/Components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/Components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
 import {
     ArrowRight,
     Highlighter,
@@ -17,6 +9,15 @@ import {
     Underline,
 } from 'lucide-react';
 import type React from 'react';
+
+import { Button } from '@/Components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/Components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 
 import { type AnnotationToolType } from './utils';
 

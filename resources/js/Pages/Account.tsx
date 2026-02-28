@@ -1,11 +1,3 @@
-import { Button } from '@/Components/ui/button';
-import { FormField } from '@/Components/ui/form-field';
-import { FormGroup } from '@/Components/ui/form-group';
-import { Input } from '@/Components/ui/input';
-import { Separator } from '@/Components/ui/separator';
-import { SettingAction } from '@/Components/ui/setting-action';
-import { SettingGroup } from '@/Components/ui/setting-group';
-import { PageProps, User } from '@/types';
 import { Form, Link, router } from '@inertiajs/react';
 import {
     AlertTriangle,
@@ -23,6 +15,15 @@ import {
     X,
 } from 'lucide-react';
 import { useState } from 'react';
+
+import { Button } from '@/Components/ui/button';
+import { FormField } from '@/Components/ui/form-field';
+import { FormGroup } from '@/Components/ui/form-group';
+import { Input } from '@/Components/ui/input';
+import { Separator } from '@/Components/ui/separator';
+import { SettingAction } from '@/Components/ui/setting-action';
+import { SettingGroup } from '@/Components/ui/setting-group';
+import { PageProps, User } from '@/types';
 
 function ChangeEmailSection({ currentName }: { currentName: string }) {
     const [email, setEmail] = useState('');

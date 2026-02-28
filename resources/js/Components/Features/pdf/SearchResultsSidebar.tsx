@@ -1,14 +1,15 @@
+import { MatchFlag } from '@embedpdf/models';
+import { useScroll } from '@embedpdf/plugin-scroll/react';
+import { useSearch } from '@embedpdf/plugin-search/react';
+import { ChevronLeft, ChevronRight, Loader2, Search, X } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+
 import { Button } from '@/Components/ui/button';
 import { Checkbox } from '@/Components/ui/checkbox';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { ScrollArea } from '@/Components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { MatchFlag } from '@embedpdf/models';
-import { useScroll } from '@embedpdf/plugin-scroll/react';
-import { useSearch } from '@embedpdf/plugin-search/react';
-import { ChevronLeft, ChevronRight, Loader2, Search, X } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 // Search result type from embedpdf
 interface SearchResult {

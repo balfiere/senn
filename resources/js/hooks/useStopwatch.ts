@@ -1,5 +1,6 @@
-import { Project } from '@/types';
 import { useEffect, useState } from 'react';
+
+import { Project } from '@/types';
 
 /**
  * Hook to manage stopwatch display logic.

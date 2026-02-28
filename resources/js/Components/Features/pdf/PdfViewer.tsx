@@ -1,11 +1,3 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
-import { usePdfLoader } from '@/hooks/use-pdf-loader';
-import type { LocalPdfAnnotation } from '@/lib/offline/db';
-import {
-    deleteAnnotationLocally,
-    upsertAnnotationLocally,
-} from '@/lib/offline/repositories/pdf-annotations';
-import { cn } from '@/lib/utils';
 import { createPluginRegistration } from '@embedpdf/core';
 import { EmbedPDF } from '@embedpdf/core/react';
 import { usePdfiumEngine } from '@embedpdf/engines/react';
@@ -46,6 +38,15 @@ import {
     useRef,
     useState,
 } from 'react';
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
+import { usePdfLoader } from '@/hooks/use-pdf-loader';
+import type { LocalPdfAnnotation } from '@/lib/offline/db';
+import {
+    deleteAnnotationLocally,
+    upsertAnnotationLocally,
+} from '@/lib/offline/repositories/pdf-annotations';
+import { cn } from '@/lib/utils';
 
 import { AnnotationSelectionMenu } from './AnnotationSelectionMenu';
 import { AnnotationToolbar } from './AnnotationToolbar';

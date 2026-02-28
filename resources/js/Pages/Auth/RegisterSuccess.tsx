@@ -1,3 +1,5 @@
+import { Head, Link } from '@inertiajs/react';
+
 import {
     Card,
     CardContent,
@@ -7,7 +9,6 @@ import {
 } from '@/Components/ui/card';
 import { MailIcon } from '@/Components/ui/mail-icon';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link } from '@inertiajs/react';
 
 export default function RegisterSuccess() {
     return (

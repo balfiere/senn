@@ -1,3 +1,16 @@
+import { Head, Link, router } from '@inertiajs/react';
+import { useLiveQuery } from 'dexie-react-hooks';
+import {
+    Clock,
+    FileText,
+    MoreHorizontal,
+    Plus,
+    Trash2,
+    User,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Masonry } from 'react-plock';
+
 import { ResponsiveToaster } from '@/Components/Features/ResponsiveToaster';
 import { Button } from '@/Components/ui/button';
 import {
@@ -27,18 +40,6 @@ import { Input } from '@/Components/ui/input';
 import { db, type LocalProject } from '@/lib/offline/db';
 import { deleteProjectLocally } from '@/lib/offline/repositories/projects';
 import { cn } from '@/lib/utils';
-import { Head, Link, router } from '@inertiajs/react';
-import { useLiveQuery } from 'dexie-react-hooks';
-import {
-    Clock,
-    FileText,
-    MoreHorizontal,
-    Plus,
-    Trash2,
-    User,
-} from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { Masonry } from 'react-plock';
 
 // Use LocalProject type which matches our DB schema
 type Project = LocalProject;

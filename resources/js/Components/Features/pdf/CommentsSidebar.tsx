@@ -1,10 +1,11 @@
+import { useScroll } from '@embedpdf/plugin-scroll/react';
+import { MessageSquare, Send, Trash2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+
 import { Button } from '@/Components/ui/button';
 import { ScrollArea } from '@/Components/ui/scroll-area';
 import { Textarea } from '@/Components/ui/textarea';
 import { cn } from '@/lib/utils';
-import { useScroll } from '@embedpdf/plugin-scroll/react';
-import { MessageSquare, Send, Trash2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
 
 import type { StoredAnnotation } from './utils';
 

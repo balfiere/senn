@@ -1,9 +1,10 @@
+import { Link } from '@inertiajs/react';
+import { Home, PanelLeftClose, Plus, Trash2, Upload } from 'lucide-react';
+
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { ScrollArea } from '@/Components/ui/scroll-area';
 import { Part, Project } from '@/types';
-import { Link } from '@inertiajs/react';
-import { Home, PanelLeftClose, Plus, Trash2, Upload } from 'lucide-react';
 
 import { SidebarPartItem } from './SidebarPartItem';
 import { SidebarStopwatch } from './SidebarStopwatch';

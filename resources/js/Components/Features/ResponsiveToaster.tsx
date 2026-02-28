@@ -1,7 +1,8 @@
-import { PageProps } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { Toaster, toast } from 'sonner';
+
+import { PageProps } from '@/types';
 
 export function ResponsiveToaster() {
     const [isMobile, setIsMobile] = useState(false);

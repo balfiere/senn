@@ -1,10 +1,11 @@
+import { useCallback, useSyncExternalStore } from 'react';
+
 import {
     getSyncState,
     subscribeSyncState,
     syncNow,
     type SyncState,
 } from '@/lib/offline';
-import { useCallback, useSyncExternalStore } from 'react';
 
 function getServerSnapshot(): SyncState {
     return {

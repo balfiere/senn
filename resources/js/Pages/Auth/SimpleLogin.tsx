@@ -1,3 +1,5 @@
+import { Form, Head, Link, usePage } from '@inertiajs/react';
+
 import { OidcButtons } from '@/Components/Auth/OidcButtons';
 import { Button } from '@/Components/ui/button';
 import {
@@ -12,7 +14,6 @@ import { FormField } from '@/Components/ui/form-field';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Form, Head, Link, usePage } from '@inertiajs/react';
 
 interface OidcProvider {
     slug: string;

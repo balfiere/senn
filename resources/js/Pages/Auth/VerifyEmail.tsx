@@ -1,3 +1,7 @@
+import { Form, Head, Link } from '@inertiajs/react';
+import { RefreshCw } from 'lucide-react';
+import { useState } from 'react';
+
 import { Button } from '@/Components/ui/button';
 import {
     Card,
@@ -8,9 +12,6 @@ import {
 } from '@/Components/ui/card';
 import { MailIcon } from '@/Components/ui/mail-icon';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Form, Head, Link } from '@inertiajs/react';
-import { RefreshCw } from 'lucide-react';
-import { useState } from 'react';
 
 interface Props {
     // status prop no longer needed - success handled client-side

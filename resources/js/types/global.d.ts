@@ -1,5 +1,6 @@
 import type { PageProps as InertiaPageProps } from '@inertiajs/react';
 import type { AxiosInstance } from 'axios';
+
 import type { route as ziggyRoute } from 'ziggy-js';
 
 import type { db, syncNow } from '../lib/offline';

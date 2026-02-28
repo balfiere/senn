@@ -1,5 +1,6 @@
-import { db, LocalPdfAnnotation, LocalProject } from '@/lib/offline/db';
 import { useLiveQuery } from 'dexie-react-hooks';
+
+import { db, LocalPdfAnnotation, LocalProject } from '@/lib/offline/db';
 
 export function useProjectData(
     initialProject: LocalProject,

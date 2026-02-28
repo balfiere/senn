@@ -1,12 +1,3 @@
-import { Button } from '@/Components/ui/button';
-import { FormField } from '@/Components/ui/form-field';
-import { FormGroup } from '@/Components/ui/form-group';
-import { Label } from '@/Components/ui/label';
-import { ScrollArea } from '@/Components/ui/scroll-area';
-import { Select } from '@/Components/ui/select';
-import { Slider } from '@/Components/ui/slider';
-import { SliderField } from '@/Components/ui/slider-field';
-import { cn } from '@/lib/utils';
 import {
     PdfAnnotationSubtype,
     PdfBlendMode,
@@ -26,6 +17,16 @@ import {
     AlignVerticalJustifyStart,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+
+import { Button } from '@/Components/ui/button';
+import { FormField } from '@/Components/ui/form-field';
+import { FormGroup } from '@/Components/ui/form-group';
+import { Label } from '@/Components/ui/label';
+import { ScrollArea } from '@/Components/ui/scroll-area';
+import { Select } from '@/Components/ui/select';
+import { Slider } from '@/Components/ui/slider';
+import { SliderField } from '@/Components/ui/slider-field';
+import { cn } from '@/lib/utils';
 
 import { ANNOTATION_COLORS, type AnnotationToolType } from './utils';
 

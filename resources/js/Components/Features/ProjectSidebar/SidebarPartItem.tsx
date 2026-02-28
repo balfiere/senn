@@ -1,9 +1,10 @@
+import { Check, Pencil, Trash2, X } from 'lucide-react';
+import { useState } from 'react';
+
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { cn } from '@/lib/utils';
 import { Part } from '@/types';
-import { Check, Pencil, Trash2, X } from 'lucide-react';
-import { useState } from 'react';
 
 interface SidebarPartItemProps {
     part: Part;

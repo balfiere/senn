@@ -1,3 +1,6 @@
+import { Head, Link } from '@inertiajs/react';
+import { AlertCircle } from 'lucide-react';
+
 import {
     Card,
     CardContent,
@@ -6,8 +9,6 @@ import {
     CardTitle,
 } from '@/Components/ui/card';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link } from '@inertiajs/react';
-import { AlertCircle } from 'lucide-react';
 
 export default function Error() {
     return (

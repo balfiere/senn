@@ -1,3 +1,6 @@
+import { usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
+
 import type {
     LocalCounter,
     LocalPart,
@@ -11,8 +14,6 @@ import {
     upsertProject,
     upsertProjects,
 } from '@/lib/offline/repositories';
-import { usePage } from '@inertiajs/react';
-import { useEffect } from 'react';
 
 interface PageProps {
     projects?: LocalProject[];
