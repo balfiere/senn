@@ -19,7 +19,7 @@ Route::get('/', function () {
         return redirect()->route('projects.index');
     }
 
-    return Inertia::render('Welcome');
+    return redirect()->route('login');
 });
 
 // Conditional route registration
