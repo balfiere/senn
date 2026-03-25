@@ -21,6 +21,7 @@ import {
     toggleStopwatchLocally,
     updateProjectLocally,
 } from '@/lib/offline/repositories/projects';
+import { cn } from '@/lib/utils';
 import { Part, PdfAnnotation, Project } from '@/types';
 
 interface Props {
@@ -277,7 +278,7 @@ export default function Show({
                     className="relative flex flex-1 overflow-hidden"
                     style={
                         isMobile
-                            ? { paddingBottom: 'calc(var(--spacing) * 12)' }
+                            ? { paddingBottom: 'var(--mobile-nav-height)' }
                             : undefined
                     }
                 >
@@ -293,7 +294,13 @@ export default function Show({
                     {/* PDF View - Always mounted but controlled by CSS visibility */}
                     {pdfUrl && (
                         <div
-                            className={`absolute inset-0 flex ${effectiveView === 'split' ? '' : ''} ${effectiveView === 'pdf' || effectiveView === 'split' ? 'visible z-0 opacity-100' : 'invisible -z-10 opacity-0'}`}
+                            className={cn(
+                                'absolute inset-x-0 top-0 flex',
+                                isMobile ? 'bottom-[var(--mobile-nav-height)]' : 'bottom-0',
+                                effectiveView === 'pdf' || effectiveView === 'split'
+                                    ? 'visible z-0 opacity-100'
+                                    : 'invisible -z-10 opacity-0',
+                            )}
                             style={{
                                 pointerEvents:
                                     effectiveView === 'pdf' ||

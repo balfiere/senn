@@ -221,7 +221,7 @@ function PdfViewerContent({
                                     className={cn(
                                         'border-border bg-background flex flex-col border-r',
                                         isMobile
-                                            ? 'absolute top-0 bottom-[53px] left-0 z-20 h-[calc(100%-53px)] w-64 shadow-xl'
+                                            ? 'absolute top-0 bottom-[var(--mobile-nav-height)] left-0 z-20 h-[calc(100%-var(--mobile-nav-height))] w-64 shadow-xl'
                                             : 'h-full w-48',
                                     )}
                                 >
@@ -354,7 +354,7 @@ function PdfViewerContent({
                                     className={cn(
                                         'border-border bg-background flex flex-col border-l',
                                         isMobile
-                                            ? 'absolute top-0 right-0 bottom-[53px] z-20 h-[calc(100%-53px)] w-72 shadow-xl'
+                                            ? 'absolute top-0 right-0 bottom-[var(--mobile-nav-height)] z-20 h-[calc(100%-var(--mobile-nav-height))] w-72 shadow-xl'
                                             : 'h-full w-64',
                                     )}
                                 >

@@ -73,13 +73,13 @@ export function MobileSidebarView({
     return (
         <>
             {/* Bottom Bar */}
-            <div className="bg-background border-border fixed right-0 bottom-0 left-0 z-50 border-t">
-                <div className="flex items-center justify-around px-4 py-2">
+            <div className="bg-background border-border fixed right-0 bottom-0 left-0 z-50 border-t pb-[env(safe-area-inset-bottom,0px)]">
+                <div className="flex items-center justify-around px-2 py-1">
                     <Button
                         asChild
                         variant="ghost"
-                        size="sm"
-                        className="text-popover-foreground flex-1"
+                        size="default"
+                        className="text-popover-foreground flex-1 h-auto py-2 rounded-md"
                     >
                         <Link
                             href={route('projects.index')}
@@ -91,9 +91,9 @@ export function MobileSidebarView({
                     </Button>
                     <Button
                         variant="ghost"
-                        size="sm"
+                        size="default"
                         onClick={() => setIsMobileExpanded(!isMobileExpanded)}
-                        className="text-popover-foreground flex-1"
+                        className="text-popover-foreground flex-1 h-auto py-2 rounded-md"
                     >
                         <div className="flex flex-col items-center gap-1">
                             <PanelLeftClose
@@ -185,7 +185,7 @@ export function MobileSidebarView({
                             <div
                                 className="space-y-6 p-4"
                                 style={{
-                                    paddingBottom: 'calc(var(--spacing) * 17)',
+                                    paddingBottom: 'calc(var(--mobile-nav-height) + 16px)',
                                 }}
                             >
                                 {/* Parts */}
