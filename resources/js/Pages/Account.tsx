@@ -763,7 +763,7 @@ export default function Account(props: AccountPageProps) {
                         Open-source pattern management for makers
                     </p>
                     <a
-                        href="https://github.com/balfiere/rowcounter"
+                        href="https://github.com/koikurasu/senn"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="border-border hover:bg-foreground hover:text-background flex w-full items-center justify-between border px-4 py-3 text-sm tracking-wider uppercase transition-all duration-300"
