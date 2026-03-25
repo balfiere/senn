@@ -19,6 +19,7 @@ import {
 import {
     resetStopwatchLocally,
     toggleStopwatchLocally,
+    updateProjectLocally,
 } from '@/lib/offline/repositories/projects';
 import { Part, PdfAnnotation, Project } from '@/types';
 
@@ -172,6 +173,10 @@ export default function Show({
         }
     };
 
+    const handleRenameProject = async (name: string) => {
+        await updateProjectLocally(project.id, { name });
+    };
+
     const handlePdfUpload = () => {
         // Force a complete refresh of the PDF viewer
         setRefreshTrigger((prev) => prev + 1);
@@ -265,6 +270,7 @@ export default function Show({
                     isStopwatchRunning={project.stopwatch_running}
                     onToggleStopwatch={handleToggleStopwatch}
                     onResetStopwatch={handleResetStopwatch}
+                    onRenameProject={handleRenameProject}
                     onPdfUpload={handlePdfUpload}
                 />
                 <main

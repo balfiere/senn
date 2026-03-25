@@ -4,6 +4,7 @@ import {
     Clock,
     FileText,
     MoreHorizontal,
+    Pencil,
     Plus,
     Trash2,
     User,
@@ -38,7 +39,7 @@ import {
 import { FormField } from '@/Components/ui/form-field';
 import { Input } from '@/Components/ui/input';
 import { db, type LocalProject } from '@/lib/offline/db';
-import { deleteProjectLocally } from '@/lib/offline/repositories/projects';
+import { deleteProjectLocally, updateProjectLocally } from '@/lib/offline/repositories/projects';
 import { cn } from '@/lib/utils';
 
 // Use LocalProject type which matches our DB schema
@@ -171,6 +172,98 @@ function CreateProjectDialog() {
     );
 }
 
+function RenameProjectDialog({
+    project,
+    open,
+    onOpenChange,
+}: {
+    project: Project;
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+}) {
+    const [name, setName] = useState(project.name);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!name.trim() || name.trim() === project.name) {
+            onOpenChange(false);
+            return;
+        }
+
+        setIsSubmitting(true);
+        setErrors({});
+
+        try {
+            await updateProjectLocally(project.id, { name: name.trim() });
+
+            router.post(
+                route('projects.update', project.id),
+                { _method: 'PATCH', name: name.trim() },
+                {
+                    preserveScroll: true,
+                    onSuccess: () => onOpenChange(false),
+                    onError: (err) => setErrors(err),
+                    onFinish: () => setIsSubmitting(false),
+                },
+            );
+        } catch (error) {
+            console.error('Failed to rename project:', error);
+            setIsSubmitting(false);
+        }
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="rounded-none sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle className="text-xl font-light tracking-tight">
+                        Rename Project
+                    </DialogTitle>
+                    <DialogDescription className="text-sm tracking-wide">
+                        Enter a new name for &ldquo;{project.name}&rdquo;.
+                    </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="grid gap-5">
+                    <FormField
+                        label="Project Name"
+                        error={errors.name}
+                        required
+                    >
+                        <Input
+                            name="name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            autoFocus
+                            required
+                        />
+                    </FormField>
+                    <DialogFooter className="mt-2">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => onOpenChange(false)}
+                            className="rounded-none"
+                            disabled={isSubmitting}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="rounded-none"
+                        >
+                            {isSubmitting ? 'Saving...' : 'Save'}
+                        </Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+
 function AccountButton() {
     return (
         <Button
@@ -196,6 +289,7 @@ function ProjectCard({
     handleDelete: (id: string) => void;
     deletingId: string | null;
 }) {
+    const [renameOpen, setRenameOpen] = useState(false);
     const [displaySeconds, setDisplaySeconds] = useState(
         project.stopwatch_seconds,
     );
@@ -265,6 +359,15 @@ function ProjectCard({
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setRenameOpen(true);
+                                }}
+                            >
+                                <Pencil className="mr-2 h-4 w-4" />
+                                Rename
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
                                 variant="destructive"
                                 onClick={(e) => {
                                     e.preventDefault();
@@ -309,6 +412,11 @@ function ProjectCard({
                     )}
                 </div>
             </CardContent>
+            <RenameProjectDialog
+                project={project}
+                open={renameOpen}
+                onOpenChange={setRenameOpen}
+            />
         </Card>
     );
 }

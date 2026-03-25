@@ -179,3 +179,61 @@ describe('Project Policy', function () {
         $response->assertForbidden();
     });
 });
+
+describe('Project Rename', function () {
+    it('renames a project successfully', function () {
+        $project = $this->user->projects()->create(['name' => 'Old Name']);
+
+        $response = $this->patch(route('projects.update', $project), [
+            'name' => 'New Name',
+        ]);
+
+        $response->assertRedirect();
+
+        $project->refresh();
+        expect($project->name)->toBe('New Name');
+    });
+
+    it('persists the new name in the database', function () {
+        $project = $this->user->projects()->create(['name' => 'Before']);
+
+        $this->patch(route('projects.update', $project), ['name' => 'After']);
+
+        expect(Project::find($project->id)->name)->toBe('After');
+    });
+
+    it('prevents another user from renaming a project', function () {
+        $otherUser = User::factory()->create();
+        $project = $otherUser->projects()->create(['name' => 'Their Project']);
+
+        $response = $this->patch(route('projects.update', $project), [
+            'name' => 'Hacked Name',
+        ]);
+
+        $response->assertForbidden();
+        $project->refresh();
+        expect($project->name)->toBe('Their Project');
+    });
+
+    it('rejects an empty name', function () {
+        $project = $this->user->projects()->create(['name' => 'Valid Name']);
+
+        $response = $this->patch(route('projects.update', $project), [
+            'name' => '',
+        ]);
+
+        $response->assertSessionHasErrors('name');
+        $project->refresh();
+        expect($project->name)->toBe('Valid Name');
+    });
+
+    it('rejects a name that exceeds 255 characters', function () {
+        $project = $this->user->projects()->create(['name' => 'Short Name']);
+
+        $response = $this->patch(route('projects.update', $project), [
+            'name' => str_repeat('a', 256),
+        ]);
+
+        $response->assertSessionHasErrors('name');
+    });
+});

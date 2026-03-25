@@ -21,6 +21,7 @@ interface ProjectSidebarProps {
     isStopwatchRunning: boolean;
     onToggleStopwatch: () => void;
     onResetStopwatch: () => void;
+    onRenameProject: (name: string) => void;
     onPdfUpload: (url: string | null) => void;
 }
 

@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
-import { Home, PanelLeftClose, Plus, Trash2, Upload } from 'lucide-react';
+import { Check, Home, PanelLeftClose, Pencil, Plus, Trash2, Upload, X } from 'lucide-react';
+import { useState } from 'react';
 
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -25,6 +26,7 @@ interface DesktopSidebarViewProps {
     isStopwatchRunning: boolean;
     onToggleStopwatch: () => void;
     onResetStopwatch: () => void;
+    onRenameProject: (name: string) => void;
     isCollapsed: boolean;
     setIsCollapsed: (collapsed: boolean) => void;
     isUploading: boolean;
@@ -47,12 +49,27 @@ export function DesktopSidebarView({
     isStopwatchRunning,
     onToggleStopwatch,
     onResetStopwatch,
+    onRenameProject,
     isCollapsed,
     setIsCollapsed,
     isUploading,
     handleFileUpload,
     handlePdfDelete,
 }: DesktopSidebarViewProps) {
+    const [isEditingName, setIsEditingName] = useState(false);
+    const [editingName, setEditingName] = useState(project.name);
+
+    const handleSaveName = () => {
+        if (editingName.trim() && editingName.trim() !== project.name) {
+            onRenameProject(editingName.trim());
+        }
+        setIsEditingName(false);
+    };
+
+    const handleCancelName = () => {
+        setEditingName(project.name);
+        setIsEditingName(false);
+    };
     if (isCollapsed) {
         return (
             <aside className="border-border bg-background flex h-screen w-14 flex-col border-r">
@@ -86,20 +103,67 @@ export function DesktopSidebarView({
         <aside className="border-border bg-background flex h-screen w-64 flex-col border-r">
             {/* Header */}
             <div className="border-border flex h-14 shrink-0 items-center justify-between border-b px-5">
-                <h2
-                    className="text-popover-foreground truncate text-sm tracking-[0.15em] uppercase"
-                    title={project.name}
-                >
-                    {project.name}
-                </h2>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setIsCollapsed(true)}
-                    className="text-popover-foreground h-7 w-7 shrink-0"
-                >
-                    <PanelLeftClose className="h-4 w-4" />
-                </Button>
+                {isEditingName ? (
+                    <div className="flex min-w-0 flex-1 items-center gap-1">
+                        <input
+                            value={editingName}
+                            onChange={(e) => setEditingName(e.target.value)}
+                            className="text-popover-foreground w-full bg-transparent text-sm tracking-[0.05em] uppercase outline-none"
+                            autoFocus
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleSaveName();
+                                if (e.key === 'Escape') handleCancelName();
+                            }}
+                        />
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-popover-foreground h-6 w-6 shrink-0"
+                            onClick={handleSaveName}
+                        >
+                            <Check className="h-3 w-3" />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-popover-foreground h-6 w-6 shrink-0"
+                            onClick={handleCancelName}
+                        >
+                            <X className="h-3 w-3" />
+                        </Button>
+                    </div>
+                ) : (
+                    <div className="group flex min-w-0 flex-1 items-center gap-1">
+                        <h2
+                            className="text-popover-foreground truncate text-sm tracking-[0.15em] uppercase"
+                            title={project.name}
+                        >
+                            {project.name}
+                        </h2>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-popover-foreground h-6 w-6 shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
+                            onClick={() => {
+                                setEditingName(project.name);
+                                setIsEditingName(true);
+                            }}
+                            title="Rename project"
+                        >
+                            <Pencil className="h-3 w-3" />
+                        </Button>
+                    </div>
+                )}
+                {!isEditingName && (
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setIsCollapsed(true)}
+                        className="text-popover-foreground h-7 w-7 shrink-0"
+                    >
+                        <PanelLeftClose className="h-4 w-4" />
+                    </Button>
+                )}
             </div>
 
             <ScrollArea className="min-h-0 flex-1">

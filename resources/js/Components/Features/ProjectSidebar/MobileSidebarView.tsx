@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
-import { Home, PanelLeftClose, Plus, Trash2, Upload, X } from 'lucide-react';
+import { Check, Home, PanelLeftClose, Pencil, Plus, Trash2, Upload, X } from 'lucide-react';
+import { useState } from 'react';
 
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -25,6 +26,7 @@ interface MobileSidebarViewProps {
     isStopwatchRunning: boolean;
     onToggleStopwatch: () => void;
     onResetStopwatch: () => void;
+    onRenameProject: (name: string) => void;
     isMobileExpanded: boolean;
     setIsMobileExpanded: (expanded: boolean) => void;
     isUploading: boolean;
@@ -47,12 +49,27 @@ export function MobileSidebarView({
     isStopwatchRunning,
     onToggleStopwatch,
     onResetStopwatch,
+    onRenameProject,
     isMobileExpanded,
     setIsMobileExpanded,
     isUploading,
     handleFileUpload,
     handlePdfDelete,
 }: MobileSidebarViewProps) {
+    const [isEditingName, setIsEditingName] = useState(false);
+    const [editingName, setEditingName] = useState(project.name);
+
+    const handleSaveName = () => {
+        if (editingName.trim() && editingName.trim() !== project.name) {
+            onRenameProject(editingName.trim());
+        }
+        setIsEditingName(false);
+    };
+
+    const handleCancelName = () => {
+        setEditingName(project.name);
+        setIsEditingName(false);
+    };
     return (
         <>
             {/* Bottom Bar */}
@@ -104,17 +121,64 @@ export function MobileSidebarView({
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="border-border flex shrink-0 items-center justify-between border-b p-4">
-                            <h2 className="text-popover-foreground font-medium">
-                                {project.name}
-                            </h2>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => setIsMobileExpanded(false)}
-                                className="text-popover-foreground"
-                            >
-                                <X className="h-5 w-5" />
-                            </Button>
+                            {isEditingName ? (
+                                <div className="flex min-w-0 flex-1 items-center gap-1">
+                                    <input
+                                        value={editingName}
+                                        onChange={(e) => setEditingName(e.target.value)}
+                                        className="text-popover-foreground w-full bg-transparent font-medium outline-none"
+                                        autoFocus
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') handleSaveName();
+                                            if (e.key === 'Escape') handleCancelName();
+                                        }}
+                                    />
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="text-popover-foreground h-7 w-7 shrink-0"
+                                        onClick={handleSaveName}
+                                    >
+                                        <Check className="h-4 w-4" />
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="text-popover-foreground h-7 w-7 shrink-0"
+                                        onClick={handleCancelName}
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            ) : (
+                                <div className="group flex min-w-0 flex-1 items-center gap-1">
+                                    <h2 className="text-popover-foreground truncate font-medium">
+                                        {project.name}
+                                    </h2>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="text-popover-foreground h-7 w-7 shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
+                                        onClick={() => {
+                                            setEditingName(project.name);
+                                            setIsEditingName(true);
+                                        }}
+                                        title="Rename project"
+                                    >
+                                        <Pencil className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            )}
+                            {!isEditingName && (
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => setIsMobileExpanded(false)}
+                                    className="text-popover-foreground"
+                                >
+                                    <X className="h-5 w-5" />
+                                </Button>
+                            )}
                         </div>
 
                         <div className="flex-1 overflow-y-auto overscroll-contain">
